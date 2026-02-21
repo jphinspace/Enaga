@@ -34,20 +34,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(JUCE)
 
-# --- SDL3 -----------------------------------------------------------------
-# SDL3 provides low-level cross-platform audio / video / input access.
-# TODO:C++26  Re-evaluate SDL3 C++ binding situation when upgrading standard.
-FetchContent_Declare(
-    SDL3
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG        release-3.2.0  # keep pinned; bump deliberately
-    GIT_SHALLOW    TRUE
-)
-# Build SDL3 as a shared library; set to ON/OFF to taste.
-set(SDL_SHARED ON  CACHE BOOL "" FORCE)
-set(SDL_STATIC OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(SDL3)
-
 # ---------------------------------------------------------------------------
 # Enaga application target
 # ---------------------------------------------------------------------------
@@ -84,5 +70,4 @@ target_link_libraries(Enaga
         juce::juce_gui_basics    # JUCEApplication, GUI lifecycle
         juce::juce_core          # String, File, Logger, …
         juce::juce_events        # MessageManager, Timer, …
-        SDL3::SDL3               # SDL3 shared library
 )

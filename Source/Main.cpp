@@ -6,7 +6,7 @@
  * Built with C++23.  All areas that benefit from C++26 features are marked
  * with a "TODO:C++26" comment so the eventual migration is straightforward.
  *
- * Supported platforms (via JUCE + SDL3):
+ * Supported platforms (via JUCE):
  *   - macOS, Windows, Linux  (desktop)
  *   - iOS, Android           (mobile – handled by JUCE's platform glue)
  *
@@ -15,15 +15,13 @@
  */
 
 // TODO:C++26  Replace the #include directives below with named module imports
-//             once JUCE, SDL3 and the standard library ship module interfaces:
+//             once JUCE and the standard library ship module interfaces:
 //
 //   import std;               // replaces <iostream>
 //   import juce;              // replaces juce_* module headers
-//   import sdl3;              // replaces <SDL3/SDL.h>
 
 #include <juce_gui_basics/juce_gui_basics.h>   // JUCEApplication, MessageManager
 #include <juce_core/juce_core.h>               // String, Logger
-#include <SDL3/SDL.h>
 
 #include <iostream>                             // std::cout / std::cerr
                                                 // TODO:C++26 → std::print / std::println
@@ -68,21 +66,6 @@ public:
     {
         juce::ignoreUnused(commandLine);
 
-        // ── SDL3 initialisation ────────────────────────────────────────────
-        // SDL_Init() returns bool in SDL3 (was int in SDL2; true == success).
-        // TODO:C++26  std::expected<void, std::string> would model this
-        //             fallible initialisation without an out-of-band error
-        //             channel.
-        if (!SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO))
-        {
-            // TODO:C++26  std::print(std::cerr, "SDL_Init failed: {}\n", …)
-            std::cerr << "SDL_Init failed: " << SDL_GetError() << '\n';
-            quit();
-            return;
-        }
-
-        sdlInitialized = true;
-
         // ── Hello World ────────────────────────────────────────────────────
         // TODO:C++26  Replace with: std::println("Hello World");
         std::cout << "Hello World" << '\n';
@@ -101,11 +84,6 @@ public:
      */
     void shutdown() override
     {
-        if (sdlInitialized)
-        {
-            SDL_Quit();
-            sdlInitialized = false;
-        }
     }
 
     /** OS-level quit request (e.g. Command-Q on macOS, Alt-F4 on Windows). */
@@ -119,12 +97,6 @@ public:
     {
         juce::ignoreUnused(commandLine);
     }
-
-private:
-    // Tracks whether SDL_Init() succeeded so SDL_Quit() is only called on a
-    // matching successful initialisation.
-    // TODO:C++26  If concurrency is introduced, wrap in std::atomic<bool>.
-    bool sdlInitialized = false;
 };
 
 // ============================================================================
