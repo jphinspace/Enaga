@@ -1,18 +1,11 @@
-<!-- Logo 21: Stacked layout – icon above text, centered -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="260">
-  <!-- Bird head -->
-  <circle cx="100" cy="85" r="66" fill="#FFFFFF" stroke="#111" stroke-width="3"/>
-  <path d="M40 73 Q62 8 100 4 Q138 8 160 73 Q128 44 100 42 Q72 44 40 73Z" fill="#111111"/>
-  <circle cx="79" cy="84" r="8.5" fill="#111111"/>
-  <circle cx="82" cy="81" r="2.2" fill="#FFFFFF"/>
-  <circle cx="121" cy="84" r="8.5" fill="#111111"/>
-  <circle cx="124" cy="81" r="2.2" fill="#FFFFFF"/>
-  <path d="M97 99 L100 108 L103 99Z" fill="#111111"/>
-  <!-- Cheeks -->
-  <ellipse cx="67" cy="95" rx="13" ry="8.5" fill="#E8E8E8" opacity="0.7"/>
-  <ellipse cx="133" cy="95" rx="13" ry="8.5" fill="#E8E8E8" opacity="0.7"/>
-  <!-- App name below -->
-  <text x="100" y="180" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="bold" fill="#111111" letter-spacing="5">ENAGA</text>
-  <!-- Subtitle -->
-  <text x="100" y="206" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888888" letter-spacing="4">WHITE NOISE</text>
+<!-- Logo 21: White rounded square, eyes angled slightly (happy expression), beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes slightly angled (happy) -->
+  <circle cx="74" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="77" cy="93" r="3" fill="#FFFFFF"/>
+  <circle cx="126" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="123" cy="93" r="3" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M93 116 L100 126 L107 116Z" fill="#1A1A1A"/>
 </svg>

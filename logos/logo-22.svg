@@ -1,18 +1,11 @@
-<!-- Logo 22: Ink brush / wabi-sabi style – Japanese aesthetic -->
+<!-- Logo 22: White rounded square, thin stroke outline eyes (ring style), thin beak -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <!-- Slightly imperfect circle for ink feel -->
-  <path d="M100 28 C138 26 174 58 175 100 C176 142 145 176 102 177 C59 178 24 146 23 104 C22 62 52 30 100 28Z" fill="#FAFAF8" stroke="#1A1208" stroke-width="4"/>
-  <!-- Cap (brush-stroke style) -->
-  <path d="M35 94 C50 50 72 20 100 18 C128 20 150 50 165 94 C144 64 122 54 100 54 C78 54 56 64 35 94Z" fill="#1A1208"/>
-  <!-- Eyes – ink dots -->
-  <circle cx="78" cy="106" r="8" fill="#1A1208"/>
-  <circle cx="81" cy="103" r="2" fill="#FAFAF8"/>
-  <circle cx="122" cy="106" r="8" fill="#1A1208"/>
-  <circle cx="125" cy="103" r="2" fill="#FAFAF8"/>
-  <!-- Beak - small dash -->
-  <line x1="97" y1="122" x2="103" y2="122" stroke="#1A1208" stroke-width="3" stroke-linecap="round"/>
-  <path d="M97 122 L100 130 L103 122" fill="none" stroke="#1A1208" stroke-width="2.5" stroke-linejoin="round"/>
-  <!-- Red accent dot (Japanese seal-like) -->
-  <circle cx="160" cy="162" r="10" fill="#CC3333"/>
-  <text x="160" y="167" text-anchor="middle" font-family="serif" font-size="10" fill="#FFFFFF">鳥</text>
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Ring-style eyes -->
+  <circle cx="74" cy="96" r="10" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+  <circle cx="74" cy="96" r="3.5" fill="#1A1A1A"/>
+  <circle cx="126" cy="96" r="10" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+  <circle cx="126" cy="96" r="3.5" fill="#1A1A1A"/>
+  <!-- Thin beak outline -->
+  <path d="M93 116 L100 128 L107 116Z" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
 </svg>

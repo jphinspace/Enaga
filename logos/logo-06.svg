@@ -1,19 +1,11 @@
-<!-- Logo 06: Soft blue accent, rounded fluffy style -->
+<!-- Logo 06: Off-white/warm white bg, round square, round eyes, small beak -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <!-- Outer fluff -->
-  <circle cx="100" cy="112" r="80" fill="#E8F4FD"/>
-  <!-- Head -->
-  <circle cx="100" cy="108" r="66" fill="#FFFFFF"/>
-  <!-- Cap -->
-  <path d="M40 94 Q62 28 100 24 Q138 28 160 94 Q128 64 100 62 Q72 64 40 94Z" fill="#2D5FA0"/>
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FDFAF5"/>
   <!-- Eyes -->
-  <circle cx="78" cy="108" r="9" fill="#1A1A2E"/>
-  <circle cx="81" cy="105" r="2.5" fill="#FFFFFF"/>
-  <circle cx="122" cy="108" r="9" fill="#1A1A2E"/>
-  <circle cx="125" cy="105" r="2.5" fill="#FFFFFF"/>
+  <circle cx="74" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="78" cy="92" r="3" fill="#FDFAF5"/>
+  <circle cx="126" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="130" cy="92" r="3" fill="#FDFAF5"/>
   <!-- Beak -->
-  <path d="M97 123 L100 132 L103 123Z" fill="#2D5FA0"/>
-  <!-- Cheeks -->
-  <ellipse cx="66" cy="118" rx="14" ry="9" fill="#B8D9F5" opacity="0.7"/>
-  <ellipse cx="134" cy="118" rx="14" ry="9" fill="#B8D9F5" opacity="0.7"/>
+  <path d="M93 116 L100 128 L107 116Z" fill="#1A1A1A"/>
 </svg>

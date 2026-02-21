@@ -1,15 +1,11 @@
-<!-- Logo 18: Pill/capsule badge with bird icon, horizontal -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100" width="260" height="100">
-  <!-- Pill background -->
-  <rect x="0" y="0" width="260" height="100" rx="50" fill="#111111"/>
-  <!-- Bird head (white on dark) -->
-  <circle cx="50" cy="50" r="38" fill="#FFFFFF"/>
-  <path d="M14 44 Q30 8 50 5 Q70 8 86 44 Q64 26 50 25 Q36 26 14 44Z" fill="#111111"/>
-  <circle cx="35" cy="53" r="6" fill="#111111"/>
-  <circle cx="38" cy="50" r="1.8" fill="#FFFFFF"/>
-  <circle cx="65" cy="53" r="6" fill="#111111"/>
-  <circle cx="68" cy="50" r="1.8" fill="#FFFFFF"/>
-  <path d="M47 66 L50 74 L53 66Z" fill="#111111"/>
-  <!-- App name -->
-  <text x="106" y="58" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="500" fill="#FFFFFF" letter-spacing="4">enaga</text>
+<!-- Logo 18: White rounded square, almond-shaped eyes, small beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Almond eyes -->
+  <ellipse cx="74" cy="97" rx="12" ry="9" fill="#1A1A1A"/>
+  <circle cx="78" cy="94" r="3" fill="#FFFFFF"/>
+  <ellipse cx="126" cy="97" rx="12" ry="9" fill="#1A1A1A"/>
+  <circle cx="130" cy="94" r="3" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M93 116 L100 128 L107 116Z" fill="#1A1A1A"/>
 </svg>

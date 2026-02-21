@@ -1,16 +1,11 @@
-<!-- Logo 03: Geometric / flat design Shima Enaga, navy & white -->
+<!-- Logo 03: White rounded square, larger rounder eyes, wider beak -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <!-- Background circle -->
-  <circle cx="100" cy="100" r="90" fill="#1C2B4A"/>
-  <!-- Head circle -->
-  <circle cx="100" cy="108" r="62" fill="#FFFFFF"/>
-  <!-- Cap – flat geometric -->
-  <polygon points="38,100 100,40 162,100 130,80 100,72 70,80" fill="#1C2B4A"/>
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
   <!-- Eyes -->
-  <circle cx="80" cy="108" r="8" fill="#1C2B4A"/>
-  <circle cx="83" cy="105" r="2" fill="#FFFFFF"/>
-  <circle cx="120" cy="108" r="8" fill="#1C2B4A"/>
-  <circle cx="123" cy="105" r="2" fill="#FFFFFF"/>
-  <!-- Beak -->
-  <polygon points="97,122 100,131 103,122" fill="#1C2B4A"/>
+  <circle cx="72" cy="96" r="13" fill="#1A1A1A"/>
+  <circle cx="77" cy="91" r="4" fill="#FFFFFF"/>
+  <circle cx="128" cy="96" r="13" fill="#1A1A1A"/>
+  <circle cx="133" cy="91" r="4" fill="#FFFFFF"/>
+  <!-- Beak (wider) -->
+  <path d="M90 118 L100 132 L110 118Z" fill="#1A1A1A"/>
 </svg>

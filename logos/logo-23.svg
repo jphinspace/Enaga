@@ -1,22 +1,11 @@
-<!-- Logo 23: Negative space – bird silhouette cut from colored circle -->
+<!-- Logo 23: White rounded square, eyes set lower (cuter proportions), beak -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <defs>
-    <mask id="birdMask">
-      <rect width="200" height="200" fill="white"/>
-      <!-- Head cutout -->
-      <circle cx="100" cy="108" r="64" fill="black"/>
-      <!-- Cap filled back white (so cap shows as circle color) -->
-      <path d="M42 96 Q64 32 100 28 Q136 32 158 96 Q128 66 100 64 Q72 66 42 96Z" fill="white"/>
-      <!-- Eye cutouts -->
-      <circle cx="79" cy="106" r="8" fill="white"/>
-      <circle cx="121" cy="106" r="8" fill="white"/>
-      <!-- Eye shine back black -->
-      <circle cx="82" cy="103" r="2" fill="black"/>
-      <circle cx="124" cy="103" r="2" fill="black"/>
-      <!-- Beak cutout -->
-      <path d="M97 121 L100 130 L103 121Z" fill="white"/>
-    </mask>
-  </defs>
-  <!-- Colored circle with mask applied -->
-  <circle cx="100" cy="100" r="96" fill="#2A5298" mask="url(#birdMask)"/>
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes (lower center) -->
+  <circle cx="74" cy="104" r="10" fill="#1A1A1A"/>
+  <circle cx="78" cy="100" r="3" fill="#FFFFFF"/>
+  <circle cx="126" cy="104" r="10" fill="#1A1A1A"/>
+  <circle cx="130" cy="100" r="3" fill="#FFFFFF"/>
+  <!-- Beak (lower) -->
+  <path d="M93 122 L100 134 L107 122Z" fill="#1A1A1A"/>
 </svg>

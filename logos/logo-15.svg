@@ -1,13 +1,11 @@
-<!-- Logo 15: Outlined wordmark with bird glyph, sans-serif -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 100" width="340" height="100">
-  <!-- Bird glyph (small) -->
-  <circle cx="46" cy="50" r="38" fill="#FFFFFF" stroke="#0F0F0F" stroke-width="2.5"/>
-  <path d="M12 44 Q28 6 46 4 Q64 6 80 44 Q60 28 46 27 Q32 28 12 44Z" fill="#0F0F0F"/>
-  <circle cx="32" cy="52" r="5.5" fill="#0F0F0F"/>
-  <circle cx="34" cy="50" r="1.5" fill="#FFFFFF"/>
-  <circle cx="60" cy="52" r="5.5" fill="#0F0F0F"/>
-  <circle cx="62" cy="50" r="1.5" fill="#FFFFFF"/>
-  <path d="M43 63 L46 70 L49 63Z" fill="#0F0F0F"/>
-  <!-- Text -->
-  <text x="100" y="62" font-family="'Helvetica Neue', Arial, sans-serif" font-size="42" font-weight="300" fill="#0F0F0F" letter-spacing="6">enaga</text>
+<!-- Logo 15: White rounded square, wider eye gap, narrow beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes (wider gap) -->
+  <circle cx="66" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="70" cy="92" r="3" fill="#FFFFFF"/>
+  <circle cx="134" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="138" cy="92" r="3" fill="#FFFFFF"/>
+  <!-- Narrow beak -->
+  <path d="M96 116 L100 126 L104 116Z" fill="#1A1A1A"/>
 </svg>

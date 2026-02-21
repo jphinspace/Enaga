@@ -1,16 +1,9 @@
-<!-- Logo 04: Line-art style, single stroke weight, minimal -->
+<!-- Logo 04: White rounded square, eyes higher up, tiny beak, more open spacing -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <!-- Head outline -->
-  <circle cx="100" cy="110" r="68" fill="none" stroke="#222222" stroke-width="3.5"/>
-  <!-- Cap outline -->
-  <path d="M42 96 Q65 32 100 28 Q135 32 158 96 Q128 70 100 68 Q72 70 42 96Z" fill="none" stroke="#222222" stroke-width="3.5" stroke-linejoin="round"/>
-  <!-- Cap fill -->
-  <path d="M42 96 Q65 32 100 28 Q135 32 158 96 Q128 70 100 68 Q72 70 42 96Z" fill="#222222"/>
-  <!-- Eyes (ring style) -->
-  <circle cx="78" cy="110" r="9" fill="none" stroke="#222222" stroke-width="3"/>
-  <circle cx="78" cy="110" r="3" fill="#222222"/>
-  <circle cx="122" cy="110" r="9" fill="none" stroke="#222222" stroke-width="3"/>
-  <circle cx="122" cy="110" r="3" fill="#222222"/>
-  <!-- Beak -->
-  <path d="M96 125 L100 134 L104 125" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes (placed higher) -->
+  <circle cx="74" cy="88" r="10" fill="#1A1A1A"/>
+  <circle cx="126" cy="88" r="10" fill="#1A1A1A"/>
+  <!-- Beak (lower, more space) -->
+  <path d="M93 112 L100 124 L107 112Z" fill="#1A1A1A"/>
 </svg>
