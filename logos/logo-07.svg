@@ -1,0 +1,19 @@
+<!-- Logo 07: Dark mode / inverse – white on dark bg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <rect width="200" height="200" rx="20" fill="#1A1A2E"/>
+  <!-- Head -->
+  <circle cx="100" cy="110" r="68" fill="#FFFFFF"/>
+  <!-- Cap -->
+  <path d="M40 96 Q62 30 100 26 Q138 30 160 96 Q130 68 100 66 Q70 68 40 96Z" fill="#1A1A2E"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="110" r="9" fill="#1A1A2E"/>
+  <circle cx="81" cy="107" r="2.5" fill="#FFFFFF"/>
+  <circle cx="122" cy="110" r="9" fill="#1A1A2E"/>
+  <circle cx="125" cy="107" r="2.5" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M97 125 L100 134 L103 125Z" fill="#1A1A2E"/>
+  <!-- Cheeks (subtle) -->
+  <ellipse cx="66" cy="120" rx="14" ry="9" fill="#D0D0E8" opacity="0.5"/>
+  <ellipse cx="134" cy="120" rx="14" ry="9" fill="#D0D0E8" opacity="0.5"/>
+</svg>

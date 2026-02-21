@@ -1,0 +1,25 @@
+<!-- Logo 24: Warm sunset gradient – orange to deep pink -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bg24" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF8C42"/>
+      <stop offset="100%" stop-color="#C83E6A"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square bg -->
+  <rect x="0" y="0" width="200" height="200" rx="44" fill="url(#bg24)"/>
+  <!-- Head -->
+  <circle cx="100" cy="110" r="70" fill="#FFFFFF"/>
+  <!-- Cap (deep warm dark) -->
+  <path d="M36 98 Q58 32 100 28 Q142 32 164 98 Q132 68 100 66 Q68 68 36 98Z" fill="#2A1020"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="110" r="9" fill="#2A1020"/>
+  <circle cx="82" cy="106" r="2.5" fill="#FFFFFF"/>
+  <circle cx="122" cy="110" r="9" fill="#2A1020"/>
+  <circle cx="126" cy="106" r="2.5" fill="#FFFFFF"/>
+  <!-- Beak warm -->
+  <path d="M97 126 L100 135 L103 126Z" fill="#FF8C42"/>
+  <!-- Cheeks warm -->
+  <ellipse cx="66" cy="121" rx="14" ry="9" fill="#FFD0B8" opacity="0.6"/>
+  <ellipse cx="134" cy="121" rx="14" ry="9" fill="#FFD0B8" opacity="0.6"/>
+</svg>

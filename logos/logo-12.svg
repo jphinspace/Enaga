@@ -1,0 +1,19 @@
+<!-- Logo 12: Soft lavender palette, rounded square frame -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Rounded square background -->
+  <rect x="4" y="4" width="192" height="192" rx="40" fill="#6B5EA8"/>
+  <!-- Head -->
+  <circle cx="100" cy="108" r="68" fill="#FEFEFE"/>
+  <!-- Cap -->
+  <path d="M38 95 Q60 28 100 24 Q140 28 162 95 Q130 64 100 62 Q70 64 38 95Z" fill="#6B5EA8"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="108" r="9" fill="#3D3560"/>
+  <circle cx="81" cy="105" r="2.5" fill="#FFFFFF"/>
+  <circle cx="122" cy="108" r="9" fill="#3D3560"/>
+  <circle cx="125" cy="105" r="2.5" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M97 123 L100 132 L103 123Z" fill="#6B5EA8"/>
+  <!-- Cheeks -->
+  <ellipse cx="66" cy="119" rx="15" ry="10" fill="#C4B8E8" opacity="0.6"/>
+  <ellipse cx="134" cy="119" rx="15" ry="10" fill="#C4B8E8" opacity="0.6"/>
+</svg>

@@ -1,0 +1,14 @@
+<!-- Logo 05: Enaga with text, clean wordmark style -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160" width="320" height="160">
+  <!-- Icon: bird head -->
+  <circle cx="70" cy="72" r="54" fill="#FFFFFF" stroke="#111111" stroke-width="3"/>
+  <path d="M24 66 Q44 18 70 15 Q96 18 116 66 Q90 48 70 46 Q50 48 24 66Z" fill="#111111"/>
+  <circle cx="52" cy="76" r="7.5" fill="#111111"/>
+  <circle cx="55" cy="73" r="2" fill="#FFFFFF"/>
+  <circle cx="88" cy="76" r="7.5" fill="#111111"/>
+  <circle cx="91" cy="73" r="2" fill="#FFFFFF"/>
+  <path d="M67 90 L70 98 L73 90Z" fill="#111111"/>
+  <!-- Text: ENAGA -->
+  <text x="140" y="80" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#111111" letter-spacing="4">ENAGA</text>
+  <text x="142" y="104" font-family="Georgia, serif" font-size="13" fill="#555555" letter-spacing="6">white noise</text>
+</svg>

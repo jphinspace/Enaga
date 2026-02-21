@@ -1,0 +1,22 @@
+<!-- Logo 23: Negative space – bird silhouette cut from colored circle -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <mask id="birdMask">
+      <rect width="200" height="200" fill="white"/>
+      <!-- Head cutout -->
+      <circle cx="100" cy="108" r="64" fill="black"/>
+      <!-- Cap filled back white (so cap shows as circle color) -->
+      <path d="M42 96 Q64 32 100 28 Q136 32 158 96 Q128 66 100 64 Q72 66 42 96Z" fill="white"/>
+      <!-- Eye cutouts -->
+      <circle cx="79" cy="106" r="8" fill="white"/>
+      <circle cx="121" cy="106" r="8" fill="white"/>
+      <!-- Eye shine back black -->
+      <circle cx="82" cy="103" r="2" fill="black"/>
+      <circle cx="124" cy="103" r="2" fill="black"/>
+      <!-- Beak cutout -->
+      <path d="M97 121 L100 130 L103 121Z" fill="white"/>
+    </mask>
+  </defs>
+  <!-- Colored circle with mask applied -->
+  <circle cx="100" cy="100" r="96" fill="#2A5298" mask="url(#birdMask)"/>
+</svg>

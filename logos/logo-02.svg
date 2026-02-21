@@ -1,0 +1,18 @@
+<!-- Logo 02: Soft pastel Shima Enaga face with pink cheeks -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Head (round white, soft shadow) -->
+  <circle cx="100" cy="108" r="74" fill="#FAFAFA" stroke="#C8C8C8" stroke-width="2"/>
+  <!-- Dark cap -->
+  <path d="M36 92 Q58 26 100 23 Q142 26 164 92 Q132 66 100 64 Q68 66 36 92Z" fill="#2C2C2C"/>
+  <!-- Pink cheeks -->
+  <ellipse cx="68" cy="118" rx="16" ry="11" fill="#FFB3C1" opacity="0.6"/>
+  <ellipse cx="132" cy="118" rx="16" ry="11" fill="#FFB3C1" opacity="0.6"/>
+  <!-- Left eye -->
+  <circle cx="78" cy="106" r="9" fill="#2C2C2C"/>
+  <circle cx="81" cy="103" r="2.5" fill="#FFFFFF"/>
+  <!-- Right eye -->
+  <circle cx="122" cy="106" r="9" fill="#2C2C2C"/>
+  <circle cx="125" cy="103" r="2.5" fill="#FFFFFF"/>
+  <!-- Tiny beak -->
+  <path d="M97 122 L100 130 L103 122Z" fill="#E08070"/>
+</svg>

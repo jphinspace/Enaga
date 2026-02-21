@@ -1,0 +1,19 @@
+<!-- Logo 11: Hexagon frame with bird face inside -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Hexagon background -->
+  <polygon points="100,8 182,54 182,146 100,192 18,146 18,54" fill="#2C2C2C"/>
+  <!-- Head -->
+  <circle cx="100" cy="104" r="62" fill="#FFFFFF"/>
+  <!-- Cap -->
+  <path d="M44 92 Q66 30 100 26 Q134 30 156 92 Q126 64 100 62 Q74 64 44 92Z" fill="#2C2C2C"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="104" r="8.5" fill="#2C2C2C"/>
+  <circle cx="81" cy="101" r="2.2" fill="#FFFFFF"/>
+  <circle cx="122" cy="104" r="8.5" fill="#2C2C2C"/>
+  <circle cx="125" cy="101" r="2.2" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M97 119 L100 128 L103 119Z" fill="#2C2C2C"/>
+  <!-- Cheeks -->
+  <ellipse cx="66" cy="114" rx="13" ry="8" fill="#E8E8E8" opacity="0.6"/>
+  <ellipse cx="134" cy="114" rx="13" ry="8" fill="#E8E8E8" opacity="0.6"/>
+</svg>

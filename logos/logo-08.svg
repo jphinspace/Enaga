@@ -1,0 +1,20 @@
+<!-- Logo 08: Chibi style – very large round face, tiny beak, big eyes -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Head (very round, large) -->
+  <circle cx="100" cy="105" r="80" fill="#FFFEF8"/>
+  <circle cx="100" cy="105" r="80" fill="none" stroke="#222" stroke-width="3"/>
+  <!-- Cap (soft curve) -->
+  <path d="M20 95 Q40 15 100 10 Q160 15 180 95 Q146 55 100 52 Q54 55 20 95Z" fill="#222222"/>
+  <!-- Fluffy cheeks -->
+  <circle cx="56" cy="118" r="20" fill="#FFE4E8" opacity="0.7"/>
+  <circle cx="144" cy="118" r="20" fill="#FFE4E8" opacity="0.7"/>
+  <!-- Eyes (big & cute) -->
+  <circle cx="76" cy="108" r="14" fill="#222222"/>
+  <circle cx="82" cy="103" r="4" fill="#FFFFFF"/>
+  <circle cx="84" cy="101" r="2" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="124" cy="108" r="14" fill="#222222"/>
+  <circle cx="130" cy="103" r="4" fill="#FFFFFF"/>
+  <circle cx="132" cy="101" r="2" fill="#FFFFFF" opacity="0.6"/>
+  <!-- Tiny beak -->
+  <ellipse cx="100" cy="130" rx="5" ry="4" fill="#E0A090"/>
+</svg>

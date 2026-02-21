@@ -1,0 +1,19 @@
+<!-- Logo 01: Classic minimal round Shima Enaga face, black & white -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Head (round white) -->
+  <circle cx="100" cy="110" r="72" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="4"/>
+  <!-- Dark cap -->
+  <path d="M38 90 Q60 28 100 25 Q140 28 162 90 Q130 68 100 66 Q70 68 38 90Z" fill="#1A1A1A"/>
+  <!-- Left eye -->
+  <circle cx="76" cy="108" r="10" fill="#1A1A1A"/>
+  <circle cx="79" cy="105" r="3" fill="#FFFFFF"/>
+  <!-- Right eye -->
+  <circle cx="124" cy="108" r="10" fill="#1A1A1A"/>
+  <circle cx="127" cy="105" r="3" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M96 124 L100 134 L104 124Z" fill="#1A1A1A"/>
+  <!-- Cheek fluff left -->
+  <ellipse cx="62" cy="120" rx="14" ry="10" fill="#F0F0F0" stroke="#1A1A1A" stroke-width="2"/>
+  <!-- Cheek fluff right -->
+  <ellipse cx="138" cy="120" rx="14" ry="10" fill="#F0F0F0" stroke="#1A1A1A" stroke-width="2"/>
+</svg>

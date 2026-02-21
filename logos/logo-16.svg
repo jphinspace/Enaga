@@ -1,0 +1,19 @@
+<!-- Logo 16: Teal accent – fresh & modern -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="96" fill="#E5F5F4"/>
+  <!-- Head -->
+  <circle cx="100" cy="108" r="66" fill="#FFFFFF"/>
+  <!-- Cap -->
+  <path d="M40 96 Q62 30 100 26 Q138 30 160 96 Q128 66 100 64 Q72 66 40 96Z" fill="#1A8C8C"/>
+  <!-- Cheeks teal light -->
+  <ellipse cx="68" cy="118" rx="14" ry="9" fill="#80CCCC" opacity="0.5"/>
+  <ellipse cx="132" cy="118" rx="14" ry="9" fill="#80CCCC" opacity="0.5"/>
+  <!-- Eyes -->
+  <circle cx="79" cy="107" r="8.5" fill="#0D5C5C"/>
+  <circle cx="82" cy="104" r="2.2" fill="#FFFFFF"/>
+  <circle cx="121" cy="107" r="8.5" fill="#0D5C5C"/>
+  <circle cx="124" cy="104" r="2.2" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M97 122 L100 131 L103 122Z" fill="#1A8C8C"/>
+</svg>

@@ -1,0 +1,15 @@
+<!-- Logo 13: Ultra minimal – just outlines, two colors only -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Head outline only -->
+  <circle cx="100" cy="110" r="70" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="4"/>
+  <!-- Cap (filled, no stroke on edges) -->
+  <path d="M36 98 Q56 30 100 26 Q144 30 164 98 Q134 68 100 66 Q66 68 36 98Z" fill="#1A1A1A"/>
+  <!-- Eyes – simple dots -->
+  <circle cx="78" cy="112" r="7" fill="#1A1A1A"/>
+  <circle cx="122" cy="112" r="7" fill="#1A1A1A"/>
+  <!-- Shine dots -->
+  <circle cx="81" cy="109" r="2" fill="#FFFFFF"/>
+  <circle cx="125" cy="109" r="2" fill="#FFFFFF"/>
+  <!-- Beak – tiny triangle -->
+  <path d="M97 126 L100 134 L103 126Z" fill="#1A1A1A"/>
+</svg>

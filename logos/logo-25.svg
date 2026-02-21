@@ -1,0 +1,31 @@
+<!-- Logo 25: Masterpiece – refined, polished version with all elements balanced -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="headGlow" cx="48%" cy="46%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F0F4FA"/>
+    </radialGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#1A3050" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <circle cx="100" cy="100" r="96" fill="#EDF2F8"/>
+  <!-- Head with glow -->
+  <circle cx="100" cy="109" r="70" fill="url(#headGlow)" filter="url(#softShadow)"/>
+  <!-- Cap – refined curve -->
+  <path d="M36 97 C52 42 72 24 100 22 C128 24 148 42 164 97 C140 64 120 58 100 57 C80 58 60 64 36 97Z" fill="#1A3050"/>
+  <!-- Left eye -->
+  <circle cx="78" cy="109" r="9.5" fill="#1A3050"/>
+  <circle cx="82" cy="105" r="3" fill="#FFFFFF"/>
+  <circle cx="84" cy="103.5" r="1.2" fill="#FFFFFF" opacity="0.7"/>
+  <!-- Right eye -->
+  <circle cx="122" cy="109" r="9.5" fill="#1A3050"/>
+  <circle cx="126" cy="105" r="3" fill="#FFFFFF"/>
+  <circle cx="128" cy="103.5" r="1.2" fill="#FFFFFF" opacity="0.7"/>
+  <!-- Cheeks – soft pink blush -->
+  <ellipse cx="65" cy="120" rx="15" ry="10" fill="#FFB8C8" opacity="0.45"/>
+  <ellipse cx="135" cy="120" rx="15" ry="10" fill="#FFB8C8" opacity="0.45"/>
+  <!-- Beak -->
+  <path d="M97 125 L100 135 L103 125Z" fill="#1A3050"/>
+</svg>
