@@ -1,7 +1,10 @@
 /**
  * @file   Main.cpp
  * @brief  Enaga – Relaxing White Noise Generator
- *         Application skeleton
+ *
+ * Generates white noise via JUCE's audio-device API while the application is
+ * running.  Audio stops automatically when the app is closed.  Perceived
+ * volume is governed entirely by the platform (OS) volume control.
  *
  * Built with C++23.  All areas that benefit from C++26 features are marked
  * with a "TODO:C++26" comment so the eventual migration is straightforward.
@@ -20,11 +23,82 @@
 //   import std;               // replaces <iostream>
 //   import juce;              // replaces juce_* module headers
 
-#include <juce_gui_basics/juce_gui_basics.h>   // JUCEApplication, MessageManager
-#include <juce_core/juce_core.h>               // String, Logger
+#include <juce_audio_devices/juce_audio_devices.h>  // AudioDeviceManager, AudioSourcePlayer
+#include <juce_gui_basics/juce_gui_basics.h>         // JUCEApplication, DocumentWindow
+#include <juce_core/juce_core.h>                     // String, Logger, Random
 
-#include <iostream>                             // std::cout / std::cerr
-                                                // TODO:C++26 → std::print / std::println
+// ============================================================================
+//  WhiteNoiseAudioSource
+// ============================================================================
+
+/**
+ * Fills every audio buffer with uniformly distributed random samples in
+ * [-1, 1], producing flat-spectrum (white) noise.
+ *
+ * Output amplitude is at full scale; the OS/hardware volume control governs
+ * the perceived loudness — no application-side gain stage is required.
+ */
+class WhiteNoiseAudioSource final : public juce::AudioSource
+{
+public:
+    void prepareToPlay(int /*samplesPerBlockExpected*/, double /*sampleRate*/) override {}
+    void releaseResources() override {}
+
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override
+    {
+        for (int ch = 0; ch < info.buffer->getNumChannels(); ++ch)
+        {
+            auto* out = info.buffer->getWritePointer(ch, info.startSample);
+            for (int i = 0; i < info.numSamples; ++i)
+                out[i] = random.nextFloat() * 2.0f - 1.0f;
+        }
+    }
+
+private:
+    juce::Random random;  // PRNG seeded from system entropy at construction
+};
+
+// ============================================================================
+//  MainWindow
+// ============================================================================
+
+/**
+ * Single application window.
+ *
+ * Keeping a window open is what keeps the JUCE event loop (and therefore the
+ * audio stream) running.  Closing the window triggers a clean exit via
+ * systemRequestedQuit(), which calls shutdown() before the process exits.
+ */
+class MainWindow final : public juce::DocumentWindow
+{
+public:
+    explicit MainWindow(const juce::String& name)
+        : DocumentWindow(name,
+                         juce::Desktop::getInstance().getDefaultLookAndFeel()
+                             .findColour(juce::ResizableWindow::backgroundColourId),
+                         DocumentWindow::allButtons)
+    {
+        setUsingNativeTitleBar(true);
+        setResizable(true, false);
+
+        auto* label = new juce::Label(
+            "status",
+            "White noise is playing.\nUse your system volume to adjust loudness.");
+        label->setFont(juce::Font(18.0f));
+        label->setJustificationType(juce::Justification::centred);
+        label->setSize(400, 120);
+        setContentOwned(label, true);
+
+        centreWithSize(getWidth(), getHeight());
+        setVisible(true);
+    }
+
+    /** Closing the window exits the application cleanly. */
+    void closeButtonPressed() override
+    {
+        juce::JUCEApplication::getInstance()->systemRequestedQuit();
+    }
+};
 
 // ============================================================================
 //  EnagaApplication
@@ -38,6 +112,10 @@
  * lifecycle is driven by the OS (UIApplicationDelegate on iOS,
  * android.app.Activity on Android); JUCE abstracts this behind the same
  * JUCEApplication interface used on the desktop.
+ *
+ * Audio lifetime mirrors application lifetime:
+ *   initialise() → open default audio device, begin streaming white noise
+ *   shutdown()   → stop the stream, release the device
  *
  * TODO:C++26  'final' is already C++11, but once reflection lands in C++26
  *             consider annotating with [[clang::trivially_relocatable]] or the
@@ -58,32 +136,53 @@ public:
     /**
      * Called by JUCE after all platform initialisation is complete.
      *
+     * Opens the default audio output device (CoreAudio / WASAPI / ALSA,
+     * depending on the platform) and begins streaming white noise.
+     *
      * @param commandLine  Space-separated command-line arguments provided by
-     *                     the platform.  Unused in this skeleton.
+     *                     the platform.  Unused here.
      *                     TODO:C++26  Prefer std::span<std::string_view>.
      */
     void initialise(const juce::String& commandLine) override
     {
         juce::ignoreUnused(commandLine);
 
-        // ── Hello World ────────────────────────────────────────────────────
-        // TODO:C++26  Replace with: std::println("Hello World");
-        std::cout << "Hello World" << '\n';
+        // Show the main window first so the event loop stays alive even if
+        // audio initialisation fails.
+        mainWindow = std::make_unique<MainWindow>(getApplicationName());
 
-        // ── Clean exit ─────────────────────────────────────────────────────
-        // quit() posts a quit message to JUCE's event loop; shutdown() is
-        // called before the process exits (see below).
-        // TODO:C++26  C++26 structured concurrency (std::execution) may
-        //             provide a cleaner async-shutdown pattern here.
-        quit();
+        // Open the platform's default audio output device (stereo, no input).
+        // AudioDeviceManager automatically honours the OS volume control.
+        const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);
+        if (error.isNotEmpty())
+        {
+            juce::Logger::writeToLog("Audio device error: " + error);
+            juce::AlertWindow::showMessageBoxAsync(
+                juce::MessageBoxIconType::WarningIcon,
+                "Audio Error",
+                "Could not open the audio device:\n\n" + error
+                    + "\n\nClose and re-open the application after checking "
+                      "your audio settings.",
+                "OK");
+            return;
+        }
+
+        // Connect: noiseSource → sourcePlayer → deviceManager.
+        sourcePlayer.setSource(&noiseSource);
+        deviceManager.addAudioCallback(&sourcePlayer);
     }
 
     /**
      * Called by JUCE just before the application process exits.
-     * All resource teardown belongs here to guarantee symmetric init/shutdown.
+     * Tears down audio in the reverse order of initialise() to avoid
+     * use-after-free on the audio thread.
      */
     void shutdown() override
     {
+        mainWindow.reset();
+        deviceManager.removeAudioCallback(&sourcePlayer);
+        sourcePlayer.setSource(nullptr);
+        deviceManager.closeAudioDevice();
     }
 
     /** OS-level quit request (e.g. Command-Q on macOS, Alt-F4 on Windows). */
@@ -97,6 +196,13 @@ public:
     {
         juce::ignoreUnused(commandLine);
     }
+
+private:
+    // Declaration order matches the dependency chain (destroyed in reverse).
+    juce::AudioDeviceManager     deviceManager;  // owns the hardware device
+    juce::AudioSourcePlayer      sourcePlayer;   // bridges AudioSource → device
+    WhiteNoiseAudioSource        noiseSource;    // generates the noise samples
+    std::unique_ptr<MainWindow>  mainWindow;     // destroyed first (UI last)
 };
 
 // ============================================================================
