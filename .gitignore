@@ -39,3 +39,28 @@
 
 # debug information files
 *.dwo
+
+# CMake build directories and FetchContent cache
+build/
+_deps/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+
+# IDE / editor directories
+.idea/
+.vscode/
+*.xcworkspace
+*.xcuserdata
+xcuserdata/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# CodeQL
+_codeql_detected_source_root
