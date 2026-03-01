@@ -1,0 +1,11 @@
+<!-- Logo 16: White rounded square, sleepy half-closed eyes (arc), small beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Half-closed eyes (filled ellipse + arc clip) -->
+  <circle cx="74" cy="100" r="10" fill="#1A1A1A"/>
+  <rect x="64" y="90" width="20" height="10" fill="#FFFFFF"/>
+  <circle cx="126" cy="100" r="10" fill="#1A1A1A"/>
+  <rect x="116" y="90" width="20" height="10" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M93 116 L100 128 L107 116Z" fill="#1A1A1A"/>
+</svg>
