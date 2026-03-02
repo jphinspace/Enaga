@@ -90,7 +90,7 @@ public:
      */
     void setGain(float newGain) noexcept
     {
-        gain.store(juce::jlimit(0.0f, 1.0f, newGain));
+        gain.store(juce::jlimit(0.0f, 1.0f, newGain), std::memory_order_relaxed);
     }
 
     void prepareToPlay(int /*samplesPerBlockExpected*/, double /*sampleRate*/) override {}
@@ -98,7 +98,7 @@ public:
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override
     {
-        const float g = gain.load();
+        const float g = gain.load(std::memory_order_relaxed);
         for (int ch = 0; ch < info.buffer->getNumChannels(); ++ch)
         {
             auto* out = info.buffer->getWritePointer(ch, info.startSample);
@@ -324,7 +324,7 @@ private:
         discreteSlider.setSliderStyle(juce::Slider::LinearHorizontal);
         discreteSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 36, 20);
         discreteSlider.setRange(1.0, 5.0, 1.0);  // 5 discrete steps
-        discreteSlider.setValue(3.0);
+        discreteSlider.setValue(defaultDiscreteValue);
         addAndMakeVisible(discreteSlider);
     }
 
@@ -333,7 +333,7 @@ private:
         continuousSlider.setSliderStyle(juce::Slider::LinearHorizontal);
         continuousSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         continuousSlider.setRange(0.0, 100.0);
-        continuousSlider.setValue(100.0);
+        continuousSlider.setValue(defaultContinuousValue);
         continuousSlider.onValueChange = [this]
         {
             syncValueBox();
@@ -345,8 +345,11 @@ private:
 
     void setupValueBox()
     {
+        // Character restriction prevents non-numeric input; getDoubleValue() in
+        // applyValueBox() stops at the first ambiguous character (e.g. a second
+        // decimal point) so multi-point strings like "1.2.3" resolve to 1.2.
         continuousValueBox.setInputRestrictions(6, "0123456789.");
-        continuousValueBox.setText("100.0", false);
+        continuousValueBox.setText(juce::String(defaultContinuousValue, 1), false);
         continuousValueBox.setJustification(juce::Justification::centred);
         continuousValueBox.onReturnKey = [this] { applyValueBox(); };
         continuousValueBox.onFocusLost = [this] { applyValueBox(); };
@@ -390,16 +393,18 @@ private:
         g.setColour(juce::Colour(0xff222222));
         g.fillRoundedRectangle(imageArea.toFloat(), 8.0f);
 
-        // Decorative static-noise waveform
+        // Decorative static-noise waveform.
+        // Fixed seed ensures identical decorative pattern on every paint.
+        static constexpr int   waveformSampleCount = 80;    // line segments
+        static constexpr int   waveformSeed        = 12345;  // fixed for visual consistency
         g.setColour(juce::Colour(0xff4fc3f7).withAlpha(0.45f));
         juce::Path wave;
-        constexpr int n    = 80;
-        const float   step = imageArea.getWidth() / static_cast<float>(n);
+        const float   step = imageArea.getWidth() / static_cast<float>(waveformSampleCount);
         const float   cy   = static_cast<float>(imageArea.getCentreY());
         const float   amp  = imageArea.getHeight() * 0.28f;
-        juce::Random  r(12345);
+        juce::Random  r(waveformSeed);
         wave.startNewSubPath(static_cast<float>(imageArea.getX()), cy);
-        for (int i = 1; i <= n; ++i)
+        for (int i = 1; i <= waveformSampleCount; ++i)
             wave.lineTo(imageArea.getX() + i * step,
                         cy + (r.nextFloat() * 2.0f - 1.0f) * amp);
         g.strokePath(wave, juce::PathStrokeType(1.5f));
@@ -478,8 +483,8 @@ private:
 
             if (const auto xml = juce::XmlDocument::parse(file))
             {
-                const double discVal = xml->getDoubleAttribute("discreteValue",  3.0);
-                const double contVal = xml->getDoubleAttribute("continuousValue", 100.0);
+                const double discVal = xml->getDoubleAttribute("discreteValue",  defaultDiscreteValue);
+                const double contVal = xml->getDoubleAttribute("continuousValue", defaultContinuousValue);
                 const bool   playing = xml->getIntAttribute("isPlaying", 0) != 0;
 
                 discreteSlider.setValue(discVal);
@@ -519,6 +524,10 @@ private:
 
     AudioToggleCallback audioToggle;
     AudioGainCallback   audioGain;
+
+    // Default values used at construction and as fallbacks when loading presets.
+    static constexpr double defaultDiscreteValue  = 3.0;
+    static constexpr double defaultContinuousValue = 100.0;
 
     PlayButton       playButton;
     juce::Slider     discreteSlider;
@@ -562,7 +571,8 @@ public:
     {
         setUsingNativeTitleBar(true);
         setResizable(true, false);
-        setResizeLimits(320, 240, 10000, 10000);
+        setResizeLimits(320, 240,       // minimum per issue requirement
+                        10000, 10000);  // effectively unbounded maximum
 
         setContentOwned(
             new MainComponent(std::move(onToggle), std::move(onGain)), true);
