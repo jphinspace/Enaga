@@ -4,10 +4,10 @@
  *
  * Generates white noise via JUCE's audio-device API while the application is
  * running.  Audio stops when the user presses the on/off button and resumes
- * when they press it again.  The continuous slider controls the cutoff
- * frequency of a low-pass filter (0–100 for user convenience, mapped to
- * 20 Hz–20 kHz on a log scale); perceived loudness is governed by the OS/hardware
- * volume control.
+ * when they press it again.  The continuous Cutoff slider controls the cutoff
+ * frequency of a low-pass filter (0–100 → 20 Hz–20 kHz, log scale).  On
+ * desktop a Volume slider provides application-level gain control; on iOS and
+ * Android the system media volume (hardware buttons) is used instead.
  *
  * Built with C++23.  All areas that benefit from C++26 features are marked
  * with a "TODO:C++26" comment so the eventual migration is straightforward.
@@ -77,16 +77,16 @@ public:
 
 /**
  * Produces full-scale white noise routed through a first-order Butterworth
- * low-pass IIR filter whose cutoff frequency is set from the UI.
+ * low-pass IIR filter, then scaled by a gain factor.
  *
- * The cutoff is expressed on a normalised 0–100 scale that maps to
- * 20 Hz – 20 kHz via a logarithmic curve, matching perceptual expectations.
- * The atomic cutoff value is written by the UI thread and read (with
- * relaxed ordering) by the audio thread; a coefficient update is triggered
- * at the start of the first block after each change.
+ * Both the cutoff (0–100 normalised scale → 20 Hz–20 kHz log) and gain
+ * (0–1) are written by the UI thread via lock-free atomics and read on the
+ * real-time audio thread using relaxed ordering.  Coefficient updates happen
+ * at the start of the first audio block after each cutoff change.
  *
- * Output amplitude is always full-scale; the OS/hardware volume control
- * governs perceived loudness — no application-side gain stage is required.
+ * On desktop the gain is driven by the Volume slider; on iOS/Android the
+ * atomic is left at 1.0f (full scale) and loudness is handled by the OS
+ * media volume.
  */
 class WhiteNoiseAudioSource final : public juce::AudioSource
 {
@@ -100,6 +100,15 @@ public:
     {
         cutoff.store(juce::jlimit(0.0f, 100.0f, normalised0to100),
                      std::memory_order_relaxed);
+    }
+
+    /**
+     * Set output amplitude multiplier in [0, 1].
+     * Thread-safe: called from the message thread, read on the audio thread.
+     */
+    void setGain(float newGain) noexcept
+    {
+        gain.store(juce::jlimit(0.0f, 1.0f, newGain), std::memory_order_relaxed);
     }
 
     void prepareToPlay(int /*samplesPerBlockExpected*/, double newSampleRate) override
@@ -127,6 +136,7 @@ public:
             updateFilters();
         }
 
+        const float g = gain.load(std::memory_order_relaxed);
         for (int ch = 0; ch < info.buffer->getNumChannels(); ++ch)
         {
             auto* out = info.buffer->getWritePointer(ch, info.startSample);
@@ -135,6 +145,8 @@ public:
 
             if (ch < static_cast<int>(filters.size()))
                 filters[static_cast<size_t>(ch)].processSamples(out, info.numSamples);
+
+            juce::FloatVectorOperations::multiply(out, g, info.numSamples);
         }
     }
 
@@ -157,6 +169,7 @@ private:
     juce::Random            random;              // PRNG seeded from system entropy
     std::atomic<float>      cutoff { 100.0f };   // normalised 0–100; written by UI thread
     float                   lastCutoff { 100.0f }; // applied value (audio thread only)
+    std::atomic<float>      gain   { 1.0f };     // amplitude multiplier [0,1]; written by UI thread, read on audio thread
     double                  sampleRate { 44100.0 };
     std::array<juce::IIRFilter, 2> filters;      // one per stereo channel
 };
@@ -219,7 +232,10 @@ public:
  *   1. Menu bar (desktop) or image area with overlay button (mobile).
  *   2. Image / branding area with decorative waveform.
  *   3. Play button  +  discrete (stepped) slider with label.
- *   4. Label  +  continuous slider  +  numeric text box (0.0–100.0).
+ *   4. "Cutoff" label  +  continuous slider  +  numeric text box (0.0–100.0).
+ *   5. "Volume" label  +  volume slider  +  numeric text box  (desktop only).
+ *      On iOS/Android perceived loudness is controlled by the system media
+ *      volume (hardware buttons), so no application-side slider is shown.
  *
  * Platform-specific navigation:
  *   - Desktop (macOS/Windows/Linux) : juce::MenuBarComponent at the top.
@@ -235,16 +251,24 @@ class MainComponent final : public juce::Component
 public:
     using AudioToggleCallback  = std::function<void(bool /*shouldPlay*/)>;
     using AudioFilterCallback  = std::function<void(float /*cutoff 0-100*/)>;
+    using AudioGainCallback    = std::function<void(float /*gain 0-1*/)>;
 
-    MainComponent(AudioToggleCallback onToggle, AudioFilterCallback onFilter)
+    MainComponent(AudioToggleCallback onToggle,
+                  AudioFilterCallback onFilter,
+                  AudioGainCallback   onGain)
         : audioToggle(std::move(onToggle))
         , audioFilter(std::move(onFilter))
+        , audioGain(std::move(onGain))
     {
         setupPlayButton();
         setupDiscreteSlider();
         setupContinuousSlider();
         setupValueBox();
         setupLabels();
+#if ! (JUCE_IOS || JUCE_ANDROID)
+        setupVolumeSlider();
+        setupVolumeValueBox();
+#endif
 
 #if JUCE_IOS || JUCE_ANDROID
         setupMobileMenuButton();
@@ -327,7 +351,14 @@ public:
 #endif
 
         area.removeFromTop(pad);
-        const int ctrlH = (area.getHeight() - pad) / 2;
+
+        // Control row height: split remaining space equally across rows.
+#if JUCE_IOS || JUCE_ANDROID
+        const int numRows = 2;
+#else
+        const int numRows = 3;
+#endif
+        const int ctrlH = (area.getHeight() - (numRows - 1) * pad) / numRows;
 
         // Row 1: play button + label + discrete slider
         auto row1   = area.removeFromTop(ctrlH);
@@ -340,12 +371,28 @@ public:
                                     .withHeight(ctrlH).withY(row1.getY()));
         discreteSlider.setBounds(row1);
 
-        // Row 2: label + continuous slider + value box
-        continuousLabel.setBounds(area.removeFromLeft(64));
-        const int boxW = juce::jlimit(56, 76, area.getWidth() / 5);
-        continuousValueBox.setBounds(area.removeFromRight(boxW));
-        area.removeFromRight(4);
-        continuousSlider.setBounds(area);
+        // Row 2: Cutoff label + continuous slider + value box
+        auto row2 = area.removeFromTop(ctrlH);
+        continuousLabel.setBounds(row2.removeFromLeft(64));
+        {
+            const int boxW = juce::jlimit(56, 76, row2.getWidth() / 5);
+            continuousValueBox.setBounds(row2.removeFromRight(boxW));
+            row2.removeFromRight(4);
+            continuousSlider.setBounds(row2);
+        }
+
+#if ! (JUCE_IOS || JUCE_ANDROID)
+        area.removeFromTop(pad);
+
+        // Row 3: Volume label + volume slider + value box
+        volumeLabel.setBounds(area.removeFromLeft(64));
+        {
+            const int boxW = juce::jlimit(56, 76, area.getWidth() / 5);
+            volumeValueBox.setBounds(area.removeFromRight(boxW));
+            area.removeFromRight(4);
+            volumeSlider.setBounds(area);
+        }
+#endif
     }
 
     void paint(juce::Graphics& g) override
@@ -414,6 +461,12 @@ private:
         continuousLabel.setText("Cutoff", juce::dontSendNotification);
         continuousLabel.setJustificationType(juce::Justification::centredLeft);
         addAndMakeVisible(continuousLabel);
+
+#if ! (JUCE_IOS || JUCE_ANDROID)
+        volumeLabel.setText("Volume", juce::dontSendNotification);
+        volumeLabel.setJustificationType(juce::Justification::centredLeft);
+        addAndMakeVisible(volumeLabel);
+#endif
     }
 
     void setupMobileMenuButton()
@@ -432,6 +485,33 @@ private:
         addAndMakeVisible(mobileMenuButton);
 #endif
     }
+
+#if ! (JUCE_IOS || JUCE_ANDROID)
+    void setupVolumeSlider()
+    {
+        volumeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+        volumeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+        volumeSlider.setRange(0.0, 100.0);
+        volumeSlider.setValue(defaultVolumeValue);
+        volumeSlider.onValueChange = [this]
+        {
+            syncVolumeValueBox();
+            if (audioGain)
+                audioGain(static_cast<float>(volumeSlider.getValue()) / 100.0f);
+        };
+        addAndMakeVisible(volumeSlider);
+    }
+
+    void setupVolumeValueBox()
+    {
+        volumeValueBox.setInputRestrictions(6, "0123456789.");
+        volumeValueBox.setText(juce::String(defaultVolumeValue, 1), false);
+        volumeValueBox.setJustification(juce::Justification::centred);
+        volumeValueBox.onReturnKey = [this] { applyVolumeValueBox(); };
+        volumeValueBox.onFocusLost = [this] { applyVolumeValueBox(); };
+        addAndMakeVisible(volumeValueBox);
+    }
+#endif
 
     // -----------------------------------------------------------------------
     //  Painting
@@ -482,6 +562,21 @@ private:
         syncValueBox();
     }
 
+#if ! (JUCE_IOS || JUCE_ANDROID)
+    void syncVolumeValueBox()
+    {
+        volumeValueBox.setText(juce::String(volumeSlider.getValue(), 1), false);
+    }
+
+    void applyVolumeValueBox()
+    {
+        const double v = juce::jlimit(0.0, 100.0,
+                                      volumeValueBox.getText().getDoubleValue());
+        volumeSlider.setValue(v, juce::sendNotificationSync);
+        syncVolumeValueBox();
+    }
+#endif
+
     // -----------------------------------------------------------------------
     //  Preset I/O
     // -----------------------------------------------------------------------
@@ -509,6 +604,9 @@ private:
             preset.setAttribute("continuousValue", continuousSlider.getValue());
             preset.setAttribute("isPlaying",
                                 static_cast<int>(playButton.getToggleState()));
+#if ! (JUCE_IOS || JUCE_ANDROID)
+            preset.setAttribute("volumeValue", volumeSlider.getValue());
+#endif
 
             if (! preset.writeTo(file))
                 juce::Logger::writeToLog("Preset save failed: " + file.getFullPathName());
@@ -539,6 +637,12 @@ private:
                 discreteSlider.setValue(discVal);
                 continuousSlider.setValue(contVal);
                 syncValueBox();
+
+#if ! (JUCE_IOS || JUCE_ANDROID)
+                const double volVal = xml->getDoubleAttribute("volumeValue", defaultVolumeValue);
+                volumeSlider.setValue(volVal);
+                syncVolumeValueBox();
+#endif
 
                 if (playing != playButton.getToggleState())
                     playButton.setToggleState(playing, juce::sendNotification);
@@ -573,10 +677,12 @@ private:
 
     AudioToggleCallback audioToggle;
     AudioFilterCallback audioFilter;
+    AudioGainCallback   audioGain;
 
     // Default values used at construction and as fallbacks when loading presets.
-    static constexpr double defaultDiscreteValue  = 3.0;
+    static constexpr double defaultDiscreteValue   = 3.0;
     static constexpr double defaultContinuousValue = 100.0;
+    static constexpr double defaultVolumeValue     = 100.0;
 
     PlayButton       playButton;
     juce::Slider     discreteSlider;
@@ -584,6 +690,12 @@ private:
     juce::TextEditor continuousValueBox;
     juce::Label      discreteLabel;
     juce::Label      continuousLabel;
+
+#if ! (JUCE_IOS || JUCE_ANDROID)
+    juce::Slider     volumeSlider;
+    juce::TextEditor volumeValueBox;
+    juce::Label      volumeLabel;
+#endif
 
     juce::Rectangle<int> imageArea;
 
@@ -613,7 +725,8 @@ class MainWindow final : public juce::DocumentWindow
 public:
     MainWindow(const juce::String& name,
                MainComponent::AudioToggleCallback  onToggle,
-               MainComponent::AudioFilterCallback  onFilter)
+               MainComponent::AudioFilterCallback  onFilter,
+               MainComponent::AudioGainCallback    onGain)
         : DocumentWindow(name,
                          juce::Colour(0xff1a1a1a),
                          DocumentWindow::allButtons)
@@ -624,9 +737,9 @@ public:
                         10000, 10000);  // effectively unbounded maximum
 
         setContentOwned(
-            new MainComponent(std::move(onToggle), std::move(onFilter)), true);
+            new MainComponent(std::move(onToggle), std::move(onFilter), std::move(onGain)), true);
 
-        centreWithSize(480, 360);
+        centreWithSize(480, 420);
         setVisible(true);
     }
 
@@ -691,8 +804,9 @@ public:
         // Create the main window; audio starts only when the play button is pressed.
         mainWindow = std::make_unique<MainWindow>(
             getApplicationName(),
-            [this](bool shouldPlay) { toggleAudio(shouldPlay);     },
-            [this](float v)         { noiseSource.setCutoff(v);    });
+            [this](bool shouldPlay) { toggleAudio(shouldPlay);                  },
+            [this](float v)         { noiseSource.setCutoff(v);                 },
+            [this](float g)         { noiseSource.setGain(g);                   });
 
         // Open the platform's default audio output device (stereo, no input).
         const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);
