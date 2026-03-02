@@ -4,8 +4,10 @@
  *
  * Generates white noise via JUCE's audio-device API while the application is
  * running.  Audio stops when the user presses the on/off button and resumes
- * when they press it again.  The continuous slider controls output gain;
- * additional loudness adjustment is available via the OS volume control.
+ * when they press it again.  The continuous slider controls the cutoff
+ * frequency of a low-pass filter (0–100 for user convenience, mapped to
+ * 20 Hz–20 kHz on a log scale); perceived loudness is governed by the OS/hardware
+ * volume control.
  *
  * Built with C++23.  All areas that benefit from C++26 features are marked
  * with a "TODO:C++26" comment so the eventual migration is straightforward.
@@ -74,42 +76,89 @@ public:
 // ============================================================================
 
 /**
- * Fills every audio buffer with uniformly distributed random samples scaled
- * by a gain factor, producing flat-spectrum (white) noise at the requested
- * level.
+ * Produces full-scale white noise routed through a first-order Butterworth
+ * low-pass IIR filter whose cutoff frequency is set from the UI.
  *
- * Gain is accessed via a lock-free atomic so the UI thread can change it
- * safely while the audio callback runs on a separate real-time thread.
+ * The cutoff is expressed on a normalised 0–100 scale that maps to
+ * 20 Hz – 20 kHz via a logarithmic curve, matching perceptual expectations.
+ * The atomic cutoff value is written by the UI thread and read (with
+ * relaxed ordering) by the audio thread; a coefficient update is triggered
+ * at the start of the first block after each change.
+ *
+ * Output amplitude is always full-scale; the OS/hardware volume control
+ * governs perceived loudness — no application-side gain stage is required.
  */
 class WhiteNoiseAudioSource final : public juce::AudioSource
 {
 public:
     /**
-     * Set output amplitude multiplier in [0, 1].
-     * Thread-safe: called from the message thread, read on the audio thread.
+     * Set the low-pass filter cutoff on a normalised 0–100 scale.
+     * 0 → 20 Hz (heavy filtering), 100 → 20 kHz (wide open, near full spectrum).
+     * Thread-safe: called from the message thread, applied on the audio thread.
      */
-    void setGain(float newGain) noexcept
+    void setCutoff(float normalised0to100) noexcept
     {
-        gain.store(juce::jlimit(0.0f, 1.0f, newGain), std::memory_order_relaxed);
+        cutoff.store(juce::jlimit(0.0f, 100.0f, normalised0to100),
+                     std::memory_order_relaxed);
     }
 
-    void prepareToPlay(int /*samplesPerBlockExpected*/, double /*sampleRate*/) override {}
-    void releaseResources() override {}
+    void prepareToPlay(int /*samplesPerBlockExpected*/, double newSampleRate) override
+    {
+        sampleRate = newSampleRate;
+        lastCutoff = cutoff.load(std::memory_order_relaxed);
+        updateFilters();
+        for (auto& f : filters)
+            f.reset();
+    }
+
+    void releaseResources() override
+    {
+        for (auto& f : filters)
+            f.reset();
+    }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override
     {
-        const float g = gain.load(std::memory_order_relaxed);
+        // Re-coefficient the filters if the cutoff changed since the last block.
+        const float c = cutoff.load(std::memory_order_relaxed);
+        if (c != lastCutoff)
+        {
+            lastCutoff = c;
+            updateFilters();
+        }
+
         for (int ch = 0; ch < info.buffer->getNumChannels(); ++ch)
         {
             auto* out = info.buffer->getWritePointer(ch, info.startSample);
             for (int i = 0; i < info.numSamples; ++i)
-                out[i] = (random.nextFloat() * 2.0f - 1.0f) * g;
+                out[i] = random.nextFloat() * 2.0f - 1.0f;
+
+            if (ch < static_cast<int>(filters.size()))
+                filters[static_cast<size_t>(ch)].processSamples(out, info.numSamples);
         }
     }
 
 private:
-    juce::Random       random;       // PRNG seeded from system entropy at construction
-    std::atomic<float> gain { 1.0f }; // amplitude multiplier; modified from UI thread
+    /**
+     * Recalculate IIR coefficients from the current @c lastCutoff value.
+     * Must only be called on the audio thread (or before streaming starts).
+     */
+    void updateFilters()
+    {
+        if (sampleRate <= 0.0) return;
+
+        // Logarithmic map: 0 → 20 Hz, 100 → 20 000 Hz.
+        const double freq = 20.0 * std::pow(1000.0, static_cast<double>(lastCutoff) / 100.0);
+        const auto   coef = juce::IIRCoefficients::makeLowPass(sampleRate, freq);
+        for (auto& f : filters)
+            f.setCoefficients(coef);
+    }
+
+    juce::Random            random;              // PRNG seeded from system entropy
+    std::atomic<float>      cutoff { 100.0f };   // normalised 0–100; written by UI thread
+    float                   lastCutoff { 100.0f }; // applied value (audio thread only)
+    double                  sampleRate { 44100.0 };
+    std::array<juce::IIRFilter, 2> filters;      // one per stereo channel
 };
 
 // ============================================================================
@@ -184,12 +233,12 @@ class MainComponent final : public juce::Component
                           , public juce::MenuBarModel
 {
 public:
-    using AudioToggleCallback = std::function<void(bool /*shouldPlay*/)>;
-    using AudioGainCallback   = std::function<void(float /*gain 0-1*/)>;
+    using AudioToggleCallback  = std::function<void(bool /*shouldPlay*/)>;
+    using AudioFilterCallback  = std::function<void(float /*cutoff 0-100*/)>;
 
-    MainComponent(AudioToggleCallback onToggle, AudioGainCallback onGain)
+    MainComponent(AudioToggleCallback onToggle, AudioFilterCallback onFilter)
         : audioToggle(std::move(onToggle))
-        , audioGain(std::move(onGain))
+        , audioFilter(std::move(onFilter))
     {
         setupPlayButton();
         setupDiscreteSlider();
@@ -337,8 +386,8 @@ private:
         continuousSlider.onValueChange = [this]
         {
             syncValueBox();
-            if (audioGain)
-                audioGain(static_cast<float>(continuousSlider.getValue()) / 100.0f);
+            if (audioFilter)
+                audioFilter(static_cast<float>(continuousSlider.getValue()));
         };
         addAndMakeVisible(continuousSlider);
     }
@@ -362,7 +411,7 @@ private:
         discreteLabel.setJustificationType(juce::Justification::centredLeft);
         addAndMakeVisible(discreteLabel);
 
-        continuousLabel.setText("Volume", juce::dontSendNotification);
+        continuousLabel.setText("Cutoff", juce::dontSendNotification);
         continuousLabel.setJustificationType(juce::Justification::centredLeft);
         addAndMakeVisible(continuousLabel);
     }
@@ -523,7 +572,7 @@ private:
     // -----------------------------------------------------------------------
 
     AudioToggleCallback audioToggle;
-    AudioGainCallback   audioGain;
+    AudioFilterCallback audioFilter;
 
     // Default values used at construction and as fallbacks when loading presets.
     static constexpr double defaultDiscreteValue  = 3.0;
@@ -563,8 +612,8 @@ class MainWindow final : public juce::DocumentWindow
 {
 public:
     MainWindow(const juce::String& name,
-               MainComponent::AudioToggleCallback onToggle,
-               MainComponent::AudioGainCallback   onGain)
+               MainComponent::AudioToggleCallback  onToggle,
+               MainComponent::AudioFilterCallback  onFilter)
         : DocumentWindow(name,
                          juce::Colour(0xff1a1a1a),
                          DocumentWindow::allButtons)
@@ -575,7 +624,7 @@ public:
                         10000, 10000);  // effectively unbounded maximum
 
         setContentOwned(
-            new MainComponent(std::move(onToggle), std::move(onGain)), true);
+            new MainComponent(std::move(onToggle), std::move(onFilter)), true);
 
         centreWithSize(480, 360);
         setVisible(true);
@@ -642,8 +691,8 @@ public:
         // Create the main window; audio starts only when the play button is pressed.
         mainWindow = std::make_unique<MainWindow>(
             getApplicationName(),
-            [this](bool shouldPlay) { toggleAudio(shouldPlay); },
-            [this](float g)         { noiseSource.setGain(g);  });
+            [this](bool shouldPlay) { toggleAudio(shouldPlay);     },
+            [this](float v)         { noiseSource.setCutoff(v);    });
 
         // Open the platform's default audio output device (stereo, no input).
         const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);
