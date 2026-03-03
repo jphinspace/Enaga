@@ -146,9 +146,11 @@ public:
             return;
         }
 
-        // Connect source to player; the callback is added when the play button
-        // is pressed via toggleAudio(true).
+        // Connect source to player and register the callback for the duration of
+        // the session.  The fade envelope (fadeCurrent = 0 at startup) keeps the
+        // output silent until the play button is pressed.
         sourcePlayer.setSource(&noiseSource);
+        deviceManager.addAudioCallback(&sourcePlayer);
     }
 
     /**
@@ -158,10 +160,6 @@ public:
      */
     void shutdown() override
     {
-        // Prevent any pending fade-out timer callback from touching the device
-        // after it has been closed.
-        pendingStop = false;
-
         mainWindow.reset();
         juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
         deviceManager.removeAudioCallback(&sourcePlayer);
@@ -182,44 +180,10 @@ public:
     }
 
 private:
-    /** Starts the audio callback and triggers a fade-in. */
-    void startAudio()
-    {
-        pendingStop = false;
-        noiseSource.startFadeIn();
-        if (!callbackAdded)
-        {
-            deviceManager.addAudioCallback(&sourcePlayer);
-            callbackAdded = true;
-        }
-    }
-
-    /** Triggers a fade-out and removes the audio callback once silence is reached. */
-    void stopAudio()
-    {
-        noiseSource.startFadeOut();
-        pendingStop = true;
-
-        // Derived from the fade duration; 50 ms guard ensures the audio thread
-        // has fully reached silence before the callback is removed.
-        static constexpr int fadeOutDelayMs =
-            static_cast<int>(WhiteNoiseAudioSource::fadeDurationSeconds * 1000.0f) + 50;
-
-        juce::Timer::callAfterDelay(fadeOutDelayMs, [this]()
-        {
-            if (pendingStop)
-            {
-                deviceManager.removeAudioCallback(&sourcePlayer);
-                callbackAdded = false;
-                pendingStop   = false;
-            }
-        });
-    }
-
-    /** Routes the play-button toggle to startAudio() or stopAudio(). */
+    /** Fades in or out based on whether the play button is on or off. */
     void toggleAudio(bool shouldPlay)
     {
-        if (shouldPlay) startAudio(); else stopAudio();
+        if (shouldPlay) noiseSource.startFadeIn(); else noiseSource.startFadeOut();
     }
 
     // Declaration order matches the dependency chain (destroyed in reverse).
@@ -228,9 +192,6 @@ private:
     juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource → device
     WhiteNoiseAudioSource        noiseSource;   // generates the noise samples
     std::unique_ptr<MainWindow>  mainWindow;    // destroyed first (UI last)
-
-    bool callbackAdded { false }; // true while sourcePlayer is registered
-    bool pendingStop   { false }; // true while a fade-out removal is scheduled
 };
 
 // ============================================================================
