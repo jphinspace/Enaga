@@ -26,8 +26,7 @@
  *   3. Play button  +  discrete (stepped) slider with label.
  *   4. "Cutoff" label  +  continuous slider  +  numeric text box (0.0–100.0).
  *   5. "Volume" label  +  volume control (all platforms):
- *        - Desktop (macOS/Windows/Linux): juce::Slider driving app-level gain
- *          + numeric text box.
+ *        - Desktop (macOS/Windows/Linux): juce::Slider driving app-level gain.
  *        - iOS:     MPVolumeView (native system volume slider via UIViewComponent).
  *        - Android: juce::Slider wired to juce::SystemAudioVolume.
  *
@@ -97,11 +96,6 @@ private:
     void syncValueBox();
     void applyValueBox();
 
-#if ! (JUCE_IOS || JUCE_ANDROID)
-    void syncVolumeValueBox();
-    void applyVolumeValueBox();
-#endif
-
     // -----------------------------------------------------------------------
     //  Preset I/O
     // -----------------------------------------------------------------------
@@ -137,16 +131,13 @@ private:
     // Volume control: platform-specific widget + shared label.
     // iOS     – MPVolumeView (native system slider; no text box needed).
     // Android – juce::Slider wired to juce::SystemAudioVolume.
-    // Desktop – juce::Slider driving app-level gain + numeric text box.
+    // Desktop – juce::Slider driving app-level gain.
 #if JUCE_IOS
     iOSVolumeView    mobileVolumeView;
 #else
     juce::Slider     volumeSlider;
 #endif
     juce::Label      volumeLabel;
-#if ! (JUCE_IOS || JUCE_ANDROID)
-    juce::TextEditor volumeValueBox;
-#endif
 
     juce::Rectangle<int> imageArea;
 
