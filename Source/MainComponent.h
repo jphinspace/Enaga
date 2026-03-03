@@ -7,6 +7,10 @@
 
 #include "PlayButton.h"
 
+#if JUCE_IOS
+    #include "iOSVolumeView.h"
+#endif
+
 #include <juce_core/juce_core.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -21,9 +25,11 @@
  *   2. Image / branding area with decorative waveform.
  *   3. Play button  +  discrete (stepped) slider with label.
  *   4. "Cutoff" label  +  continuous slider  +  numeric text box (0.0–100.0).
- *   5. "Volume" label  +  volume slider  +  numeric text box  (desktop only).
- *      On iOS/Android perceived loudness is controlled by the system media
- *      volume (hardware buttons), so no application-side slider is shown.
+ *   5. "Volume" label  +  volume control (all platforms):
+ *        - Desktop (macOS/Windows/Linux): juce::Slider driving app-level gain
+ *          + numeric text box.
+ *        - iOS:     MPVolumeView (native system volume slider via UIViewComponent).
+ *        - Android: juce::Slider wired to juce::SystemAudioVolume.
  *
  * Platform-specific navigation:
  *   - Desktop (macOS/Windows/Linux) : juce::MenuBarComponent at the top.
@@ -76,10 +82,7 @@ private:
     void setupValueBox();
     void setupLabels();
     void setupMobileMenuButton();
-
-#if ! (JUCE_IOS || JUCE_ANDROID)
     void setupVolumeSlider();
-#endif
 
     // -----------------------------------------------------------------------
     //  Painting
@@ -131,9 +134,17 @@ private:
     juce::Label      discreteLabel;
     juce::Label      continuousLabel;
 
-#if ! (JUCE_IOS || JUCE_ANDROID)
+    // Volume control: platform-specific widget + shared label.
+    // iOS     – MPVolumeView (native system slider; no text box needed).
+    // Android – juce::Slider wired to juce::SystemAudioVolume.
+    // Desktop – juce::Slider driving app-level gain + numeric text box.
+#if JUCE_IOS
+    iOSVolumeView    mobileVolumeView;
+#else
     juce::Slider     volumeSlider;
+#endif
     juce::Label      volumeLabel;
+#if ! (JUCE_IOS || JUCE_ANDROID)
     juce::TextEditor volumeValueBox;
 #endif
 

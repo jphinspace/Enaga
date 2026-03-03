@@ -21,9 +21,7 @@ MainComponent::MainComponent(AudioToggleCallback onToggle,
     setupContinuousSlider();
     setupValueBox();
     setupLabels();
-#if ! (JUCE_IOS || JUCE_ANDROID)
     setupVolumeSlider();
-#endif
 
 #if JUCE_IOS || JUCE_ANDROID
     setupMobileMenuButton();
@@ -108,11 +106,7 @@ void MainComponent::resized()
     area.removeFromTop(pad);
 
     // Control row height: split remaining space equally across rows.
-#if JUCE_IOS || JUCE_ANDROID
-    const int numRows = 2;
-#else
-    const int numRows = 3;
-#endif
+    const int numRows = 3;  // play, cutoff, volume (all platforms)
     const int ctrlH = (area.getHeight() - (numRows - 1) * pad) / numRows;
 
     // Row 1: play button + label + discrete slider
@@ -147,6 +141,19 @@ void MainComponent::resized()
         area.removeFromRight(4);
         volumeSlider.setBounds(area);
     }
+#else
+    area.removeFromTop(pad);
+
+    // Row 3: Volume label + platform-specific volume control
+    volumeLabel.setBounds(area.removeFromLeft(64));
+  #if JUCE_IOS
+    // MPVolumeView is self-contained (includes speaker icons); give it all
+    // remaining row space so it can render at its natural size.
+    mobileVolumeView.setBounds(area);
+  #else
+    // Android: juce::Slider wired to system audio volume
+    volumeSlider.setBounds(area);
+  #endif
 #endif
 }
 
@@ -216,11 +223,9 @@ void MainComponent::setupLabels()
     continuousLabel.setJustificationType(juce::Justification::centredLeft);
     addAndMakeVisible(continuousLabel);
 
-#if ! (JUCE_IOS || JUCE_ANDROID)
     volumeLabel.setText("Volume", juce::dontSendNotification);
     volumeLabel.setJustificationType(juce::Justification::centredLeft);
     addAndMakeVisible(volumeLabel);
-#endif
 }
 
 void MainComponent::setupMobileMenuButton()
@@ -261,6 +266,35 @@ void MainComponent::setupVolumeSlider()
     volumeValueBox.onReturnKey = [this] { applyVolumeValueBox(); };
     volumeValueBox.onFocusLost = [this] { applyVolumeValueBox(); };
     addAndMakeVisible(volumeValueBox);
+}
+#elif JUCE_IOS
+void MainComponent::setupVolumeSlider()
+{
+    // mobileVolumeView wraps MPVolumeView; no extra configuration needed —
+    // UIKit owns the appearance and the control directly manipulates device
+    // media volume without any application-layer callbacks.
+    addAndMakeVisible(mobileVolumeView);
+}
+#else // JUCE_ANDROID
+void MainComponent::setupVolumeSlider()
+{
+    volumeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    volumeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    volumeSlider.setRange(0.0, 100.0);
+
+    // Initialise from the current system media volume; clamp to [0, 1] in
+    // case the API returns an unexpected value on some devices.
+    const float sysGain = juce::jlimit(0.0f, 1.0f,
+                                        juce::SystemAudioVolume::getGain());
+    volumeSlider.setValue(static_cast<double>(sysGain) * 100.0,
+                          juce::dontSendNotification);
+
+    volumeSlider.onValueChange = [this]
+    {
+        juce::SystemAudioVolume::setGain(
+            static_cast<float>(volumeSlider.getValue()) / 100.0f);
+    };
+    addAndMakeVisible(volumeSlider);
 }
 #endif
 
