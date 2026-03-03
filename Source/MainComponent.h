@@ -24,6 +24,7 @@
  *   1. Menu bar (desktop) or image area with overlay button (mobile).
  *   2. Image / branding area with decorative waveform.
  *   3. Play button  +  discrete (stepped) slider with label.
+ *      The discrete slider selects the noise colour (White / Pink / Brown / Grey).
  *   4. "Cutoff" label  +  continuous slider  +  numeric text box (0.0–100.0).
  *   5. "Volume" label  +  volume control (all platforms):
  *        - Desktop (macOS/Windows/Linux): juce::Slider driving app-level gain.
@@ -42,13 +43,15 @@ class MainComponent final : public juce::Component
                           , public juce::MenuBarModel
 {
 public:
-    using AudioToggleCallback  = std::function<void(bool /*shouldPlay*/)>;
-    using AudioFilterCallback  = std::function<void(float /*cutoff 0-100*/)>;
-    using AudioGainCallback    = std::function<void(float /*gain 0-1*/)>;
+    using AudioToggleCallback    = std::function<void(bool /*shouldPlay*/)>;
+    using AudioFilterCallback    = std::function<void(float /*cutoff 0-100*/)>;
+    using AudioGainCallback      = std::function<void(float /*gain 0-1*/)>;
+    using AudioNoiseTypeCallback = std::function<void(float /*discreteValue 1.0-4.0*/)>;
 
-    MainComponent(AudioToggleCallback onToggle,
-                  AudioFilterCallback onFilter,
-                  AudioGainCallback   onGain);
+    MainComponent(AudioToggleCallback    onToggle,
+                  AudioFilterCallback    onFilter,
+                  AudioGainCallback      onGain,
+                  AudioNoiseTypeCallback onNoiseType);
 
     ~MainComponent() override;
 
@@ -112,12 +115,13 @@ private:
     //  destruction is in reverse order — see LIFO note in EnagaApplication)
     // -----------------------------------------------------------------------
 
-    AudioToggleCallback audioToggle;
-    AudioFilterCallback audioFilter;
-    AudioGainCallback   audioGain;
+    AudioToggleCallback    audioToggle;
+    AudioFilterCallback    audioFilter;
+    AudioGainCallback      audioGain;
+    AudioNoiseTypeCallback audioNoiseType;
 
     // Default values used at construction and as fallbacks when loading presets.
-    static constexpr double defaultDiscreteValue   = 3.0;
+    static constexpr double defaultDiscreteValue   = 1.0;  // White noise
     static constexpr double defaultContinuousValue = 100.0;
     static constexpr double defaultVolumeValue     = 100.0;
 

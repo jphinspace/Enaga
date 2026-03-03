@@ -47,9 +47,10 @@ class MainWindow final : public juce::DocumentWindow
 {
 public:
     MainWindow(const juce::String& name,
-               MainComponent::AudioToggleCallback  onToggle,
-               MainComponent::AudioFilterCallback  onFilter,
-               MainComponent::AudioGainCallback    onGain)
+               MainComponent::AudioToggleCallback    onToggle,
+               MainComponent::AudioFilterCallback    onFilter,
+               MainComponent::AudioGainCallback      onGain,
+               MainComponent::AudioNoiseTypeCallback onNoiseType)
         : DocumentWindow(name,
                          juce::Colour(0xff1a1a1a),
                          DocumentWindow::allButtons)
@@ -60,7 +61,8 @@ public:
                         10000, 10000);  // effectively unbounded maximum
 
         setContentOwned(
-            new MainComponent(std::move(onToggle), std::move(onFilter), std::move(onGain)), true);
+            new MainComponent(std::move(onToggle), std::move(onFilter),
+                              std::move(onGain), std::move(onNoiseType)), true);
 
         centreWithSize(480, 420);
         setVisible(true);
@@ -129,7 +131,11 @@ public:
             getApplicationName(),
             [this](bool shouldPlay) { toggleAudio(shouldPlay);                  },
             [this](float v)         { noiseSource.setCutoff(v);                 },
-            [this](float g)         { noiseSource.setGain(g);                   });
+            [this](float g)         { noiseSource.setGain(g);                   },
+            [this](float v)         { noiseSource.setNoiseType(
+                                          static_cast<NoiseType>(
+                                              juce::jlimit(0, 3,
+                                                  static_cast<int>(v) - 1))); });
 
         // Open the platform's default audio output device (stereo, no input).
         const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);

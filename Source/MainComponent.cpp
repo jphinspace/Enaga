@@ -9,12 +9,14 @@
 //  Constructor / Destructor
 // ============================================================================
 
-MainComponent::MainComponent(AudioToggleCallback onToggle,
-                             AudioFilterCallback onFilter,
-                             AudioGainCallback   onGain)
+MainComponent::MainComponent(AudioToggleCallback    onToggle,
+                             AudioFilterCallback    onFilter,
+                             AudioGainCallback      onGain,
+                             AudioNoiseTypeCallback onNoiseType)
     : audioToggle(std::move(onToggle))
     , audioFilter(std::move(onFilter))
     , audioGain(std::move(onGain))
+    , audioNoiseType(std::move(onNoiseType))
 {
     setupPlayButton();
     setupDiscreteSlider();
@@ -174,9 +176,36 @@ void MainComponent::setupPlayButton()
 void MainComponent::setupDiscreteSlider()
 {
     discreteSlider.setSliderStyle(juce::Slider::LinearHorizontal);
-    discreteSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 36, 20);
-    discreteSlider.setRange(1.0, 5.0, 1.0);  // 5 discrete steps
+    discreteSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 56, 20);
+    discreteSlider.setRange(1.0, 4.0, 1.0);  // 4 noise types: White, Pink, Brown, Grey
     discreteSlider.setValue(defaultDiscreteValue);
+
+    // Show the noise-type name instead of a raw number.
+    discreteSlider.textFromValueFunction = [](double v) -> juce::String
+    {
+        switch (static_cast<int>(std::round(v)))
+        {
+            case 1:  return "White";
+            case 2:  return "Pink";
+            case 3:  return "Brown";
+            case 4:  return "Grey";
+            default: return {};
+        }
+    };
+    discreteSlider.valueFromTextFunction = [](const juce::String& text) -> double
+    {
+        const auto lower = text.toLowerCase();
+        if (lower == "pink")  return 2.0;
+        if (lower == "brown") return 3.0;
+        if (lower == "grey")  return 4.0;
+        return 1.0; // default to White
+    };
+
+    discreteSlider.onValueChange = [this]
+    {
+        if (audioNoiseType)
+            audioNoiseType(static_cast<float>(discreteSlider.getValue()));
+    };
     addAndMakeVisible(discreteSlider);
 }
 
@@ -210,7 +239,7 @@ void MainComponent::setupValueBox()
 
 void MainComponent::setupLabels()
 {
-    discreteLabel.setText("Steps", juce::dontSendNotification);
+    discreteLabel.setText("Noise", juce::dontSendNotification);
     discreteLabel.setJustificationType(juce::Justification::centredLeft);
     addAndMakeVisible(discreteLabel);
 
