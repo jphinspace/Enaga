@@ -39,6 +39,18 @@ public:
      */
     void setGain(float newGain) noexcept;
 
+    /**
+     * Begin a 0.25-second linear fade-in from silence to full level.
+     * Thread-safe: written by the message thread, applied on the audio thread.
+     */
+    void startFadeIn() noexcept;
+
+    /**
+     * Begin a 0.25-second linear fade-out from full level to silence.
+     * Thread-safe: written by the message thread, applied on the audio thread.
+     */
+    void startFadeOut() noexcept;
+
     void prepareToPlay(int samplesPerBlockExpected, double newSampleRate) override;
     void releaseResources() override;
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override;
@@ -54,6 +66,9 @@ private:
     std::atomic<float>      cutoff { 100.0f };     // normalised 0–100; written by UI thread
     float                   lastCutoff { 100.0f }; // applied value (audio thread only)
     std::atomic<float>      gain   { 1.0f };       // amplitude multiplier [0,1]
+    std::atomic<float>      fadeTarget { 0.0f };   // 0=silent, 1=full; written by UI thread
+    float                   fadeCurrent { 0.0f };  // current fade level (audio thread only)
+    float                   fadeStep    { 0.0f };  // per-sample increment (audio thread only)
     double                  sampleRate { 44100.0 };
     std::array<juce::IIRFilter, 2> filters;        // one per stereo channel
 };

@@ -158,6 +158,10 @@ public:
      */
     void shutdown() override
     {
+        // Prevent any pending fade-out timer callback from touching the device
+        // after it has been closed.
+        pendingStop = false;
+
         mainWindow.reset();
         juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
         deviceManager.removeAudioCallback(&sourcePlayer);
@@ -178,13 +182,41 @@ public:
     }
 
 private:
-    /** Starts or stops the audio callback in response to the play button. */
+    /** Starts or stops the audio with a 0.25-second fade in or fade out. */
     void toggleAudio(bool shouldPlay)
     {
         if (shouldPlay)
-            deviceManager.addAudioCallback(&sourcePlayer);
+        {
+            // Cancel any pending fade-out removal so a rapid stop→play sequence
+            // does not remove an already-live callback.
+            pendingStop = false;
+
+            noiseSource.startFadeIn();   // arm ramp before callback can fire
+            if (!callbackAdded)
+            {
+                deviceManager.addAudioCallback(&sourcePlayer);
+                callbackAdded = true;
+            }
+        }
         else
-            deviceManager.removeAudioCallback(&sourcePlayer);
+        {
+            noiseSource.startFadeOut();
+            pendingStop = true;
+
+            // Remove the audio callback after the 0.25 s fade has completed.
+            // 50 ms of extra margin ensures the audio thread has fully reached
+            // silence before the callback is torn down.
+            static constexpr int fadeOutDelayMs = 300; // 250 ms fade + 50 ms margin
+            juce::Timer::callAfterDelay(fadeOutDelayMs, [this]()
+            {
+                if (pendingStop)
+                {
+                    deviceManager.removeAudioCallback(&sourcePlayer);
+                    callbackAdded = false;
+                    pendingStop   = false;
+                }
+            });
+        }
     }
 
     // Declaration order matches the dependency chain (destroyed in reverse).
@@ -193,6 +225,9 @@ private:
     juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource → device
     WhiteNoiseAudioSource        noiseSource;   // generates the noise samples
     std::unique_ptr<MainWindow>  mainWindow;    // destroyed first (UI last)
+
+    bool callbackAdded { false }; // true while sourcePlayer is registered
+    bool pendingStop   { false }; // true while a fade-out removal is scheduled
 };
 
 // ============================================================================
