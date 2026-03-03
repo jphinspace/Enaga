@@ -1,10 +1,13 @@
 /**
  * @file   Main.cpp
- * @brief  Enaga – Relaxing White Noise Generator
+ * @brief  Enaga application entry point — MainWindow, EnagaApplication, and
+ *         the platform-specific entry point macro.
  *
- * Generates white noise via JUCE's audio-device API while the application is
- * running.  Audio stops automatically when the app is closed.  Perceived
- * volume is governed entirely by the platform (OS) volume control.
+ * Class responsibilities are split across separate source files:
+ *   - EnagaLookAndFeel.h          : dark theme / LookAndFeel overrides
+ *   - PlayButton.h                : custom play/stop toggle button
+ *   - WhiteNoiseAudioSource.h/cpp : noise generator with LP filter + gain
+ *   - MainComponent.h/cpp         : root UI component and preset I/O
  *
  * Built with C++23.  All areas that benefit from C++26 features are marked
  * with a "TODO:C++26" comment so the eventual migration is straightforward.
@@ -20,76 +23,46 @@
 // TODO:C++26  Replace the #include directives below with named module imports
 //             once JUCE and the standard library ship module interfaces:
 //
-//   import std;               // replaces <iostream>
+//   import std;               // replaces <cmath>, <array>, <atomic>, etc.
 //   import juce;              // replaces juce_* module headers
 
-#include <juce_audio_devices/juce_audio_devices.h>  // AudioDeviceManager, AudioSourcePlayer
-#include <juce_gui_basics/juce_gui_basics.h>         // JUCEApplication, DocumentWindow
-#include <juce_core/juce_core.h>                     // String, Logger, Random
+#include "EnagaLookAndFeel.h"
+#include "MainComponent.h"
+#include "WhiteNoiseAudioSource.h"
 
-// ============================================================================
-//  WhiteNoiseAudioSource
-// ============================================================================
-
-/**
- * Fills every audio buffer with uniformly distributed random samples in
- * [-1, 1], producing flat-spectrum (white) noise.
- *
- * Output amplitude is at full scale; the OS/hardware volume control governs
- * the perceived loudness — no application-side gain stage is required.
- */
-class WhiteNoiseAudioSource final : public juce::AudioSource
-{
-public:
-    void prepareToPlay(int /*samplesPerBlockExpected*/, double /*sampleRate*/) override {}
-    void releaseResources() override {}
-
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override
-    {
-        for (int ch = 0; ch < info.buffer->getNumChannels(); ++ch)
-        {
-            auto* out = info.buffer->getWritePointer(ch, info.startSample);
-            for (int i = 0; i < info.numSamples; ++i)
-                out[i] = random.nextFloat() * 2.0f - 1.0f;
-        }
-    }
-
-private:
-    juce::Random random;  // PRNG seeded from system entropy at construction
-};
+#include <juce_audio_devices/juce_audio_devices.h>  // AudioDeviceManager, AudioSourcePlayer (EnagaApplication)
 
 // ============================================================================
 //  MainWindow
 // ============================================================================
 
 /**
- * Single application window.
+ * Single application window hosting MainComponent.
  *
  * Keeping a window open is what keeps the JUCE event loop (and therefore the
- * audio stream) running.  Closing the window triggers a clean exit via
+ * audio stream) alive.  Closing the window triggers a clean exit via
  * systemRequestedQuit(), which calls shutdown() before the process exits.
  */
 class MainWindow final : public juce::DocumentWindow
 {
 public:
-    explicit MainWindow(const juce::String& name)
+    MainWindow(const juce::String& name,
+               MainComponent::AudioToggleCallback  onToggle,
+               MainComponent::AudioFilterCallback  onFilter,
+               MainComponent::AudioGainCallback    onGain)
         : DocumentWindow(name,
-                         juce::Desktop::getInstance().getDefaultLookAndFeel()
-                             .findColour(juce::ResizableWindow::backgroundColourId),
+                         juce::Colour(0xff1a1a1a),
                          DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar(true);
         setResizable(true, false);
+        setResizeLimits(320, 240,       // minimum per issue requirement
+                        10000, 10000);  // effectively unbounded maximum
 
-        auto* label = new juce::Label(
-            "status",
-            "White noise is playing.\nUse your system volume to adjust loudness.");
-        label->setFont(juce::Font(18.0f));
-        label->setJustificationType(juce::Justification::centred);
-        label->setSize(400, 120);
-        setContentOwned(label, true);
+        setContentOwned(
+            new MainComponent(std::move(onToggle), std::move(onFilter), std::move(onGain)), true);
 
-        centreWithSize(getWidth(), getHeight());
+        centreWithSize(480, 420);
         setVisible(true);
     }
 
@@ -113,9 +86,8 @@ public:
  * android.app.Activity on Android); JUCE abstracts this behind the same
  * JUCEApplication interface used on the desktop.
  *
- * Audio lifetime mirrors application lifetime:
- *   initialise() → open default audio device, begin streaming white noise
- *   shutdown()   → stop the stream, release the device
+ * Audio lifetime is user-controlled (play/stop button); the device is opened
+ * in initialise() and closed in shutdown().
  *
  * TODO:C++26  'final' is already C++11, but once reflection lands in C++26
  *             consider annotating with [[clang::trivially_relocatable]] or the
@@ -136,8 +108,10 @@ public:
     /**
      * Called by JUCE after all platform initialisation is complete.
      *
-     * Opens the default audio output device (CoreAudio / WASAPI / ALSA,
-     * depending on the platform) and begins streaming white noise.
+     * Sets the global look and feel, creates the main window, and opens the
+     * default audio output device (CoreAudio / WASAPI / ALSA, depending on
+     * the platform).  Audio streaming starts only when the user presses the
+     * play button.
      *
      * @param commandLine  Space-separated command-line arguments provided by
      *                     the platform.  Unused here.
@@ -147,12 +121,17 @@ public:
     {
         juce::ignoreUnused(commandLine);
 
-        // Show the main window first so the event loop stays alive even if
-        // audio initialisation fails.
-        mainWindow = std::make_unique<MainWindow>(getApplicationName());
+        // Apply dark theme globally before any window is created.
+        juce::LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
+
+        // Create the main window; audio starts only when the play button is pressed.
+        mainWindow = std::make_unique<MainWindow>(
+            getApplicationName(),
+            [this](bool shouldPlay) { toggleAudio(shouldPlay);                  },
+            [this](float v)         { noiseSource.setCutoff(v);                 },
+            [this](float g)         { noiseSource.setGain(g);                   });
 
         // Open the platform's default audio output device (stereo, no input).
-        // AudioDeviceManager automatically honours the OS volume control.
         const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);
         if (error.isNotEmpty())
         {
@@ -167,9 +146,9 @@ public:
             return;
         }
 
-        // Connect: noiseSource → sourcePlayer → deviceManager.
+        // Connect source to player; the callback is added when the play button
+        // is pressed via toggleAudio(true).
         sourcePlayer.setSource(&noiseSource);
-        deviceManager.addAudioCallback(&sourcePlayer);
     }
 
     /**
@@ -180,6 +159,7 @@ public:
     void shutdown() override
     {
         mainWindow.reset();
+        juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
         deviceManager.removeAudioCallback(&sourcePlayer);
         sourcePlayer.setSource(nullptr);
         deviceManager.closeAudioDevice();
@@ -198,11 +178,21 @@ public:
     }
 
 private:
+    /** Starts or stops the audio callback in response to the play button. */
+    void toggleAudio(bool shouldPlay)
+    {
+        if (shouldPlay)
+            deviceManager.addAudioCallback(&sourcePlayer);
+        else
+            deviceManager.removeAudioCallback(&sourcePlayer);
+    }
+
     // Declaration order matches the dependency chain (destroyed in reverse).
-    juce::AudioDeviceManager     deviceManager;  // owns the hardware device
-    juce::AudioSourcePlayer      sourcePlayer;   // bridges AudioSource → device
-    WhiteNoiseAudioSource        noiseSource;    // generates the noise samples
-    std::unique_ptr<MainWindow>  mainWindow;     // destroyed first (UI last)
+    EnagaLookAndFeel             lookAndFeel;   // must outlive all UI components
+    juce::AudioDeviceManager     deviceManager; // owns the hardware device
+    juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource → device
+    WhiteNoiseAudioSource        noiseSource;   // generates the noise samples
+    std::unique_ptr<MainWindow>  mainWindow;    // destroyed first (UI last)
 };
 
 // ============================================================================

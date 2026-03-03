@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.22)
 project(Enaga
     VERSION      0.1.0
     DESCRIPTION  "Relaxing white noise generator"
-    LANGUAGES    CXX
+    LANGUAGES    C CXX
 )
 
 # ---------------------------------------------------------------------------
 # C++ standard
 # Using C++23 now; migrate to C++26 by changing 23 → 26 below once toolchain
-# support is widespread.  See Source/Main.cpp for per-file C++26 TODO notes.
+# support is widespread.  See the Source/ directory for per-file C++26 TODO notes.
 # ---------------------------------------------------------------------------
 set(CMAKE_CXX_STANDARD          23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -50,6 +50,8 @@ juce_add_gui_app(Enaga
 
 target_sources(Enaga PRIVATE
     Source/Main.cpp
+    Source/WhiteNoiseAudioSource.cpp
+    Source/MainComponent.cpp
 )
 
 # Require C++23 for this target explicitly (inherits project default, but
