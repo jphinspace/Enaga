@@ -21,9 +21,7 @@ MainComponent::MainComponent(AudioToggleCallback onToggle,
     setupContinuousSlider();
     setupValueBox();
     setupLabels();
-#if ! (JUCE_IOS || JUCE_ANDROID)
     setupVolumeSlider();
-#endif
 
 #if JUCE_IOS || JUCE_ANDROID
     setupMobileMenuButton();
@@ -108,11 +106,7 @@ void MainComponent::resized()
     area.removeFromTop(pad);
 
     // Control row height: split remaining space equally across rows.
-#if JUCE_IOS || JUCE_ANDROID
-    const int numRows = 2;
-#else
-    const int numRows = 3;
-#endif
+    const int numRows = 3;  // play, cutoff, volume (all platforms)
     const int ctrlH = (area.getHeight() - (numRows - 1) * pad) / numRows;
 
     // Row 1: play button + label + discrete slider
@@ -139,14 +133,22 @@ void MainComponent::resized()
 #if ! (JUCE_IOS || JUCE_ANDROID)
     area.removeFromTop(pad);
 
-    // Row 3: Volume label + volume slider + value box
+    // Row 3: Volume label + volume slider
     volumeLabel.setBounds(area.removeFromLeft(64));
-    {
-        const int boxW = juce::jlimit(56, 76, area.getWidth() / 5);
-        volumeValueBox.setBounds(area.removeFromRight(boxW));
-        area.removeFromRight(4);
-        volumeSlider.setBounds(area);
-    }
+    volumeSlider.setBounds(area);
+#else
+    area.removeFromTop(pad);
+
+    // Row 3: Volume label + platform-specific volume control
+    volumeLabel.setBounds(area.removeFromLeft(64));
+  #if JUCE_IOS
+    // MPVolumeView is self-contained (includes speaker icons); give it all
+    // remaining row space so it can render at its natural size.
+    mobileVolumeView.setBounds(area);
+  #else
+    // Android: juce::Slider wired to system audio volume
+    volumeSlider.setBounds(area);
+  #endif
 #endif
 }
 
@@ -216,11 +218,9 @@ void MainComponent::setupLabels()
     continuousLabel.setJustificationType(juce::Justification::centredLeft);
     addAndMakeVisible(continuousLabel);
 
-#if ! (JUCE_IOS || JUCE_ANDROID)
     volumeLabel.setText("Volume", juce::dontSendNotification);
     volumeLabel.setJustificationType(juce::Justification::centredLeft);
     addAndMakeVisible(volumeLabel);
-#endif
 }
 
 void MainComponent::setupMobileMenuButton()
@@ -249,18 +249,39 @@ void MainComponent::setupVolumeSlider()
     volumeSlider.setValue(defaultVolumeValue);
     volumeSlider.onValueChange = [this]
     {
-        syncVolumeValueBox();
         if (audioGain)
             audioGain(static_cast<float>(volumeSlider.getValue()) / 100.0f);
     };
     addAndMakeVisible(volumeSlider);
+}
+#elif JUCE_IOS
+void MainComponent::setupVolumeSlider()
+{
+    // mobileVolumeView wraps MPVolumeView; no extra configuration needed —
+    // UIKit owns the appearance and the control directly manipulates device
+    // media volume without any application-layer callbacks.
+    addAndMakeVisible(mobileVolumeView);
+}
+#else // JUCE_ANDROID
+void MainComponent::setupVolumeSlider()
+{
+    volumeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    volumeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    volumeSlider.setRange(0.0, 100.0);
 
-    volumeValueBox.setInputRestrictions(6, "0123456789.");
-    volumeValueBox.setText(juce::String(defaultVolumeValue, 1), false);
-    volumeValueBox.setJustification(juce::Justification::centred);
-    volumeValueBox.onReturnKey = [this] { applyVolumeValueBox(); };
-    volumeValueBox.onFocusLost = [this] { applyVolumeValueBox(); };
-    addAndMakeVisible(volumeValueBox);
+    // Initialise from the current system media volume; clamp to [0, 1] in
+    // case the API returns an unexpected value on some devices.
+    const float sysGain = juce::jlimit(0.0f, 1.0f,
+                                        juce::SystemAudioVolume::getGain());
+    volumeSlider.setValue(static_cast<double>(sysGain) * 100.0,
+                          juce::dontSendNotification);
+
+    volumeSlider.onValueChange = [this]
+    {
+        juce::SystemAudioVolume::setGain(
+            static_cast<float>(volumeSlider.getValue()) / 100.0f);
+    };
+    addAndMakeVisible(volumeSlider);
 }
 #endif
 
@@ -312,22 +333,6 @@ void MainComponent::applyValueBox()
     continuousSlider.setValue(v, juce::sendNotificationSync);
     syncValueBox();
 }
-
-#if ! (JUCE_IOS || JUCE_ANDROID)
-void MainComponent::syncVolumeValueBox()
-{
-    volumeValueBox.setText(
-        juce::String(volumeSlider.getValue(), 1), false);
-}
-
-void MainComponent::applyVolumeValueBox()
-{
-    const double v = juce::jlimit(0.0, 100.0,
-                                  volumeValueBox.getText().getDoubleValue());
-    volumeSlider.setValue(v, juce::sendNotificationSync);
-    syncVolumeValueBox();
-}
-#endif
 
 // ============================================================================
 //  Preset I/O
@@ -396,7 +401,6 @@ void MainComponent::loadPreset()
             const double volVal = xml->getDoubleAttribute("volumeValue",
                                                           defaultVolumeValue);
             volumeSlider.setValue(volVal);
-            syncVolumeValueBox();
 #endif
 
             if (playing != playButton.getToggleState())

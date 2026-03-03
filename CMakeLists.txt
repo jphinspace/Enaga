@@ -54,6 +54,11 @@ target_sources(Enaga PRIVATE
     Source/MainComponent.cpp
 )
 
+# iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    target_sources(Enaga PRIVATE Source/iOSVolumeView.mm)
+endif()
+
 # Require C++23 for this target explicitly (inherits project default, but
 # explicit is better than implicit — a C++26 TODO marker in its own right).
 target_compile_features(Enaga PRIVATE cxx_std_23)
@@ -75,3 +80,12 @@ target_link_libraries(Enaga
         juce::juce_audio_basics  # AudioSource, AudioBuffer, …
         juce::juce_audio_devices # AudioDeviceManager, AudioSourcePlayer, …
 )
+
+# iOS-specific: UIViewComponent (hosts MPVolumeView) lives in juce_gui_extra;
+# MediaPlayer.framework provides MPVolumeView itself.
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    target_link_libraries(Enaga PRIVATE
+        juce::juce_gui_extra
+        "-framework MediaPlayer"
+    )
+endif()
