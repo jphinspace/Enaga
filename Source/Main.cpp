@@ -421,9 +421,14 @@ public:
 #if ! (JUCE_IOS || JUCE_ANDROID)
         area.removeFromTop(pad);
 
-        // Row 3: Volume label + volume slider (no value box)
+        // Row 3: Volume label + volume slider + value box
         volumeLabel.setBounds(area.removeFromLeft(64));
-        volumeSlider.setBounds(area);
+        {
+            const int boxW = juce::jlimit(56, 76, area.getWidth() / 5);
+            volumeValueBox.setBounds(area.removeFromRight(boxW));
+            area.removeFromRight(4);
+            volumeSlider.setBounds(area);
+        }
 #endif
     }
 
@@ -527,10 +532,18 @@ private:
         volumeSlider.setValue(defaultVolumeValue);
         volumeSlider.onValueChange = [this]
         {
+            syncVolumeValueBox();
             if (audioGain)
                 audioGain(static_cast<float>(volumeSlider.getValue()) / 100.0f);
         };
         addAndMakeVisible(volumeSlider);
+
+        volumeValueBox.setInputRestrictions(6, "0123456789.");
+        volumeValueBox.setText(juce::String(defaultVolumeValue, 1), false);
+        volumeValueBox.setJustification(juce::Justification::centred);
+        volumeValueBox.onReturnKey = [this] { applyVolumeValueBox(); };
+        volumeValueBox.onFocusLost = [this] { applyVolumeValueBox(); };
+        addAndMakeVisible(volumeValueBox);
     }
 #endif
 
@@ -582,6 +595,22 @@ private:
         continuousSlider.setValue(v, juce::sendNotificationSync);
         syncValueBox();
     }
+
+#if ! (JUCE_IOS || JUCE_ANDROID)
+    void syncVolumeValueBox()
+    {
+        volumeValueBox.setText(
+            juce::String(volumeSlider.getValue(), 1), false);
+    }
+
+    void applyVolumeValueBox()
+    {
+        const double v = juce::jlimit(0.0, 100.0,
+                                      volumeValueBox.getText().getDoubleValue());
+        volumeSlider.setValue(v, juce::sendNotificationSync);
+        syncVolumeValueBox();
+    }
+#endif
 
     // -----------------------------------------------------------------------
     //  Preset I/O
@@ -647,6 +676,7 @@ private:
 #if ! (JUCE_IOS || JUCE_ANDROID)
                 const double volVal = xml->getDoubleAttribute("volumeValue", defaultVolumeValue);
                 volumeSlider.setValue(volVal);
+                syncVolumeValueBox();
 #endif
 
                 if (playing != playButton.getToggleState())
@@ -699,6 +729,7 @@ private:
 #if ! (JUCE_IOS || JUCE_ANDROID)
     juce::Slider     volumeSlider;
     juce::Label      volumeLabel;
+    juce::TextEditor volumeValueBox;
 #endif
 
     juce::Rectangle<int> imageArea;
