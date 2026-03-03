@@ -69,6 +69,44 @@ public:
         setColour(juce::TextButton::textColourOffId,                  textCol);
         setColour(juce::TextButton::textColourOnId,                   bg);
     }
+
+    /** Draws step-position tick marks below the track for sliders with a
+     *  non-zero snap interval (i.e. the discrete Steps slider). */
+    void drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
+                          float sliderPos, float minSliderPos, float maxSliderPos,
+                          juce::Slider::SliderStyle style, juce::Slider& slider) override
+    {
+        LookAndFeel_V4::drawLinearSlider(g, x, y, width, height,
+                                         sliderPos, minSliderPos, maxSliderPos,
+                                         style, slider);
+
+        // Only add tick marks for horizontal sliders with a visible snap interval.
+        if (style != juce::Slider::LinearHorizontal)
+            return;
+
+        const double interval = slider.getInterval();
+        if (interval <= 0.0)
+            return;
+
+        const double lo   = slider.getMinimum();
+        const double hi   = slider.getMaximum();
+        const double span = hi - lo;
+
+        const auto tickColour = juce::Colour(0xff4fc3f7).withAlpha(0.55f);
+        const int  tickH      = 6;   // height of each tick mark (pixels)
+        const int  tickW      = 2;   // width  of each tick mark (pixels)
+        // Position ticks just below the slider track centre.
+        const int  tickY      = y + height / 2 + 5;
+
+        for (double v = lo; v <= hi + interval * 0.01; v += interval)
+        {
+            const float proportion = static_cast<float>((v - lo) / span);
+            const int   tickX      = x + juce::roundToInt(proportion * static_cast<float>(width))
+                                       - tickW / 2;
+            g.setColour(tickColour);
+            g.fillRect(tickX, tickY, tickW, tickH);
+        }
+    }
 };
 
 // ============================================================================
