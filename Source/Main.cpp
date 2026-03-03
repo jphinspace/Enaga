@@ -146,9 +146,11 @@ public:
             return;
         }
 
-        // Connect source to player; the callback is added when the play button
-        // is pressed via toggleAudio(true).
+        // Connect source to player and register the callback for the duration of
+        // the session.  The fade envelope (fadeCurrent = 0 at startup) keeps the
+        // output silent until the play button is pressed.
         sourcePlayer.setSource(&noiseSource);
+        deviceManager.addAudioCallback(&sourcePlayer);
     }
 
     /**
@@ -178,13 +180,10 @@ public:
     }
 
 private:
-    /** Starts or stops the audio callback in response to the play button. */
+    /** Fades in or out based on whether the play button is on or off. */
     void toggleAudio(bool shouldPlay)
     {
-        if (shouldPlay)
-            deviceManager.addAudioCallback(&sourcePlayer);
-        else
-            deviceManager.removeAudioCallback(&sourcePlayer);
+        if (shouldPlay) noiseSource.startFadeIn(); else noiseSource.startFadeOut();
     }
 
     // Declaration order matches the dependency chain (destroyed in reverse).
