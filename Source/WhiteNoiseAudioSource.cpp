@@ -35,9 +35,8 @@ void WhiteNoiseAudioSource::prepareToPlay(int /*samplesPerBlockExpected*/,
     fadeCurrent = fadeTarget.load(std::memory_order_relaxed);
 
     // Pre-compute the per-sample fade step (constant while sampleRate is fixed).
-    static constexpr float fadeDuration = 0.25f; // seconds
     fadeStep = (sampleRate > 0.0)
-             ? 1.0f / (fadeDuration * static_cast<float>(sampleRate))
+             ? 1.0f / (fadeDurationSeconds * static_cast<float>(sampleRate))
              : 0.0f;
 
     lastCutoff  = cutoff.load(std::memory_order_relaxed);

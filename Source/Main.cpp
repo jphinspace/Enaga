@@ -182,41 +182,44 @@ public:
     }
 
 private:
-    /** Starts or stops the audio with a 0.25-second fade in or fade out. */
+    /** Starts the audio callback and triggers a fade-in. */
+    void startAudio()
+    {
+        pendingStop = false;
+        noiseSource.startFadeIn();
+        if (!callbackAdded)
+        {
+            deviceManager.addAudioCallback(&sourcePlayer);
+            callbackAdded = true;
+        }
+    }
+
+    /** Triggers a fade-out and removes the audio callback once silence is reached. */
+    void stopAudio()
+    {
+        noiseSource.startFadeOut();
+        pendingStop = true;
+
+        // Derived from the fade duration; 50 ms guard ensures the audio thread
+        // has fully reached silence before the callback is removed.
+        static constexpr int fadeOutDelayMs =
+            static_cast<int>(WhiteNoiseAudioSource::fadeDurationSeconds * 1000.0f) + 50;
+
+        juce::Timer::callAfterDelay(fadeOutDelayMs, [this]()
+        {
+            if (pendingStop)
+            {
+                deviceManager.removeAudioCallback(&sourcePlayer);
+                callbackAdded = false;
+                pendingStop   = false;
+            }
+        });
+    }
+
+    /** Routes the play-button toggle to startAudio() or stopAudio(). */
     void toggleAudio(bool shouldPlay)
     {
-        if (shouldPlay)
-        {
-            // Cancel any pending fade-out removal so a rapid stop→play sequence
-            // does not remove an already-live callback.
-            pendingStop = false;
-
-            noiseSource.startFadeIn();   // arm ramp before callback can fire
-            if (!callbackAdded)
-            {
-                deviceManager.addAudioCallback(&sourcePlayer);
-                callbackAdded = true;
-            }
-        }
-        else
-        {
-            noiseSource.startFadeOut();
-            pendingStop = true;
-
-            // Remove the audio callback after the 0.25 s fade has completed.
-            // 50 ms of extra margin ensures the audio thread has fully reached
-            // silence before the callback is torn down.
-            static constexpr int fadeOutDelayMs = 300; // 250 ms fade + 50 ms margin
-            juce::Timer::callAfterDelay(fadeOutDelayMs, [this]()
-            {
-                if (pendingStop)
-                {
-                    deviceManager.removeAudioCallback(&sourcePlayer);
-                    callbackAdded = false;
-                    pendingStop   = false;
-                }
-            });
-        }
+        if (shouldPlay) startAudio(); else stopAudio();
     }
 
     // Declaration order matches the dependency chain (destroyed in reverse).

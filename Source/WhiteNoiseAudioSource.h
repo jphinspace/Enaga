@@ -40,16 +40,19 @@ public:
     void setGain(float newGain) noexcept;
 
     /**
-     * Begin a 0.25-second linear fade-in from silence to full level.
+     * Begin a linear fade-in from silence to full level over @c fadeDurationSeconds.
      * Thread-safe: written by the message thread, applied on the audio thread.
      */
     void startFadeIn() noexcept;
 
     /**
-     * Begin a 0.25-second linear fade-out from full level to silence.
+     * Begin a linear fade-out from full level to silence over @c fadeDurationSeconds.
      * Thread-safe: written by the message thread, applied on the audio thread.
      */
     void startFadeOut() noexcept;
+
+    /** Duration of the fade-in and fade-out ramp in seconds. */
+    static constexpr float fadeDurationSeconds = 0.25f;
 
     void prepareToPlay(int samplesPerBlockExpected, double newSampleRate) override;
     void releaseResources() override;
