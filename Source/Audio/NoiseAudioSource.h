@@ -1,5 +1,5 @@
 /**
- * @file   WhiteNoiseAudioSource.h
+ * @file   NoiseAudioSource.h
  * @brief  JUCE AudioSource that delegates sample generation to a pluggable
  *         NoiseGenerator, then applies a low-pass filter, gain, fade, and LFO.
  */
@@ -34,7 +34,7 @@ enum class NoiseType { White = 0, Pink, Brown, Grey };
  * The LFO modulates gain and/or cutoff within the bounds set by the user's
  * existing Volume and Cutoff sliders (it never exceeds those values).
  */
-class WhiteNoiseAudioSource final : public juce::AudioSource
+class NoiseAudioSource final : public juce::AudioSource
 {
 public:
     /**

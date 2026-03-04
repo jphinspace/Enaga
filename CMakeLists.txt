@@ -50,13 +50,29 @@ juce_add_gui_app(Enaga
 
 target_sources(Enaga PRIVATE
     Source/Main.cpp
-    Source/WhiteNoiseAudioSource.cpp
-    Source/MainComponent.cpp
+    Source/Audio/NoiseAudioSource.cpp
+    Source/UI/MainComponent.cpp
+
+    # Headers – listed so IDEs (CLion, VS, Xcode) display them in the project tree.
+    Source/Audio/LfoEngine.h
+    Source/Audio/NoiseAudioSource.h
+    Source/Audio/NoiseGenerator.h
+    Source/Audio/WhiteNoiseGenerator.h
+    Source/Audio/PinkNoiseGenerator.h
+    Source/Audio/BrownNoiseGenerator.h
+    Source/Audio/GreyNoiseGenerator.h
+    Source/UI/EnagaLookAndFeel.h
+    Source/UI/LfoComponent.h
+    Source/UI/MainComponent.h
+    Source/UI/PlayButton.h
 )
 
 # iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    target_sources(Enaga PRIVATE Source/iOSVolumeView.mm)
+    target_sources(Enaga PRIVATE
+        Source/UI/iOSVolumeView.mm
+        Source/UI/iOSVolumeView.h
+    )
 endif()
 
 # Require C++23 for this target explicitly (inherits project default, but

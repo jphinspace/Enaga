@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "LfoEngine.h"
+#include "../Audio/LfoEngine.h"
 
 #include <juce_gui_basics/juce_gui_basics.h>
 

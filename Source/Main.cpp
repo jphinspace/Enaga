@@ -4,10 +4,10 @@
  *         the platform-specific entry point macro.
  *
  * Class responsibilities are split across separate source files:
- *   - EnagaLookAndFeel.h          : dark theme / LookAndFeel overrides
- *   - PlayButton.h                : custom play/stop toggle button
- *   - WhiteNoiseAudioSource.h/cpp : noise generator with LP filter + gain
- *   - MainComponent.h/cpp         : root UI component and preset I/O
+ *   - EnagaLookAndFeel.h         : dark theme / LookAndFeel overrides    (UI/)
+ *   - PlayButton.h               : custom play/stop toggle button         (UI/)
+ *   - NoiseAudioSource.h/cpp     : noise generator with LP filter + gain  (Audio/)
+ *   - MainComponent.h/cpp        : root UI component and preset I/O       (UI/)
  *
  * Built with C++23.  All areas that benefit from C++26 features are marked
  * with a "TODO:C++26" comment so the eventual migration is straightforward.
@@ -26,9 +26,9 @@
 //   import std;               // replaces <cmath>, <array>, <atomic>, etc.
 //   import juce;              // replaces juce_* module headers
 
-#include "EnagaLookAndFeel.h"
-#include "MainComponent.h"
-#include "WhiteNoiseAudioSource.h"
+#include "UI/EnagaLookAndFeel.h"
+#include "UI/MainComponent.h"
+#include "Audio/NoiseAudioSource.h"
 
 #include <juce_audio_devices/juce_audio_devices.h>  // AudioDeviceManager, AudioSourcePlayer (EnagaApplication)
 
@@ -204,7 +204,7 @@ private:
     EnagaLookAndFeel             lookAndFeel;   // must outlive all UI components
     juce::AudioDeviceManager     deviceManager; // owns the hardware device
     juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource → device
-    WhiteNoiseAudioSource        noiseSource;   // generates the noise samples
+    NoiseAudioSource             noiseSource;   // generates the noise samples
     std::unique_ptr<MainWindow>  mainWindow;    // destroyed first (UI last)
 };
 
