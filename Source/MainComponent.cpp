@@ -9,14 +9,24 @@
 //  Constructor / Destructor
 // ============================================================================
 
-MainComponent::MainComponent(AudioToggleCallback    onToggle,
-                             AudioFilterCallback    onFilter,
-                             AudioGainCallback      onGain,
-                             AudioNoiseTypeCallback onNoiseType)
-    : audioToggle(std::move(onToggle))
-    , audioFilter(std::move(onFilter))
-    , audioGain(std::move(onGain))
-    , audioNoiseType(std::move(onNoiseType))
+MainComponent::MainComponent(AudioToggleCallback       onToggle,
+                             AudioFilterCallback       onFilter,
+                             AudioGainCallback         onGain,
+                             AudioNoiseTypeCallback    onNoiseType,
+                             AudioLfoRateCallback      onLfoRate,
+                             AudioLfoIntensityCallback onLfoIntensity,
+                             AudioLfoModeCallback      onLfoMode)
+    : audioToggle    (std::move(onToggle))
+    , audioFilter    (std::move(onFilter))
+    , audioGain      (std::move(onGain))
+    , audioNoiseType (std::move(onNoiseType))
+    , audioLfoRate   (std::move(onLfoRate))
+    , audioLfoIntensity(std::move(onLfoIntensity))
+    , audioLfoMode   (std::move(onLfoMode))
+    , lfoComponent(
+        [this](float r)    { if (audioLfoRate)      audioLfoRate(r);      },
+        [this](float i)    { if (audioLfoIntensity) audioLfoIntensity(i); },
+        [this](LfoMode m)  { if (audioLfoMode)      audioLfoMode(m);      })
 {
     setupPlayButton();
     setupDiscreteSlider();
@@ -24,6 +34,7 @@ MainComponent::MainComponent(AudioToggleCallback    onToggle,
     setupValueBox();
     setupLabels();
     setupVolumeSlider();
+    addAndMakeVisible(lfoComponent);
 
 #if JUCE_IOS || JUCE_ANDROID
     setupMobileMenuButton();
@@ -107,8 +118,9 @@ void MainComponent::resized()
 
     area.removeFromTop(pad);
 
-    // Control row height: split remaining space equally across rows.
-    const int numRows = 3;  // play, cutoff, volume (all platforms)
+    // Control row height: split remaining space equally across all rows.
+    // 3 existing rows (play, cutoff, volume) + 3 LFO rows = 6 total.
+    const int numRows = 6;
     const int ctrlH = (area.getHeight() - (numRows - 1) * pad) / numRows;
 
     // Row 1: play button + label + discrete slider
@@ -136,22 +148,33 @@ void MainComponent::resized()
     area.removeFromTop(pad);
 
     // Row 3: Volume label + volume slider
-    volumeLabel.setBounds(area.removeFromLeft(64));
-    volumeSlider.setBounds(area);
+    {
+        auto row3 = area.removeFromTop(ctrlH);
+        volumeLabel.setBounds(row3.removeFromLeft(64));
+        volumeSlider.setBounds(row3);
+    }
 #else
     area.removeFromTop(pad);
 
     // Row 3: Volume label + platform-specific volume control
-    volumeLabel.setBounds(area.removeFromLeft(64));
+    {
+        auto row3 = area.removeFromTop(ctrlH);
+        volumeLabel.setBounds(row3.removeFromLeft(64));
   #if JUCE_IOS
-    // MPVolumeView is self-contained (includes speaker icons); give it all
-    // remaining row space so it can render at its natural size.
-    mobileVolumeView.setBounds(area);
+        // MPVolumeView is self-contained (includes speaker icons); give it all
+        // remaining row space so it can render at its natural size.
+        mobileVolumeView.setBounds(row3);
   #else
-    // Android: juce::Slider wired to system audio volume
-    volumeSlider.setBounds(area);
+        // Android: juce::Slider wired to system audio volume
+        volumeSlider.setBounds(row3);
   #endif
+    }
 #endif
+
+    area.removeFromTop(pad);
+
+    // Rows 4–6: LFO section (mode button, rate slider, intensity slider + value box).
+    lfoComponent.setBounds(area.removeFromTop(3 * ctrlH + 2 * pad));
 }
 
 void MainComponent::paint(juce::Graphics& g)

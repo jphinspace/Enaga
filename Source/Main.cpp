@@ -47,10 +47,13 @@ class MainWindow final : public juce::DocumentWindow
 {
 public:
     MainWindow(const juce::String& name,
-               MainComponent::AudioToggleCallback    onToggle,
-               MainComponent::AudioFilterCallback    onFilter,
-               MainComponent::AudioGainCallback      onGain,
-               MainComponent::AudioNoiseTypeCallback onNoiseType)
+               MainComponent::AudioToggleCallback       onToggle,
+               MainComponent::AudioFilterCallback       onFilter,
+               MainComponent::AudioGainCallback         onGain,
+               MainComponent::AudioNoiseTypeCallback    onNoiseType,
+               MainComponent::AudioLfoRateCallback      onLfoRate,
+               MainComponent::AudioLfoIntensityCallback onLfoIntensity,
+               MainComponent::AudioLfoModeCallback      onLfoMode)
         : DocumentWindow(name,
                          juce::Colour(0xff1a1a1a),
                          DocumentWindow::allButtons)
@@ -62,9 +65,11 @@ public:
 
         setContentOwned(
             new MainComponent(std::move(onToggle), std::move(onFilter),
-                              std::move(onGain), std::move(onNoiseType)), true);
+                              std::move(onGain), std::move(onNoiseType),
+                              std::move(onLfoRate), std::move(onLfoIntensity),
+                              std::move(onLfoMode)), true);
 
-        centreWithSize(480, 420);
+        centreWithSize(480, 600);
         setVisible(true);
     }
 
@@ -135,7 +140,10 @@ public:
             [this](float v)         { noiseSource.setNoiseType(
                                           static_cast<NoiseType>(
                                               juce::jlimit(0, 3,
-                                                  static_cast<int>(v) - 1))); });
+                                                  static_cast<int>(v) - 1))); },
+            [this](float r)         { noiseSource.setLfoRate(r);                },
+            [this](float i)         { noiseSource.setLfoIntensity(i);           },
+            [this](LfoMode m)       { noiseSource.setLfoMode(m);                });
 
         // Open the platform's default audio output device (stereo, no input).
         const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);

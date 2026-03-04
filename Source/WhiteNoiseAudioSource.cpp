@@ -23,6 +23,21 @@ void WhiteNoiseAudioSource::setNoiseType(NoiseType type) noexcept
     noiseType.store(static_cast<int>(type), std::memory_order_relaxed);
 }
 
+void WhiteNoiseAudioSource::setLfoRate(float rateHz) noexcept
+{
+    lfo.setRate(rateHz);
+}
+
+void WhiteNoiseAudioSource::setLfoIntensity(float i) noexcept
+{
+    lfo.setIntensity(i);
+}
+
+void WhiteNoiseAudioSource::setLfoMode(LfoMode mode) noexcept
+{
+    lfo.setMode(mode);
+}
+
 void WhiteNoiseAudioSource::startFadeIn() noexcept
 {
     fadeTarget.store(1.0f, std::memory_order_relaxed);
@@ -46,6 +61,8 @@ void WhiteNoiseAudioSource::prepareToPlay(int /*samplesPerBlockExpected*/,
     updateLpFilters();
     for (auto& f : lpFilters)
         f.reset();
+
+    lfo.reset();
 
     whiteGen.prepare(sampleRate);
     pinkGen.prepare(sampleRate);
@@ -77,16 +94,30 @@ NoiseGenerator* WhiteNoiseAudioSource::activeGenerator() noexcept
 
 void WhiteNoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& info)
 {
-    // Re-coefficient the LP filter if the cutoff changed since the last block.
-    const float c = cutoff.load(std::memory_order_relaxed);
-    if (c != lastCutoff)
+    // Advance the LFO once per block and obtain its normalised value [0, 1].
+    const float    lfoNorm    = lfo.tick(info.numSamples, sampleRate);
+    const LfoMode  lfoModeVal = lfo.getMode();
+
+    // Effective cutoff: apply LFO modulation when mode includes Filter.
+    const float userCutoff      = cutoff.load(std::memory_order_relaxed);
+    const float effectiveCutoff = (lfoModeVal == LfoMode::Filter || lfoModeVal == LfoMode::Both)
+                                  ? lfo.applyToMax(userCutoff, lfoNorm)
+                                  : userCutoff;
+
+    // Re-coefficient the LP filter when the effective cutoff changes.
+    if (effectiveCutoff != lastCutoff)
     {
-        lastCutoff = c;
+        lastCutoff = effectiveCutoff;
         updateLpFilters();
     }
 
     const float g      = gain.load(std::memory_order_relaxed);
     const float target = fadeTarget.load(std::memory_order_relaxed);
+
+    // LFO gain multiplier: 1.0 when not modulating volume.
+    const float lfoGainMod = (lfoModeVal == LfoMode::Volume || lfoModeVal == LfoMode::Both)
+                             ? lfo.applyToMax(1.0f, lfoNorm)
+                             : 1.0f;
 
     // Read the noise type once so the whole block uses the same generator.
     NoiseGenerator* gen = activeGenerator();
@@ -101,13 +132,13 @@ void WhiteNoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo
 
         lpFilters[chIdx].processSamples(out, info.numSamples);
 
-        // Apply user gain and per-sample fade ramp.
+        // Apply user gain, LFO gain modifier, and per-sample fade ramp.
         // All channels start from the same fadeCurrent so they stay in sync;
         // fadeCurrent is updated only once (after channel 0).
         float fc = fadeCurrent;
         for (int i = 0; i < info.numSamples; ++i)
         {
-            out[i] *= g * fc;
+            out[i] *= g * lfoGainMod * fc;
             if (fc != target)
                 fc = (target > fc) ? juce::jmin(fc + fadeStep, target)
                                    : juce::jmax(fc - fadeStep, target);
