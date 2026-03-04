@@ -18,6 +18,11 @@ void WhiteNoiseAudioSource::setGain(float newGain) noexcept
     gain.store(juce::jlimit(0.0f, 1.0f, newGain), std::memory_order_relaxed);
 }
 
+void WhiteNoiseAudioSource::setNoiseType(NoiseType type) noexcept
+{
+    noiseType.store(static_cast<int>(type), std::memory_order_relaxed);
+}
+
 void WhiteNoiseAudioSource::startFadeIn() noexcept
 {
     fadeTarget.store(1.0f, std::memory_order_relaxed);
@@ -33,49 +38,72 @@ void WhiteNoiseAudioSource::prepareToPlay(int /*samplesPerBlockExpected*/,
 {
     sampleRate  = newSampleRate;
     fadeCurrent = fadeTarget.load(std::memory_order_relaxed);
+    fadeStep    = (sampleRate > 0.0)
+               ? 1.0f / (fadeDurationSeconds * static_cast<float>(sampleRate))
+               : 0.0f;
 
-    // Pre-compute the per-sample fade step (constant while sampleRate is fixed).
-    fadeStep = (sampleRate > 0.0)
-             ? 1.0f / (fadeDurationSeconds * static_cast<float>(sampleRate))
-             : 0.0f;
-
-    lastCutoff  = cutoff.load(std::memory_order_relaxed);
-    updateFilters();
-    for (auto& f : filters)
+    lastCutoff = cutoff.load(std::memory_order_relaxed);
+    updateLpFilters();
+    for (auto& f : lpFilters)
         f.reset();
+
+    whiteGen.prepare(sampleRate);
+    pinkGen.prepare(sampleRate);
+    brownGen.prepare(sampleRate);
+    greyGen.prepare(sampleRate);
 }
 
 void WhiteNoiseAudioSource::releaseResources()
 {
-    for (auto& f : filters)
+    for (auto& f : lpFilters)
         f.reset();
+
+    whiteGen.reset();
+    pinkGen.reset();
+    brownGen.reset();
+    greyGen.reset();
+}
+
+NoiseGenerator* WhiteNoiseAudioSource::activeGenerator() noexcept
+{
+    switch (static_cast<NoiseType>(noiseType.load(std::memory_order_relaxed)))
+    {
+        case NoiseType::Pink:  return &pinkGen;
+        case NoiseType::Brown: return &brownGen;
+        case NoiseType::Grey:  return &greyGen;
+        default:               return &whiteGen;
+    }
 }
 
 void WhiteNoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& info)
 {
-    // Re-coefficient the filters if the cutoff changed since the last block.
+    // Re-coefficient the LP filter if the cutoff changed since the last block.
     const float c = cutoff.load(std::memory_order_relaxed);
     if (c != lastCutoff)
     {
         lastCutoff = c;
-        updateFilters();
+        updateLpFilters();
     }
 
     const float g      = gain.load(std::memory_order_relaxed);
     const float target = fadeTarget.load(std::memory_order_relaxed);
 
+    // Read the noise type once so the whole block uses the same generator.
+    NoiseGenerator* gen = activeGenerator();
+
     for (int ch = 0; ch < info.buffer->getNumChannels(); ++ch)
     {
         auto* out = info.buffer->getWritePointer(ch, info.startSample);
-        for (int i = 0; i < info.numSamples; ++i)
-            out[i] = random.nextFloat() * 2.0f - 1.0f;
+        const auto chIdx = static_cast<std::size_t>(juce::jmin(ch, 1));
 
-        if (ch < static_cast<int>(filters.size()))
-            filters[static_cast<size_t>(ch)].processSamples(out, info.numSamples);
+        for (int i = 0; i < info.numSamples; ++i)
+            out[i] = gen->nextSample(chIdx);
+
+        lpFilters[chIdx].processSamples(out, info.numSamples);
 
         // Apply user gain and per-sample fade ramp.
-        // Each channel starts from the same fadeCurrent so all channels are
-        // in sync; fadeCurrent is updated only once (after channel 0).
+        // All channels start from the same fadeCurrent so they stay in sync;
+        // fadeCurrent is updated only once (after channel 0).
         float fc = fadeCurrent;
         for (int i = 0; i < info.numSamples; ++i)
         {
@@ -90,13 +118,13 @@ void WhiteNoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo
     }
 }
 
-void WhiteNoiseAudioSource::updateFilters()
+void WhiteNoiseAudioSource::updateLpFilters()
 {
     if (sampleRate <= 0.0) return;
 
     // Logarithmic map: 0 → 20 Hz, 100 → 20 000 Hz.
     const double freq = 20.0 * std::pow(1000.0, static_cast<double>(lastCutoff) / 100.0);
     const auto   coef = juce::IIRCoefficients::makeLowPass(sampleRate, freq);
-    for (auto& f : filters)
+    for (auto& f : lpFilters)
         f.setCoefficients(coef);
 }
