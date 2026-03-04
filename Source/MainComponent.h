@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "LfoComponent.h"
 #include "PlayButton.h"
 
 #if JUCE_IOS
@@ -43,15 +44,21 @@ class MainComponent final : public juce::Component
                           , public juce::MenuBarModel
 {
 public:
-    using AudioToggleCallback    = std::function<void(bool /*shouldPlay*/)>;
-    using AudioFilterCallback    = std::function<void(float /*cutoff 0-100*/)>;
-    using AudioGainCallback      = std::function<void(float /*gain 0-1*/)>;
-    using AudioNoiseTypeCallback = std::function<void(float /*discreteValue 1.0-4.0*/)>;
+    using AudioToggleCallback       = std::function<void(bool /*shouldPlay*/)>;
+    using AudioFilterCallback       = std::function<void(float /*cutoff 0-100*/)>;
+    using AudioGainCallback         = std::function<void(float /*gain 0-1*/)>;
+    using AudioNoiseTypeCallback    = std::function<void(float /*discreteValue 1.0-4.0*/)>;
+    using AudioLfoRateCallback      = std::function<void(float /*rateHz*/)>;
+    using AudioLfoIntensityCallback = std::function<void(float /*0-100*/)>;
+    using AudioLfoModeCallback      = std::function<void(LfoMode)>;
 
-    MainComponent(AudioToggleCallback    onToggle,
-                  AudioFilterCallback    onFilter,
-                  AudioGainCallback      onGain,
-                  AudioNoiseTypeCallback onNoiseType);
+    MainComponent(AudioToggleCallback       onToggle,
+                  AudioFilterCallback       onFilter,
+                  AudioGainCallback         onGain,
+                  AudioNoiseTypeCallback    onNoiseType,
+                  AudioLfoRateCallback      onLfoRate,
+                  AudioLfoIntensityCallback onLfoIntensity,
+                  AudioLfoModeCallback      onLfoMode);
 
     ~MainComponent() override;
 
@@ -115,10 +122,13 @@ private:
     //  destruction is in reverse order — see LIFO note in EnagaApplication)
     // -----------------------------------------------------------------------
 
-    AudioToggleCallback    audioToggle;
-    AudioFilterCallback    audioFilter;
-    AudioGainCallback      audioGain;
-    AudioNoiseTypeCallback audioNoiseType;
+    AudioToggleCallback       audioToggle;
+    AudioFilterCallback       audioFilter;
+    AudioGainCallback         audioGain;
+    AudioNoiseTypeCallback    audioNoiseType;
+    AudioLfoRateCallback      audioLfoRate;
+    AudioLfoIntensityCallback audioLfoIntensity;
+    AudioLfoModeCallback      audioLfoMode;
 
     // Default values used at construction and as fallbacks when loading presets.
     static constexpr double defaultDiscreteValue   = 1.0;  // White noise
@@ -144,6 +154,9 @@ private:
     juce::Label      volumeLabel;
 
     juce::Rectangle<int> imageArea;
+
+    // LFO section — below the existing volume/cutoff controls.
+    LfoComponent lfoComponent;
 
 #if JUCE_IOS || JUCE_ANDROID
     juce::TextButton mobileMenuButton;
