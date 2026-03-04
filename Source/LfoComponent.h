@@ -4,7 +4,7 @@
  *
  * Provides:
  *   - A mode button that cycles: Disabled → Volume → Filter → Both → Disabled.
- *   - A "LFO Rate" slider (0.01–2.0 Hz, skewed so 0.2 Hz is at mid-travel).
+ *   - A "LFO Rate" slider (0.01–2.0 Hz, skewed so 0.2 Hz is at mid-travel) with a numeric text box.
  *   - An "LFO Intensity" slider (0–100) paired with a numeric text box.
  *
  * All three callbacks fire on the message thread immediately when a control
@@ -41,6 +41,7 @@ public:
     {
         setupModeButton();
         setupRateSlider();
+        setupRateValueBox();
         setupIntensitySlider();
         setupIntensityValueBox();
         setupLabels();
@@ -59,10 +60,12 @@ public:
         modeButton.setBounds(area.removeFromTop(rowH));
         area.removeFromTop(pad);
 
-        // Row 2: rate label + rate slider.
+        // Row 2: rate label + rate slider + rate value box.
         auto row2 = area.removeFromTop(rowH);
         area.removeFromTop(pad);
         rateLabel.setBounds(row2.removeFromLeft(labelW));
+        rateValueBox.setBounds(row2.removeFromRight(boxW));
+        row2.removeFromRight(4);
         rateSlider.setBounds(row2);
 
         // Row 3: intensity label + intensity slider + value box.
@@ -107,10 +110,22 @@ private:
         rateSlider.setValue(0.1, juce::dontSendNotification);
         rateSlider.onValueChange = [this]
         {
+            syncRateValueBox();
             if (onRate)
                 onRate(static_cast<float>(rateSlider.getValue()));
         };
         addAndMakeVisible(rateSlider);
+    }
+
+    void setupRateValueBox()
+    {
+        // Allow only numeric input; getDoubleValue() clamps on ambiguous text.
+        rateValueBox.setInputRestrictions(6, "0123456789.");
+        rateValueBox.setText(juce::String(rateSlider.getValue(), 2), false);
+        rateValueBox.setJustification(juce::Justification::centred);
+        rateValueBox.onReturnKey = [this] { applyRateValueBox(); };
+        rateValueBox.onFocusLost = [this] { applyRateValueBox(); };
+        addAndMakeVisible(rateValueBox);
     }
 
     void setupIntensitySlider()
@@ -168,6 +183,24 @@ private:
     }
 
     // -----------------------------------------------------------------------
+    //  Rate value-box / slider synchronisation
+    // -----------------------------------------------------------------------
+
+    void syncRateValueBox()
+    {
+        rateValueBox.setText(
+            juce::String(rateSlider.getValue(), 2), false);
+    }
+
+    void applyRateValueBox()
+    {
+        const double v = juce::jlimit(0.01, 2.0,
+                                      rateValueBox.getText().getDoubleValue());
+        rateSlider.setValue(v, juce::sendNotificationSync);
+        syncRateValueBox();
+    }
+
+    // -----------------------------------------------------------------------
     //  Intensity value-box / slider synchronisation
     // -----------------------------------------------------------------------
 
@@ -202,6 +235,7 @@ private:
     juce::TextButton modeButton;
     juce::Label      rateLabel;
     juce::Slider     rateSlider;
+    juce::TextEditor rateValueBox;
     juce::Label      intensityLabel;
     juce::Slider     intensitySlider;
     juce::TextEditor intensityValueBox;

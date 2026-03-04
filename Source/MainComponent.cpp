@@ -138,7 +138,7 @@ void MainComponent::resized()
     auto row2 = area.removeFromTop(ctrlH);
     continuousLabel.setBounds(row2.removeFromLeft(64));
     {
-        const int boxW = juce::jlimit(56, 76, row2.getWidth() / 5);
+        constexpr int boxW = 64;
         continuousValueBox.setBounds(row2.removeFromRight(boxW));
         row2.removeFromRight(4);
         continuousSlider.setBounds(row2);
