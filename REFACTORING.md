@@ -87,16 +87,21 @@ becomes hard to navigate.  The files fall naturally into three concerns:
 
 | Proposed subdirectory | Files |
 |-----------------------|-------|
-| `Source/Audio/` | `LfoEngine.h`, `WhiteNoiseAudioSource.h`, `WhiteNoiseAudioSource.cpp` |
-| `Source/Audio/Generators/` | `NoiseGenerator.h`, `WhiteNoiseGenerator.h`, `PinkNoiseGenerator.h`, `BrownNoiseGenerator.h`, `GreyNoiseGenerator.h` |
-| `Source/UI/` | `EnagaLookAndFeel.h`, `PlayButton.h`, `LfoComponent.h`, `MainComponent.h`, `MainComponent.cpp` |
-| `Source/Platform/` | `iOSVolumeView.h`, `iOSVolumeView.mm` |
+| `Source/audio/` | `LfoEngine.h`, `LfoMode.h`, `NoiseType.h`, `WhiteNoiseAudioSource.h`, `WhiteNoiseAudioSource.cpp` |
+| `Source/audio/generators/` | `NoiseGenerator.h`, `WhiteNoiseGenerator.h`, `PinkNoiseGenerator.h`, `BrownNoiseGenerator.h`, `GreyNoiseGenerator.h` |
+| `Source/ui/` | `EnagaLookAndFeel.h`, `PlayButton.h`, `LfoComponent.h`, `MainComponent.h`, `MainComponent.cpp` |
+| `Source/platform/` | `iOSVolumeView.h`, `iOSVolumeView.mm` |
 
 `Main.cpp` stays at `Source/` root as the application entry point.
 
-The `Generators/` subdirectory keeps the interface (`NoiseGenerator.h`) and all
+Subdirectory names are lowercase.  `Source/` is kept as-is (it is existing
+code), but new subdirectories follow lowercase convention which is standard
+for C++ source trees on Linux/Unix and avoids case-sensitivity surprises
+across platforms (e.g. macOS HFS+ vs Linux ext4).
+
+The `generators/` subdirectory keeps the interface (`NoiseGenerator.h`) and all
 four concrete implementations in one place, making it easy to add a fifth
-noise type without cluttering `Source/Audio/`.
+noise type without cluttering `Source/audio/`.
 
 **Impact on `CMakeLists.txt`:** `target_sources` paths and the iOS conditional
 source must be updated to use the new subdirectory paths.  No other CMake
@@ -136,12 +141,17 @@ the *noise generator* abstraction, not of the audio-source layer.  `LfoMode`
 parameter of the audio engine but is also consumed directly by `LfoComponent`
 in the UI layer.
 
-**Proposed fix:** Introduce a new `Source/Audio/AudioTypes.h` header that
-contains only `NoiseType` and `LfoMode` (and any future audio-domain enums).
-Both `NoiseGenerator.h` / `LfoEngine.h` and `LfoComponent.h` then include this
-single file, removing the current asymmetry and giving contributors one
-canonical place to find all audio-parameter enumerations without risk of
-circular includes.
+**Proposed fix:** Give each enum its own minimal header in `Source/audio/`:
+
+| New header | Contains |
+|------------|----------|
+| `Source/audio/NoiseType.h` | `enum class NoiseType { White, Pink, Brown, Grey };` |
+| `Source/audio/LfoMode.h`   | `enum class LfoMode { Disabled, Volume, Filter, Both };` |
+
+Keeping the enums in separate files means a consumer (e.g. `LfoComponent.h`)
+can include only the enum it needs without pulling in the full engine header,
+and adding a new enum type in the future requires only a new file rather than
+touching a shared one.
 
 ---
 
@@ -150,11 +160,20 @@ circular includes.
 callbacks individually.  Every time a new audio parameter is added, both
 constructors must grow by one parameter and every call site must be updated.
 
+**Why so many callbacks?**  The callbacks (`AudioToggleCallback`,
+`AudioFilterCallback`, `AudioGainCallback`, etc.) are the current mechanism for
+decoupling the UI layer from the audio layer.  `MainComponent` has no direct
+reference to `WhiteNoiseAudioSource` or `juce::AudioDeviceManager`; instead,
+`EnagaApplication` captures `this` in lambdas and passes them in.  This keeps
+the UI component independently testable and avoids a circular dependency between
+UI and audio headers.  The *mechanism* is sound; the *interface* (one parameter
+per callback) is the problem.
+
 **Proposed fix:** Introduce a `MainComponent::AudioCallbacks` plain struct
 holding all seven `std::function` members.  `MainComponent` takes one
 `AudioCallbacks` by value; `MainWindow` takes the struct and forwards it.
 This reduces arity from 7/8 to 1/2, and new callbacks only require changing
-the struct.
+the struct definition rather than every call site.
 
 ---
 
@@ -165,12 +184,12 @@ These are ordered so that each step leaves a compilable repository.  They are
 
 - [ ] **4.1** Add `.clang-format` at the repository root.
 - [ ] **4.2** Add `*-release` CMake presets (configure + build) for each platform.
-- [ ] **4.3** Create `Source/Audio/AudioTypes.h`; move `NoiseType` and `LfoMode` there; update all includers.
+- [ ] **4.3** Create `Source/audio/NoiseType.h` and `Source/audio/LfoMode.h`; remove the enums from their current headers and update all includers.
 - [ ] **4.4** Introduce `MainComponent::AudioCallbacks` struct; collapse constructor arities (before the rename so call-sites need only one update pass).
 - [ ] **4.5** Rename `WhiteNoiseAudioSource` → `NoiseAudioSource` (class + files + references in `Main.cpp`).
 - [ ] **4.6** Promote theme colours to `static constexpr` in `EnagaLookAndFeel`; remove duplicate literals.
 - [ ] **4.7** Split `LfoComponent.h`, `EnagaLookAndFeel.h`, and `PlayButton.h` into `.h`/`.cpp` pairs.
-- [ ] **4.8** Reorganize `Source/` into `Audio/Generators/`, `Audio/`, `UI/`, and `Platform/` subdirectories; update `CMakeLists.txt`.
+- [ ] **4.8** Reorganize `Source/` into `audio/generators/`, `audio/`, `ui/`, and `platform/` subdirectories; update `CMakeLists.txt`.
 - [ ] **4.9** Update `README.md` project-structure section to reflect the new layout.
 - [ ] **4.10** Add skeleton `tests/` directory with a CTest-registered smoke test.
 - [ ] **4.11** Add a GitHub Actions CI workflow (Linux build + test on push/PR).
