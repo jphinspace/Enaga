@@ -3,9 +3,9 @@
  * @brief  MainComponent implementation.
  */
 
-#include "MainComponent.h"
+#include "ui/MainComponent.h"
 
-#include "EnagaLookAndFeel.h"
+#include "ui/EnagaLookAndFeel.h"
 
 // ============================================================================
 //  Constructor / Destructor

@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "LfoComponent.h"
-#include "PlayButton.h"
+#include "ui/LfoComponent.h"
+#include "ui/PlayButton.h"
 
 #if JUCE_IOS
-    #include "iOSVolumeView.h"
+    #include "platform/iOSVolumeView.h"
 #endif
 
 #include <juce_core/juce_core.h>

@@ -26,9 +26,9 @@
 //   import std;               // replaces <cmath>, <array>, <atomic>, etc.
 //   import juce;              // replaces juce_* module headers
 
-#include "EnagaLookAndFeel.h"
-#include "MainComponent.h"
-#include "NoiseAudioSource.h"
+#include "ui/EnagaLookAndFeel.h"
+#include "ui/MainComponent.h"
+#include "audio/NoiseAudioSource.h"
 
 #include <juce_audio_devices/juce_audio_devices.h>  // AudioDeviceManager, AudioSourcePlayer (EnagaApplication)
 
@@ -194,7 +194,7 @@ private:
 
     EnagaLookAndFeel             lookAndFeel;   // must outlive all UI components
     juce::AudioDeviceManager     deviceManager; // owns the hardware device
-    juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource -> device
+    juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource → device
     NoiseAudioSource             noiseSource;   // generates the noise samples
     std::unique_ptr<MainWindow>  mainWindow;    // destroyed first (UI last)
 };

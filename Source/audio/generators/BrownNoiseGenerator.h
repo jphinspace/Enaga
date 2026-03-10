@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "NoiseGenerator.h"
+#include "audio/generators/NoiseGenerator.h"
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -21,16 +21,9 @@
 class BrownNoiseGenerator final : public NoiseGenerator
 {
 public:
-    void prepare(double /*sampleRate*/) override { reset(); }
-
-    void reset() noexcept override { state.fill(0.0f); }
-
-    [[nodiscard]] float nextSample(std::size_t channel) noexcept override
-    {
-        const float w  = random.nextFloat() * 2.0f - 1.0f;
-        state[channel] = (state[channel] + 0.02f * w) / 1.02f;
-        return juce::jlimit(-1.0f, 1.0f, state[channel] * 3.5f);
-    }
+    void prepare(double sampleRate) override;
+    void reset() noexcept override;
+    [[nodiscard]] float nextSample(std::size_t channel) noexcept override;
 
 private:
     juce::Random random;
