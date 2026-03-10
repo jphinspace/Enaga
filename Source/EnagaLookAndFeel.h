@@ -13,16 +13,41 @@
  *
  * TextButton colour IDs are set here because LookAndFeel_V4::drawMenuBarItem
  * resolves menu bar item colours through them.
+ *
+ * All five theme colours are exposed as public static constexpr members so
+ * that Main.cpp, MainComponent.cpp, and any future code can reference them
+ * by name rather than repeating raw hex literals.
  */
 class EnagaLookAndFeel final : public juce::LookAndFeel_V4
 {
 public:
+    // -----------------------------------------------------------------------
+    //  Theme colour palette (single source of truth for all hex literals)
+    // -----------------------------------------------------------------------
+
+    /** Main background: near-black. */
+    static constexpr juce::uint32 kBackground = 0xff1a1a1a;
+
+    /** Control panel backgrounds: dark grey. */
+    static constexpr juce::uint32 kPanel = 0xff2d2d2d;
+
+    /** Highlight / slider thumb: light blue. */
+    static constexpr juce::uint32 kAccent = 0xff4fc3f7;
+
+    /** Primary text: off-white. */
+    static constexpr juce::uint32 kText = 0xffe0e0e0;
+
+    /** Image area fill: slightly lighter than the main background. */
+    static constexpr juce::uint32 kImageArea = 0xff222222;
+
+    // -----------------------------------------------------------------------
+
     EnagaLookAndFeel()
     {
-        const auto bg      = juce::Colour(0xff1a1a1a);  // main background
-        const auto panel   = juce::Colour(0xff2d2d2d);  // control backgrounds
-        const auto accent  = juce::Colour(0xff4fc3f7);  // highlight / thumb
-        const auto textCol = juce::Colour(0xffe0e0e0);  // primary text
+        const auto bg      = juce::Colour(kBackground);
+        const auto panel   = juce::Colour(kPanel);
+        const auto accent  = juce::Colour(kAccent);
+        const auto textCol = juce::Colour(kText);
 
         setColour(juce::ResizableWindow::backgroundColourId,          bg);
         setColour(juce::DocumentWindow::backgroundColourId,           bg);
@@ -68,7 +93,7 @@ public:
         const double hi   = slider.getMaximum();
         const double span = hi - lo;
 
-        const auto tickColour = juce::Colour(0xff4fc3f7).withAlpha(0.55f);
+        const auto tickColour = juce::Colour(kAccent).withAlpha(0.55f);
         const int  tickH      = 6;   // height of each tick mark (pixels)
         const int  tickW      = 2;   // width  of each tick mark (pixels)
         // Position ticks just below the slider track centre.

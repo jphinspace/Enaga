@@ -16,19 +16,12 @@
 
 #pragma once
 
+#include "audio/LfoMode.h"
+
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include <atomic>
 #include <cmath>
-
-/** Which audio parameter(s) the LFO modulates. */
-enum class LfoMode
-{
-    Disabled = 0, ///< No modulation.
-    Volume,       ///< Modulates output gain within the Volume-slider bound.
-    Filter,       ///< Modulates LP filter cutoff within the Cutoff-slider bound.
-    Both          ///< Modulates both gain and cutoff simultaneously.
-};
 
 /**
  * Sine-wave LFO oscillator with lock-free parameter updates.

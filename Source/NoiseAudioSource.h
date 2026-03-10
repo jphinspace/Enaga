@@ -1,5 +1,5 @@
 /**
- * @file   WhiteNoiseAudioSource.h
+ * @file   NoiseAudioSource.h
  * @brief  JUCE AudioSource that delegates sample generation to a pluggable
  *         NoiseGenerator, then applies a low-pass filter, gain, fade, and LFO.
  */
@@ -32,12 +32,12 @@
  * The LFO modulates gain and/or cutoff within the bounds set by the user's
  * existing Volume and Cutoff sliders (it never exceeds those values).
  */
-class WhiteNoiseAudioSource final : public juce::AudioSource
+class NoiseAudioSource final : public juce::AudioSource
 {
 public:
     /**
      * Set the low-pass filter cutoff on a normalised 0–100 scale.
-     * 0 → 20 Hz (heavy filtering), 100 → 20 kHz (wide open, near full spectrum).
+     * 0 -> 20 Hz (heavy filtering), 100 -> 20 kHz (wide open, near full spectrum).
      * Thread-safe: called from the message thread, applied on the audio thread.
      */
     void setCutoff(float normalised0to100) noexcept;
@@ -66,7 +66,7 @@ public:
 
     /**
      * Set the LFO modulation depth.
-     * @param i  Intensity on a 0–100 scale; 0 = no modulation, 100 = full swing.
+     * @param i  Intensity on a 0-100 scale; 0 = no modulation, 100 = full swing.
      */
     void setLfoIntensity(float i) noexcept;
 
@@ -77,13 +77,13 @@ public:
     void setLfoMode(LfoMode mode) noexcept;
 
     /**
-     * Begin a linear fade-in from silence to full level over @c fadeDurationSeconds.
+     * Begin a linear fade-in from silence to full level over fadeDurationSeconds.
      * Thread-safe: written by the message thread, applied on the audio thread.
      */
     void startFadeIn() noexcept;
 
     /**
-     * Begin a linear fade-out from full level to silence over @c fadeDurationSeconds.
+     * Begin a linear fade-out from full level to silence over fadeDurationSeconds.
      * Thread-safe: written by the message thread, applied on the audio thread.
      */
     void startFadeOut() noexcept;
@@ -96,13 +96,13 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override;
 
 private:
-    /** Recompute LP IIR coefficients from @c lastCutoff (audio thread only). */
+    /** Recompute LP IIR coefficients from lastCutoff (audio thread only). */
     void updateLpFilters();
 
     /** Return a pointer to the currently active generator (audio thread only). */
     [[nodiscard]] NoiseGenerator* activeGenerator() noexcept;
 
-    // One generator per noise type – all prepared simultaneously so that
+    // One generator per noise type - all prepared simultaneously so that
     // switching between types never requires a re-initialise.
     WhiteNoiseGenerator whiteGen;
     PinkNoiseGenerator  pinkGen;
@@ -110,7 +110,7 @@ private:
     GreyNoiseGenerator  greyGen;
 
     std::atomic<int>   noiseType   { 0 };      // cast to NoiseType; written by UI thread
-    std::atomic<float> cutoff      { 100.0f }; // normalised 0–100; written by UI thread
+    std::atomic<float> cutoff      { 100.0f }; // normalised 0-100; written by UI thread
     float              lastCutoff  { 100.0f }; // applied value (audio thread only)
     std::atomic<float> gain        { 1.0f };   // amplitude multiplier [0, 1]
     std::atomic<float> fadeTarget  { 0.0f };   // 0 = silent, 1 = full

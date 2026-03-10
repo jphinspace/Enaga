@@ -6,7 +6,7 @@
  * Class responsibilities are split across separate source files:
  *   - EnagaLookAndFeel.h          : dark theme / LookAndFeel overrides
  *   - PlayButton.h                : custom play/stop toggle button
- *   - WhiteNoiseAudioSource.h/cpp : noise generator with LP filter + gain
+ *   - NoiseAudioSource.h/cpp      : noise generator with LP filter + gain
  *   - MainComponent.h/cpp         : root UI component and preset I/O
  *
  * Built with C++23.  All areas that benefit from C++26 features are marked
@@ -28,7 +28,7 @@
 
 #include "EnagaLookAndFeel.h"
 #include "MainComponent.h"
-#include "WhiteNoiseAudioSource.h"
+#include "NoiseAudioSource.h"
 
 #include <juce_audio_devices/juce_audio_devices.h>  // AudioDeviceManager, AudioSourcePlayer (EnagaApplication)
 
@@ -46,16 +46,9 @@
 class MainWindow final : public juce::DocumentWindow
 {
 public:
-    MainWindow(const juce::String& name,
-               MainComponent::AudioToggleCallback       onToggle,
-               MainComponent::AudioFilterCallback       onFilter,
-               MainComponent::AudioGainCallback         onGain,
-               MainComponent::AudioNoiseTypeCallback    onNoiseType,
-               MainComponent::AudioLfoRateCallback      onLfoRate,
-               MainComponent::AudioLfoIntensityCallback onLfoIntensity,
-               MainComponent::AudioLfoModeCallback      onLfoMode)
+    MainWindow(const juce::String& name, MainComponent::AudioCallbacks callbacks)
         : DocumentWindow(name,
-                         juce::Colour(0xff1a1a1a),
+                         juce::Colour(EnagaLookAndFeel::kBackground),
                          DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar(true);
@@ -64,10 +57,7 @@ public:
                         10000, 10000);  // effectively unbounded maximum
 
         setContentOwned(
-            new MainComponent(std::move(onToggle), std::move(onFilter),
-                              std::move(onGain), std::move(onNoiseType),
-                              std::move(onLfoRate), std::move(onLfoIntensity),
-                              std::move(onLfoMode)), true);
+            std::make_unique<MainComponent>(std::move(callbacks)).release(), true);
 
         centreWithSize(480, 600);
         setVisible(true);
@@ -108,8 +98,8 @@ public:
     // -----------------------------------------------------------------------
 
     // TODO:C++26  Return type could become std::string_view when JUCE adopts it.
-    [[nodiscard]] const juce::String getApplicationName()    override { return "Enaga"; }
-    [[nodiscard]] const juce::String getApplicationVersion() override { return "0.1.0"; }
+    [[nodiscard]] const juce::String getApplicationName()    override { return juce::String(JUCE_APPLICATION_NAME_STRING);    }
+    [[nodiscard]] const juce::String getApplicationVersion() override { return juce::String(JUCE_APPLICATION_VERSION_STRING); }
     [[nodiscard]] bool moreThanOneInstanceAllowed()           override { return false;   }
 
     /**
@@ -134,16 +124,18 @@ public:
         // Create the main window; audio starts only when the play button is pressed.
         mainWindow = std::make_unique<MainWindow>(
             getApplicationName(),
-            [this](bool shouldPlay) { toggleAudio(shouldPlay);                  },
-            [this](float v)         { noiseSource.setCutoff(v);                 },
-            [this](float g)         { noiseSource.setGain(g);                   },
-            [this](float v)         { noiseSource.setNoiseType(
-                                          static_cast<NoiseType>(
-                                              juce::jlimit(0, 3,
-                                                  static_cast<int>(v) - 1))); },
-            [this](float r)         { noiseSource.setLfoRate(r);                },
-            [this](float i)         { noiseSource.setLfoIntensity(i);           },
-            [this](LfoMode m)       { noiseSource.setLfoMode(m);                });
+            MainComponent::AudioCallbacks {
+                [this](bool shouldPlay) { toggleAudio(shouldPlay);                  },
+                [this](float v)         { noiseSource.setCutoff(v);                 },
+                [this](float g)         { noiseSource.setGain(g);                   },
+                [this](float v)         { noiseSource.setNoiseType(
+                                              static_cast<NoiseType>(
+                                                  juce::jlimit(0, 3,
+                                                      static_cast<int>(v) - 1))); },
+                [this](float r)         { noiseSource.setLfoRate(r);                },
+                [this](float i)         { noiseSource.setLfoIntensity(i);           },
+                [this](LfoMode m)       { noiseSource.setLfoMode(m);                }
+            });
 
         // Open the platform's default audio output device (stereo, no input).
         const auto error = deviceManager.initialiseWithDefaultDevices(0, 2);
@@ -200,11 +192,10 @@ private:
         if (shouldPlay) noiseSource.startFadeIn(); else noiseSource.startFadeOut();
     }
 
-    // Declaration order matches the dependency chain (destroyed in reverse).
     EnagaLookAndFeel             lookAndFeel;   // must outlive all UI components
     juce::AudioDeviceManager     deviceManager; // owns the hardware device
-    juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource → device
-    WhiteNoiseAudioSource        noiseSource;   // generates the noise samples
+    juce::AudioSourcePlayer      sourcePlayer;  // bridges AudioSource -> device
+    NoiseAudioSource             noiseSource;   // generates the noise samples
     std::unique_ptr<MainWindow>  mainWindow;    // destroyed first (UI last)
 };
 

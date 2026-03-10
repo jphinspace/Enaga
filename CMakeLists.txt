@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(Enaga
     VERSION      0.1.0
-    DESCRIPTION  "Relaxing white noise generator"
+    DESCRIPTION  "Relaxing noise generator"
     LANGUAGES    C CXX
 )
 
@@ -45,12 +45,12 @@ juce_add_gui_app(Enaga
     COMPANY_NAME     "jphinspace"
     COMPANY_WEBSITE  "https://github.com/jphinspace"
     COMPANY_EMAIL    ""
-    VERSION          "0.1.0"
+    VERSION          "${PROJECT_VERSION}"
 )
 
 target_sources(Enaga PRIVATE
     Source/Main.cpp
-    Source/WhiteNoiseAudioSource.cpp
+    Source/NoiseAudioSource.cpp
     Source/MainComponent.cpp
 )
 
