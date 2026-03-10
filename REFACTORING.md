@@ -42,7 +42,7 @@ produces an optimised binary.
 
 ### 1.4 README project-structure section is out of date
 `README.md` still shows only `Main.cpp` under `Source/`, even though the
-directory now contains 15 files across audio, UI, and platform concerns.
+directory now contains 16 files across audio, UI, and platform concerns.
 
 **Expected:** The project-structure section reflects the actual file tree and
 describes each major file/group in one sentence.
@@ -58,7 +58,7 @@ headers.
 
 | File | Non-trivial implementation |
 |------|---------------------------|
-| `LfoComponent.h` (242 lines) | Full `juce::Component` with 8 setup helpers, sync/apply logic, and all child-control callbacks |
+| `LfoComponent.h` (242 lines) | Full `juce::Component` with 6 setup helpers, sync/apply logic, and all child-control callbacks |
 | `LfoEngine.h` (130 lines) | Full audio-thread `tick()` algorithm and all setters/getters inline |
 | `EnagaLookAndFeel.h` (86 lines) | Constructor with 20+ colour assignments; `drawLinearSlider` override |
 | `GreyNoiseGenerator.h` (68 lines) | Three-stage IIR filter chain with `prepare`, `reset`, and `nextSample` |
@@ -161,7 +161,7 @@ setContentOwned(std::make_unique<MainComponent>(…).release(), true);
 ## 2. Organization Improvements
 
 ### 2.1 Flat `Source/` directory — no subdirectory structure
-All 15 source files live in one flat directory.  As the project grows this
+All 16 source files live in one flat directory.  As the project grows this
 becomes hard to navigate.  The files fall naturally into three concerns:
 
 | Proposed subdirectory | Files |
@@ -189,15 +189,30 @@ changes are needed.
 ---
 
 ### 2.2 Scattered colour literals
-The four theme colours (`0xff1a1a1a` background, `0xff4fc3f7` accent,
-`0xffe0e0e0` text, `0xff222222` panel) are defined as local variables inside
-`EnagaLookAndFeel`'s constructor but then re-typed as magic literals in
-`Main.cpp` (window background) and `MainComponent.cpp` (fill/paint calls).
+There are five distinct theme colours used across the codebase, all written as
+raw hex literals with no shared source of truth:
 
-**Proposed fix:** Promote the four colour values to `public static constexpr`
-members of `EnagaLookAndFeel` so that `Main.cpp` and `MainComponent.cpp` can
-reference them by name (`EnagaLookAndFeel::kBackground`, etc.) rather than
-repeating the hex literals.
+| Hex value    | Role in `EnagaLookAndFeel` constructor | Duplicated in |
+|--------------|----------------------------------------|---------------|
+| `0xff1a1a1a` | `bg` — main background                 | `Main.cpp` (window background), `MainComponent.cpp` (`paint()` fill-all) |
+| `0xff4fc3f7` | `accent` — highlight / thumb           | `EnagaLookAndFeel.h::drawLinearSlider` (intra-class: out of constructor scope), `MainComponent.cpp::paintImageArea()` |
+| `0xffe0e0e0` | `textCol` — primary text               | `MainComponent.cpp::paintImageArea()` |
+| `0xff2d2d2d` | `panel` — control backgrounds          | *(not duplicated elsewhere)* |
+| `0xff222222` | *(unnamed)* — image area fill          | *(only in `MainComponent.cpp::paintImageArea()`)* |
+
+Note that `0xff2d2d2d` (the `panel` local in `EnagaLookAndFeel`'s constructor)
+and `0xff222222` (the image area background in `MainComponent.cpp`) are two
+distinct shades of dark grey — they are not the same colour.
+
+The `accent` colour has an additional intra-class duplication: `drawLinearSlider`
+inside `EnagaLookAndFeel.h` re-types `0xff4fc3f7` as a raw literal because the
+`accent` local variable defined in the constructor is not in scope there.
+
+**Proposed fix:** Promote all five colour values to `public static constexpr`
+members of `EnagaLookAndFeel` so that `Main.cpp`, `MainComponent.cpp`, and
+`drawLinearSlider` itself can reference them by name
+(`EnagaLookAndFeel::kBackground`, `EnagaLookAndFeel::kAccent`, etc.) rather than
+repeating hex literals.
 
 ---
 
