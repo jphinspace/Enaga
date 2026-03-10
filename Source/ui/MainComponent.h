@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "LfoComponent.h"
-#include "PlayButton.h"
+#include "ui/LfoComponent.h"
+#include "ui/PlayButton.h"
 
 #if JUCE_IOS
-    #include "iOSVolumeView.h"
+    #include "platform/iOSVolumeView.h"
 #endif
 
 #include <juce_core/juce_core.h>
@@ -52,13 +52,24 @@ public:
     using AudioLfoIntensityCallback = std::function<void(float /*0-100*/)>;
     using AudioLfoModeCallback      = std::function<void(LfoMode)>;
 
-    MainComponent(AudioToggleCallback       onToggle,
-                  AudioFilterCallback       onFilter,
-                  AudioGainCallback         onGain,
-                  AudioNoiseTypeCallback    onNoiseType,
-                  AudioLfoRateCallback      onLfoRate,
-                  AudioLfoIntensityCallback onLfoIntensity,
-                  AudioLfoModeCallback      onLfoMode);
+    /** All audio-layer callbacks bundled into a single struct.
+     *
+     *  Passing one struct instead of seven individual parameters keeps
+     *  constructor arity low and means adding a new callback only requires
+     *  changing this struct definition rather than every call site.
+     */
+    struct AudioCallbacks
+    {
+        AudioToggleCallback       onToggle;
+        AudioFilterCallback       onFilter;
+        AudioGainCallback         onGain;
+        AudioNoiseTypeCallback    onNoiseType;
+        AudioLfoRateCallback      onLfoRate;
+        AudioLfoIntensityCallback onLfoIntensity;
+        AudioLfoModeCallback      onLfoMode;
+    };
+
+    explicit MainComponent(AudioCallbacks callbacks);
 
     ~MainComponent() override;
 
@@ -122,13 +133,7 @@ private:
     //  destruction is in reverse order — see LIFO note in EnagaApplication)
     // -----------------------------------------------------------------------
 
-    AudioToggleCallback       audioToggle;
-    AudioFilterCallback       audioFilter;
-    AudioGainCallback         audioGain;
-    AudioNoiseTypeCallback    audioNoiseType;
-    AudioLfoRateCallback      audioLfoRate;
-    AudioLfoIntensityCallback audioLfoIntensity;
-    AudioLfoModeCallback      audioLfoMode;
+    AudioCallbacks callbacks;
 
     // Default values used at construction and as fallbacks when loading presets.
     static constexpr double defaultDiscreteValue   = 1.0;  // White noise

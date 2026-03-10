@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(Enaga
     VERSION      0.1.0
-    DESCRIPTION  "Relaxing white noise generator"
+    DESCRIPTION  "Relaxing noise generator"
     LANGUAGES    C CXX
 )
 
@@ -35,6 +35,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(JUCE)
 
 # ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+include(CTest)
+add_subdirectory(tests)
+
+# ---------------------------------------------------------------------------
 # Enaga application target
 # ---------------------------------------------------------------------------
 # juce_add_gui_app is required to support iOS and Android.
@@ -45,18 +51,28 @@ juce_add_gui_app(Enaga
     COMPANY_NAME     "jphinspace"
     COMPANY_WEBSITE  "https://github.com/jphinspace"
     COMPANY_EMAIL    ""
-    VERSION          "0.1.0"
+    VERSION          "${PROJECT_VERSION}"
 )
+
+target_include_directories(Enaga PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
 target_sources(Enaga PRIVATE
     Source/Main.cpp
-    Source/WhiteNoiseAudioSource.cpp
-    Source/MainComponent.cpp
+    Source/audio/NoiseAudioSource.cpp
+    Source/audio/LfoEngine.cpp
+    Source/audio/generators/WhiteNoiseGenerator.cpp
+    Source/audio/generators/BrownNoiseGenerator.cpp
+    Source/audio/generators/PinkNoiseGenerator.cpp
+    Source/audio/generators/GreyNoiseGenerator.cpp
+    Source/ui/EnagaLookAndFeel.cpp
+    Source/ui/PlayButton.cpp
+    Source/ui/LfoComponent.cpp
+    Source/ui/MainComponent.cpp
 )
 
 # iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    target_sources(Enaga PRIVATE Source/iOSVolumeView.mm)
+    target_sources(Enaga PRIVATE Source/platform/iOSVolumeView.mm)
 endif()
 
 # Require C++23 for this target explicitly (inherits project default, but

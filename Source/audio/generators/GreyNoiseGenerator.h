@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "NoiseGenerator.h"
+#include "audio/generators/NoiseGenerator.h"
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -26,38 +26,9 @@
 class GreyNoiseGenerator final : public NoiseGenerator
 {
 public:
-    void prepare(double sampleRate) override
-    {
-        const auto s0 = juce::IIRCoefficients::makeLowShelf (sampleRate, 100.0,   0.5, 10.0);
-        const auto s1 = juce::IIRCoefficients::makePeakFilter(sampleRate, 3500.0, 1.5, 0.71);
-        const auto s2 = juce::IIRCoefficients::makeHighShelf (sampleRate, 10000.0, 0.5, 1.5);
-
-        for (auto& ch : filters)
-        {
-            ch[0].setCoefficients(s0);
-            ch[1].setCoefficients(s1);
-            ch[2].setCoefficients(s2);
-        }
-
-        reset();
-    }
-
-    void reset() noexcept override
-    {
-        for (auto& ch : filters)
-            for (auto& f : ch)
-                f.reset();
-    }
-
-    [[nodiscard]] float nextSample(std::size_t channel) noexcept override
-    {
-        float s = random.nextFloat() * 2.0f - 1.0f;
-
-        for (auto& f : filters[channel])
-            s = f.processSingleSampleRaw(s);
-
-        return s * kAmplitude;
-    }
+    void prepare(double sampleRate) override;
+    void reset() noexcept override;
+    [[nodiscard]] float nextSample(std::size_t channel) noexcept override;
 
 private:
     static constexpr int   kStages    = 3;

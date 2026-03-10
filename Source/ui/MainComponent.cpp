@@ -3,30 +3,20 @@
  * @brief  MainComponent implementation.
  */
 
-#include "MainComponent.h"
+#include "ui/MainComponent.h"
+
+#include "ui/EnagaLookAndFeel.h"
 
 // ============================================================================
 //  Constructor / Destructor
 // ============================================================================
 
-MainComponent::MainComponent(AudioToggleCallback       onToggle,
-                             AudioFilterCallback       onFilter,
-                             AudioGainCallback         onGain,
-                             AudioNoiseTypeCallback    onNoiseType,
-                             AudioLfoRateCallback      onLfoRate,
-                             AudioLfoIntensityCallback onLfoIntensity,
-                             AudioLfoModeCallback      onLfoMode)
-    : audioToggle    (std::move(onToggle))
-    , audioFilter    (std::move(onFilter))
-    , audioGain      (std::move(onGain))
-    , audioNoiseType (std::move(onNoiseType))
-    , audioLfoRate   (std::move(onLfoRate))
-    , audioLfoIntensity(std::move(onLfoIntensity))
-    , audioLfoMode   (std::move(onLfoMode))
+MainComponent::MainComponent(AudioCallbacks cbs)
+    : callbacks(std::move(cbs))
     , lfoComponent(
-        [this](float r)    { if (audioLfoRate)      audioLfoRate(r);      },
-        [this](float i)    { if (audioLfoIntensity) audioLfoIntensity(i); },
-        [this](LfoMode m)  { if (audioLfoMode)      audioLfoMode(m);      })
+        [this](float r)    { if (callbacks.onLfoRate)      callbacks.onLfoRate(r);      },
+        [this](float i)    { if (callbacks.onLfoIntensity) callbacks.onLfoIntensity(i); },
+        [this](LfoMode m)  { if (callbacks.onLfoMode)      callbacks.onLfoMode(m);      })
 {
     setupPlayButton();
     setupDiscreteSlider();
@@ -179,7 +169,7 @@ void MainComponent::resized()
 
 void MainComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colour(0xff1a1a1a));
+    g.fillAll(juce::Colour(EnagaLookAndFeel::kBackground));
     paintImageArea(g);
 }
 
@@ -191,7 +181,7 @@ void MainComponent::setupPlayButton()
 {
     playButton.onClick = [this]
     {
-        if (audioToggle) audioToggle(playButton.getToggleState());
+        if (callbacks.onToggle) callbacks.onToggle(playButton.getToggleState());
     };
     addAndMakeVisible(playButton);
 }
@@ -226,8 +216,8 @@ void MainComponent::setupDiscreteSlider()
 
     discreteSlider.onValueChange = [this]
     {
-        if (audioNoiseType)
-            audioNoiseType(static_cast<float>(discreteSlider.getValue()));
+        if (callbacks.onNoiseType)
+            callbacks.onNoiseType(static_cast<float>(discreteSlider.getValue()));
     };
     addAndMakeVisible(discreteSlider);
 }
@@ -241,8 +231,8 @@ void MainComponent::setupContinuousSlider()
     continuousSlider.onValueChange = [this]
     {
         syncValueBox();
-        if (audioFilter)
-            audioFilter(static_cast<float>(continuousSlider.getValue()));
+        if (callbacks.onFilter)
+            callbacks.onFilter(static_cast<float>(continuousSlider.getValue()));
     };
     addAndMakeVisible(continuousSlider);
 }
@@ -301,8 +291,8 @@ void MainComponent::setupVolumeSlider()
     volumeSlider.setValue(defaultVolumeValue);
     volumeSlider.onValueChange = [this]
     {
-        if (audioGain)
-            audioGain(static_cast<float>(volumeSlider.getValue()) / 100.0f);
+        if (callbacks.onGain)
+            callbacks.onGain(static_cast<float>(volumeSlider.getValue()) / 100.0f);
     };
     addAndMakeVisible(volumeSlider);
 }
@@ -343,14 +333,14 @@ void MainComponent::setupVolumeSlider()
 
 void MainComponent::paintImageArea(juce::Graphics& g)
 {
-    g.setColour(juce::Colour(0xff222222));
+    g.setColour(juce::Colour(EnagaLookAndFeel::kImageArea));
     g.fillRoundedRectangle(imageArea.toFloat(), 8.0f);
 
     // Decorative static-noise waveform.
     // Fixed seed ensures identical decorative pattern on every paint.
     static constexpr int   waveformSampleCount = 80;    // line segments
     static constexpr int   waveformSeed        = 12345; // fixed for visual consistency
-    g.setColour(juce::Colour(0xff4fc3f7).withAlpha(0.45f));
+    g.setColour(juce::Colour(EnagaLookAndFeel::kAccent).withAlpha(0.45f));
     juce::Path wave;
     const float   step = imageArea.getWidth() / static_cast<float>(waveformSampleCount);
     const float   cy   = static_cast<float>(imageArea.getCentreY());
@@ -363,7 +353,7 @@ void MainComponent::paintImageArea(juce::Graphics& g)
     g.strokePath(wave, juce::PathStrokeType(1.5f));
 
     // App name
-    g.setColour(juce::Colour(0xffe0e0e0).withAlpha(0.8f));
+    g.setColour(juce::Colour(EnagaLookAndFeel::kText).withAlpha(0.8f));
     g.setFont(juce::Font(juce::FontOptions{}.withHeight(24.0f).withStyle("Bold")));
     g.drawText("ENAGA", imageArea, juce::Justification::centred, false);
 }

@@ -1,0 +1,45 @@
+---
+# Enaga project clang-tidy configuration.
+#
+# Enabled check families:
+#   readability-*        — naming, clarity, and readability improvements
+#   modernize-*          — update to modern C++ idioms
+#   cppcoreguidelines-*  — C++ Core Guidelines enforcement
+#
+# JUCE macro-generated code is excluded via HeaderFilterRegex so that
+# warnings originating inside JUCE's own headers are suppressed.
+
+Checks: >
+  readability-*,
+  modernize-*,
+  cppcoreguidelines-*,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-special-member-functions,
+  -readability-identifier-length
+
+# Only report warnings for headers under Source/ (not JUCE internals).
+HeaderFilterRegex: "Source/.*"
+
+WarningsAsErrors: ""
+
+CheckOptions:
+  - key:   readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key:   readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key:   readability-identifier-naming.MemberCase
+    value: camelBack
+  - key:   readability-identifier-naming.ParameterCase
+    value: camelBack
+  - key:   readability-identifier-naming.VariableCase
+    value: camelBack
+  - key:   readability-identifier-naming.ConstantPrefix
+    value: k
+  - key:   readability-identifier-naming.StaticConstantCase
+    value: camelBack
+  - key:   modernize-use-default-member-init.UseAssignment
+    value: "1"
