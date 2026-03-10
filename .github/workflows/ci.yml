@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Linux – Ninja – Debug
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            ninja-build \
+            cmake \
+            libasound2-dev \
+            libx11-dev \
+            libxext-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libfreetype6-dev \
+            libfontconfig1-dev \
+            libpng-dev
+
+      - name: Fix freetype include path
+        run: |
+          sudo ln -sf /usr/include/freetype2/ft2build.h /usr/include/ft2build.h
+          sudo ln -sf /usr/include/freetype2/freetype   /usr/include/freetype
+
+      - name: Configure (Debug)
+        run: cmake --preset linux
+
+      - name: Build (Debug)
+        run: cmake --build --preset linux
+
+      - name: Run tests
+        run: ctest --preset linux --output-on-failure

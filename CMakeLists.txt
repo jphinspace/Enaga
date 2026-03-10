@@ -35,6 +35,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(JUCE)
 
 # ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+include(CTest)
+add_subdirectory(tests)
+
+# ---------------------------------------------------------------------------
 # Enaga application target
 # ---------------------------------------------------------------------------
 # juce_add_gui_app is required to support iOS and Android.

@@ -172,5 +172,20 @@
         { "name": "windows-release",  "configurePreset": "windows-release"  },
         { "name": "ios-release",      "configurePreset": "ios-release"      },
         { "name": "android-release",  "configurePreset": "android-release"  }
+    ],
+
+    "testPresets": [
+        {
+            "name":             "linux",
+            "displayName":      "Linux – CTest",
+            "configurePreset":  "linux",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name":             "linux-release",
+            "displayName":      "Linux – CTest – Release",
+            "configurePreset":  "linux-release",
+            "output": { "outputOnFailure": true }
+        }
     ]
 }

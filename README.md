@@ -1,6 +1,6 @@
 # Enaga
 
-Relaxing white noise generator.
+Relaxing noise generator.
 
 Built in C++23 (targeting C++26), using [JUCE](https://juce.com/) for platform
 lifecycle, audio, and UI.
@@ -141,8 +141,32 @@ from C++26 language features (modules, `std::println`, `std::expected`, etc.).
 
 ```
 Enaga/
-├── CMakeLists.txt       # Build definition; fetches JUCE via FetchContent
-├── CMakePresets.json    # Per-platform configure & build presets
+├── .clang-format              # Code style configuration (100-col, Allman)
+├── .clang-tidy                # Static analysis checks (readability-*, modernize-*, cppcoreguidelines-*)
+├── CMakeLists.txt             # Build definition; fetches JUCE via FetchContent
+├── CMakePresets.json          # Per-platform Debug + Release configure/build presets
+├── tests/                     # CTest-registered unit tests
+│   ├── CMakeLists.txt
+│   └── SmokeTest.cpp          # Smoke test: constructs NoiseAudioSource and exercises the audio path
 └── Source/
-    └── Main.cpp         # Application entry point (JUCEApplication subclass)
+    ├── Main.cpp               # Application entry point (JUCEApplication, MainWindow)
+    ├── audio/                 # Audio-domain classes and enumerations
+    │   ├── LfoEngine.h/.cpp   # Sine-wave LFO oscillator with lock-free parameter updates
+    │   ├── LfoMode.h          # enum class LfoMode (Disabled / Volume / Filter / Both)
+    │   ├── NoiseAudioSource.h/.cpp  # JUCE AudioSource: LP filter, gain, fade, LFO
+    │   ├── NoiseType.h        # enum class NoiseType (White / Pink / Brown / Grey)
+    │   └── generators/        # Per-sample noise generator implementations
+    │       ├── NoiseGenerator.h           # Abstract base interface
+    │       ├── WhiteNoiseGenerator.h/.cpp # Flat spectrum (PRNG)
+    │       ├── PinkNoiseGenerator.h/.cpp  # 1/f spectrum (Kellett parallel filter)
+    │       ├── BrownNoiseGenerator.h/.cpp # 1/f² spectrum (leaky integrator)
+    │       └── GreyNoiseGenerator.h/.cpp  # Perceptually flat (inverse A-weighting)
+    ├── ui/                    # UI-domain classes
+    │   ├── EnagaLookAndFeel.h/.cpp  # Dark theme; exposes kBackground/kAccent/etc. constants
+    │   ├── LfoComponent.h/.cpp      # LFO controls panel (mode button, rate/intensity sliders)
+    │   ├── MainComponent.h/.cpp     # Root component: layout, sliders, menus, preset I/O
+    │   └── PlayButton.h/.cpp        # Custom play/stop toggle button
+    └── platform/              # Platform-specific glue code
+        ├── iOSVolumeView.h    # iOS MPVolumeView wrapper interface
+        └── iOSVolumeView.mm   # iOS MPVolumeView wrapper implementation (Objective-C++)
 ```
