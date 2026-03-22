@@ -9,7 +9,7 @@
 #include "ui/PlayButton.h"
 
 #if JUCE_IOS
-    #include "platform/iOSVolumeView.h"
+    #include "platform/IOSVolumeView.h"
 #endif
 
 #include <juce_core/juce_core.h>
@@ -152,7 +152,7 @@ private:
     // Android – juce::Slider wired to juce::SystemAudioVolume.
     // Desktop – juce::Slider driving app-level gain.
 #if JUCE_IOS
-    iOSVolumeView    mobileVolumeView;
+    IOSVolumeView    mobileVolumeView;
 #else
     juce::Slider     volumeSlider;
 #endif

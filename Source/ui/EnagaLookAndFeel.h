@@ -40,6 +40,9 @@ public:
     /** Image area fill: slightly lighter than the main background. */
     static constexpr juce::uint32 kImageArea = 0xff222222;
 
+    /** TextButton background (also used by MenuBarComponent rendering). */
+    static constexpr juce::uint32 kButtonBackground = 0xff212121;
+
     // -----------------------------------------------------------------------
 
     EnagaLookAndFeel();

@@ -1,5 +1,5 @@
 /**
- * @file   iOSVolumeView.mm
+ * @file   IOSVolumeView.mm
  * @brief  iOS-only native system volume slider implementation.
  *
  * Compiled only on iOS (Xcode treats .mm as Objective-C++).
@@ -7,13 +7,13 @@
  * standard system volume control into the JUCE component hierarchy.
  */
 
-#include "iOSVolumeView.h"
+#include "platform/IOSVolumeView.h"
 
 #if JUCE_IOS
 
 #import <MediaPlayer/MediaPlayer.h>
 
-iOSVolumeView::iOSVolumeView()
+IOSVolumeView::IOSVolumeView()
 {
     // Create the native volume slider. [[alloc] init] gives us a +1 retain
     // count. JUCE's UIViewComponent stores it with an ARC strong reference
@@ -23,7 +23,7 @@ iOSVolumeView::iOSVolumeView()
     setView((__bridge void*) volView);
 }
 
-iOSVolumeView::~iOSVolumeView()
+IOSVolumeView::~IOSVolumeView()
 {
     // Remove the native view from the hierarchy before JUCE tears down
     // the component tree to avoid dangling UIView references.

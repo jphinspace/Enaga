@@ -167,6 +167,6 @@ Enaga/
     │   ├── MainComponent.h/.cpp     # Root component: layout, sliders, menus, preset I/O
     │   └── PlayButton.h/.cpp        # Custom play/stop toggle button
     └── platform/              # Platform-specific glue code
-        ├── iOSVolumeView.h    # iOS MPVolumeView wrapper interface
-        └── iOSVolumeView.mm   # iOS MPVolumeView wrapper implementation (Objective-C++)
+        ├── IOSVolumeView.h    # iOS MPVolumeView wrapper interface
+        └── IOSVolumeView.mm   # iOS MPVolumeView wrapper implementation (Objective-C++)
 ```
