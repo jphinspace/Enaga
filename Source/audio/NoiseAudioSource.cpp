@@ -1,54 +1,54 @@
 /**
- * @file   WhiteNoiseAudioSource.cpp
- * @brief  WhiteNoiseAudioSource implementation.
+ * @file   NoiseAudioSource.cpp
+ * @brief  NoiseAudioSource implementation.
  */
 
-#include "WhiteNoiseAudioSource.h"
+#include "audio/NoiseAudioSource.h"
 
 #include <cmath>
 
-void WhiteNoiseAudioSource::setCutoff(float normalised0to100) noexcept
+void NoiseAudioSource::setCutoff(float normalised0to100) noexcept
 {
     cutoff.store(juce::jlimit(0.0f, 100.0f, normalised0to100),
                  std::memory_order_relaxed);
 }
 
-void WhiteNoiseAudioSource::setGain(float newGain) noexcept
+void NoiseAudioSource::setGain(float newGain) noexcept
 {
     gain.store(juce::jlimit(0.0f, 1.0f, newGain), std::memory_order_relaxed);
 }
 
-void WhiteNoiseAudioSource::setNoiseType(NoiseType type) noexcept
+void NoiseAudioSource::setNoiseType(NoiseType type) noexcept
 {
     noiseType.store(static_cast<int>(type), std::memory_order_relaxed);
 }
 
-void WhiteNoiseAudioSource::setLfoRate(float rateHz) noexcept
+void NoiseAudioSource::setLfoRate(float rateHz) noexcept
 {
     lfo.setRate(rateHz);
 }
 
-void WhiteNoiseAudioSource::setLfoIntensity(float i) noexcept
+void NoiseAudioSource::setLfoIntensity(float i) noexcept
 {
     lfo.setIntensity(i);
 }
 
-void WhiteNoiseAudioSource::setLfoMode(LfoMode mode) noexcept
+void NoiseAudioSource::setLfoMode(LfoMode mode) noexcept
 {
     lfo.setMode(mode);
 }
 
-void WhiteNoiseAudioSource::startFadeIn() noexcept
+void NoiseAudioSource::startFadeIn() noexcept
 {
     fadeTarget.store(1.0f, std::memory_order_relaxed);
 }
 
-void WhiteNoiseAudioSource::startFadeOut() noexcept
+void NoiseAudioSource::startFadeOut() noexcept
 {
     fadeTarget.store(0.0f, std::memory_order_relaxed);
 }
 
-void WhiteNoiseAudioSource::prepareToPlay(int /*samplesPerBlockExpected*/,
+void NoiseAudioSource::prepareToPlay(int /*samplesPerBlockExpected*/,
                                           double newSampleRate)
 {
     sampleRate  = newSampleRate;
@@ -70,7 +70,7 @@ void WhiteNoiseAudioSource::prepareToPlay(int /*samplesPerBlockExpected*/,
     greyGen.prepare(sampleRate);
 }
 
-void WhiteNoiseAudioSource::releaseResources()
+void NoiseAudioSource::releaseResources()
 {
     for (auto& f : lpFilters)
         f.reset();
@@ -81,7 +81,7 @@ void WhiteNoiseAudioSource::releaseResources()
     greyGen.reset();
 }
 
-NoiseGenerator* WhiteNoiseAudioSource::activeGenerator() noexcept
+NoiseGenerator* NoiseAudioSource::activeGenerator() noexcept
 {
     switch (static_cast<NoiseType>(noiseType.load(std::memory_order_relaxed)))
     {
@@ -92,7 +92,7 @@ NoiseGenerator* WhiteNoiseAudioSource::activeGenerator() noexcept
     }
 }
 
-void WhiteNoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& info)
+void NoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& info)
 {
     // Advance the LFO once per block and obtain its normalised value [0, 1].
     const float    lfoNorm    = lfo.tick(info.numSamples, sampleRate);
@@ -149,7 +149,7 @@ void WhiteNoiseAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo
     }
 }
 
-void WhiteNoiseAudioSource::updateLpFilters()
+void NoiseAudioSource::updateLpFilters()
 {
     if (sampleRate <= 0.0) return;
 

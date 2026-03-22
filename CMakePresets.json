@@ -7,7 +7,18 @@
             "hidden":      true,
             "binaryDir":   "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE":             "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+
+        {
+            "name":        "base-release",
+            "hidden":      true,
+            "binaryDir":   "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE":             "Release",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         },
 
@@ -78,14 +89,103 @@
                 "CMAKE_ANDROID_STL_TYPE":  "c++_shared",
                 "ANDROID_PLATFORM":        "android-24"
             }
+        },
+
+        {
+            "name":        "linux-release",
+            "displayName": "Linux – Ninja – Release",
+            "description": "Desktop Linux release build using the Ninja generator.",
+            "inherits":    "base-release",
+            "generator":   "Ninja",
+            "condition": {
+                "type": "equals",
+                "lhs":  "${hostSystemName}",
+                "rhs":  "Linux"
+            }
+        },
+
+        {
+            "name":        "macos-release",
+            "displayName": "macOS – Xcode – Release",
+            "description": "Desktop macOS release build using the Xcode generator.",
+            "inherits":    "base-release",
+            "generator":   "Xcode",
+            "condition": {
+                "type": "equals",
+                "lhs":  "${hostSystemName}",
+                "rhs":  "Darwin"
+            }
+        },
+
+        {
+            "name":        "windows-release",
+            "displayName": "Windows – Visual Studio 2022 – Release",
+            "description": "Desktop Windows release build using Visual Studio 2022.",
+            "inherits":    "base-release",
+            "generator":   "Visual Studio 17 2022",
+            "condition": {
+                "type": "equals",
+                "lhs":  "${hostSystemName}",
+                "rhs":  "Windows"
+            }
+        },
+
+        {
+            "name":        "ios-release",
+            "displayName": "iOS – Xcode – Release",
+            "description": "iOS device / simulator release build.  Must be configured on macOS.",
+            "inherits":    "base-release",
+            "generator":   "Xcode",
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "iOS"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs":  "${hostSystemName}",
+                "rhs":  "Darwin"
+            }
+        },
+
+        {
+            "name":        "android-release",
+            "displayName": "Android – Ninja – Release",
+            "description": "Android ARM64 release build.  Requires Android NDK; set ANDROID_NDK env var.",
+            "inherits":    "base-release",
+            "generator":   "Ninja",
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME":       "Android",
+                "CMAKE_ANDROID_ARCH_ABI":  "arm64-v8a",
+                "CMAKE_ANDROID_STL_TYPE":  "c++_shared",
+                "ANDROID_PLATFORM":        "android-24"
+            }
         }
     ],
 
     "buildPresets": [
-        { "name": "linux",   "configurePreset": "linux"   },
-        { "name": "macos",   "configurePreset": "macos"   },
-        { "name": "windows", "configurePreset": "windows" },
-        { "name": "ios",     "configurePreset": "ios"     },
-        { "name": "android", "configurePreset": "android" }
+        { "name": "linux",            "configurePreset": "linux"            },
+        { "name": "macos",            "configurePreset": "macos"            },
+        { "name": "windows",          "configurePreset": "windows"          },
+        { "name": "ios",              "configurePreset": "ios"              },
+        { "name": "android",          "configurePreset": "android"          },
+        { "name": "linux-release",    "configurePreset": "linux-release"    },
+        { "name": "macos-release",    "configurePreset": "macos-release"    },
+        { "name": "windows-release",  "configurePreset": "windows-release"  },
+        { "name": "ios-release",      "configurePreset": "ios-release"      },
+        { "name": "android-release",  "configurePreset": "android-release"  }
+    ],
+
+    "testPresets": [
+        {
+            "name":             "linux",
+            "displayName":      "Linux – CTest",
+            "configurePreset":  "linux",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name":             "linux-release",
+            "displayName":      "Linux – CTest – Release",
+            "configurePreset":  "linux-release",
+            "output": { "outputOnFailure": true }
+        }
     ]
 }
