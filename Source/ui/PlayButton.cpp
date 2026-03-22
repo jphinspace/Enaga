@@ -22,13 +22,13 @@ void PlayButton::paintButton(juce::Graphics& g,
     if (getToggleState())
     {
         // ON / playing → red rounded square (stop)
-        g.setColour(juce::Colour(0xffe53935).withAlpha(alpha));
+        g.setColour(juce::Colour(kStopColour).withAlpha(alpha));
         g.fillRoundedRectangle(sq.reduced(dim * 0.20f), 5.0f);
     }
     else
     {
         // OFF / stopped → green triangle (play)
-        g.setColour(juce::Colour(0xff43a047).withAlpha(alpha));
+        g.setColour(juce::Colour(kPlayColour).withAlpha(alpha));
         juce::Path tri;
         const auto r = sq.reduced(dim * 0.10f);
         tri.addTriangle(r.getTopLeft(), r.getBottomLeft(),

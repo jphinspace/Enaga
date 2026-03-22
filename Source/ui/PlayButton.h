@@ -17,6 +17,12 @@
 class PlayButton final : public juce::Button
 {
 public:
+    /** Colour used to paint the play (triangle) state. */
+    static constexpr juce::uint32 kPlayColour = 0xff43a047;
+
+    /** Colour used to paint the stop (square) state. */
+    static constexpr juce::uint32 kStopColour = 0xffe53935;
+
     PlayButton();
 
     void paintButton(juce::Graphics& g,

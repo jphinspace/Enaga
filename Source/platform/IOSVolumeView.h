@@ -1,5 +1,5 @@
 /**
- * @file   iOSVolumeView.h
+ * @file   IOSVolumeView.h
  * @brief  iOS-only native system volume slider using MPVolumeView.
  */
 
@@ -18,11 +18,11 @@
  * No custom painting is performed; appearance is entirely determined
  * by UIKit.
  */
-class iOSVolumeView final : public juce::UIViewComponent
+class IOSVolumeView final : public juce::UIViewComponent
 {
 public:
-    iOSVolumeView();
-    ~iOSVolumeView() override;
+    IOSVolumeView();
+    ~IOSVolumeView() override;
 };
 
 #endif // JUCE_IOS

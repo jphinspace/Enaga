@@ -72,7 +72,7 @@ target_sources(Enaga PRIVATE
 
 # iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    target_sources(Enaga PRIVATE Source/platform/iOSVolumeView.mm)
+    target_sources(Enaga PRIVATE Source/platform/IOSVolumeView.mm)
 endif()
 
 # Require C++23 for this target explicitly (inherits project default, but
