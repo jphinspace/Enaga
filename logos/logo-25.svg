@@ -1,0 +1,13 @@
+<!-- Logo 25: White rounded square, refined & polished – best proportions, clean shine -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes -->
+  <circle cx="74" cy="96" r="11" fill="#111111"/>
+  <circle cx="79" cy="91" r="3.5" fill="#FFFFFF"/>
+  <circle cx="81" cy="89.5" r="1.5" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="126" cy="96" r="11" fill="#111111"/>
+  <circle cx="131" cy="91" r="3.5" fill="#FFFFFF"/>
+  <circle cx="133" cy="89.5" r="1.5" fill="#FFFFFF" opacity="0.6"/>
+  <!-- Beak -->
+  <path d="M93 117 L100 129 L107 117Z" fill="#111111"/>
+</svg>

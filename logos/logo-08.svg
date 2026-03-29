@@ -1,0 +1,11 @@
+<!-- Logo 08: White rounded square, very large eyes (chibi style), small beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Big eyes -->
+  <circle cx="72" cy="98" r="16" fill="#1A1A1A"/>
+  <circle cx="78" cy="93" r="5" fill="#FFFFFF"/>
+  <circle cx="128" cy="98" r="16" fill="#1A1A1A"/>
+  <circle cx="134" cy="93" r="5" fill="#FFFFFF"/>
+  <!-- Small beak -->
+  <path d="M94 120 L100 130 L106 120Z" fill="#1A1A1A"/>
+</svg>

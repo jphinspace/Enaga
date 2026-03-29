@@ -1,0 +1,11 @@
+<!-- Logo 22: White rounded square, thin stroke outline eyes (ring style), thin beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Ring-style eyes -->
+  <circle cx="74" cy="96" r="10" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+  <circle cx="74" cy="96" r="3.5" fill="#1A1A1A"/>
+  <circle cx="126" cy="96" r="10" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+  <circle cx="126" cy="96" r="3.5" fill="#1A1A1A"/>
+  <!-- Thin beak outline -->
+  <path d="M93 116 L100 128 L107 116Z" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+</svg>
