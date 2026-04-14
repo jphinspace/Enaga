@@ -48,10 +48,8 @@ class EnagaLookAndFeel final : public juce::LookAndFeel_V4 {
 
   /** Draws step-position tick marks below the track for sliders with a
    *  non-zero snap interval (i.e. the discrete Steps slider). */
-  void drawLinearSlider(juce::Graphics& g, int x, int y,
-                        int width, int height,
+  void drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
                         float slider_pos, float min_slider_pos,
-                        float max_slider_pos,
-                        juce::Slider::SliderStyle style,
+                        float max_slider_pos, juce::Slider::SliderStyle style,
                         juce::Slider& slider) override;
 };

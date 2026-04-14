@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "audio/generators/noise_generator.h"
-
 #include <juce_audio_basics/juce_audio_basics.h>
+
+#include "audio/generators/noise_generator.h"
 
 /**
  * Produces uniformly-distributed white noise with a flat power spectrum.

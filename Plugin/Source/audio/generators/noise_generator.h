@@ -27,6 +27,5 @@ class NoiseGenerator {
    * Return the next output sample for the given stereo channel index
    * (0 or 1). Must only be called on the audio thread.
    */
-  [[nodiscard]] virtual float NextSample(
-      std::size_t channel) noexcept = 0;
+  [[nodiscard]] virtual float NextSample(std::size_t channel) noexcept = 0;
 };

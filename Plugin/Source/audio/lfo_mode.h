@@ -9,6 +9,6 @@
 enum class LfoMode {
   kDisabled = 0,  ///< No modulation.
   kVolume,        ///< Modulates output gain within the Volume-slider bound.
-  kFilter,        ///< Modulates LP filter cutoff within the Cutoff-slider bound.
-  kBoth           ///< Modulates both gain and cutoff simultaneously.
+  kFilter,  ///< Modulates LP filter cutoff within the Cutoff-slider bound.
+  kBoth     ///< Modulates both gain and cutoff simultaneously.
 };

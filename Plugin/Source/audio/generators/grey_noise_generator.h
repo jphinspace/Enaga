@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "audio/generators/noise_generator.h"
-
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include <array>
+
+#include "audio/generators/noise_generator.h"
 
 /**
  * Produces grey noise: white noise shaped by the inverse A-weighting curve
@@ -30,9 +30,9 @@ class GreyNoiseGenerator final : public NoiseGenerator {
   [[nodiscard]] float NextSample(std::size_t channel) noexcept override;
 
  private:
-  static constexpr int   kStages    = 3;
+  static constexpr int kStages = 3;
   static constexpr float kAmplitude = 0.05f;
 
   juce::Random random_;
-  std::array<std::array<juce::IIRFilter, kStages>, 2> filters_ {};
+  std::array<std::array<juce::IIRFilter, kStages>, 2> filters_{};
 };

@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "audio/generators/noise_generator.h"
-
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include <array>
+
+#include "audio/generators/noise_generator.h"
 
 /**
  * Produces pink (1/f) noise using Paul Kellett's parallel-filter algorithm.
@@ -28,5 +28,5 @@ class PinkNoiseGenerator final : public NoiseGenerator {
  private:
   juce::Random random_;
   // 7 filter-state variables per stereo channel (Paul Kellett algorithm).
-  std::array<std::array<float, 7>, 2> state_ {};
+  std::array<std::array<float, 7>, 2> state_{};
 };

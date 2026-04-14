@@ -13,12 +13,12 @@
 
 // TODO:C++26  Replace #include with module imports once JUCE ships modules.
 
-#include "audio/noise_audio_source.h"
-
 #include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <vector>
+
+#include "audio/noise_audio_source.h"
 
 // ---------------------------------------------------------------------------
 //  Minimal JUCE stub: include the JUCE headers we need for an offline test.
@@ -26,21 +26,17 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 
 static bool RunSmokeTest() {
-  constexpr double kSampleRate        = 44100.0;
-  constexpr int    kSamplesPerBlock   = 512;
-  constexpr int    kNumChannels       = 2;
-  constexpr int    kBlocksPerNoiseType = 4;
+  constexpr double kSampleRate = 44100.0;
+  constexpr int kSamplesPerBlock = 512;
+  constexpr int kNumChannels = 2;
+  constexpr int kBlocksPerNoiseType = 4;
 
   NoiseAudioSource source;
   source.prepareToPlay(kSamplesPerBlock, kSampleRate);
 
   // Exercise all four noise types.
-  const NoiseType noise_types[] = {
-    NoiseType::kWhite,
-    NoiseType::kPink,
-    NoiseType::kBrown,
-    NoiseType::kGrey
-  };
+  const NoiseType noise_types[] = {NoiseType::kWhite, NoiseType::kPink,
+                                   NoiseType::kBrown, NoiseType::kGrey};
 
   juce::AudioBuffer<float> buffer(kNumChannels, kSamplesPerBlock);
 
@@ -50,8 +46,7 @@ static bool RunSmokeTest() {
 
     for (int block = 0; block < kBlocksPerNoiseType; ++block) {
       buffer.clear();
-      juce::AudioSourceChannelInfo info(
-          &buffer, 0, kSamplesPerBlock);
+      juce::AudioSourceChannelInfo info(&buffer, 0, kSamplesPerBlock);
       source.getNextAudioBlock(info);
 
       // Verify all samples are finite.
@@ -60,10 +55,10 @@ static bool RunSmokeTest() {
         for (int i = 0; i < kSamplesPerBlock; ++i) {
           if (!std::isfinite(data[i])) {
             std::fprintf(stderr,
-                "FAIL: non-finite sample at NoiseType=%d "
-                "ch=%d i=%d value=%f\n",
-                static_cast<int>(type), ch, i,
-                static_cast<double>(data[i]));
+                         "FAIL: non-finite sample at NoiseType=%d "
+                         "ch=%d i=%d value=%f\n",
+                         static_cast<int>(type), ch, i,
+                         static_cast<double>(data[i]));
             return false;
           }
         }
@@ -78,6 +73,4 @@ static bool RunSmokeTest() {
   return true;
 }
 
-int main() {
-  return RunSmokeTest() ? 0 : 1;
-}
+int main() { return RunSmokeTest() ? 0 : 1; }

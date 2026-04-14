@@ -4,6 +4,6 @@
 # https://google.github.io/styleguide/cppguide.html
 
 Language:     Cpp
-Standard:     c++23
+Standard:     Latest
 
 BasedOnStyle: Google

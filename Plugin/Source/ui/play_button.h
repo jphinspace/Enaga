@@ -24,7 +24,6 @@ class PlayButton final : public juce::Button {
 
   PlayButton();
 
-  void paintButton(juce::Graphics& g,
-                   bool is_mouse_over,
+  void paintButton(juce::Graphics& g, bool is_mouse_over,
                    bool is_button_down) override;
 };

@@ -15,11 +15,11 @@
 
 #pragma once
 
-#include "audio/lfo_mode.h"
-
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include <functional>
+
+#include "audio/lfo_mode.h"
 
 /**
  * UI panel for the LFO section.
@@ -30,12 +30,11 @@
  */
 class LfoComponent final : public juce::Component {
  public:
-  using RateCallback      = std::function<void(float /*rateHz*/)>;
+  using RateCallback = std::function<void(float /*rateHz*/)>;
   using IntensityCallback = std::function<void(float /*0-100*/)>;
-  using ModeCallback      = std::function<void(LfoMode)>;
+  using ModeCallback = std::function<void(LfoMode)>;
 
-  LfoComponent(RateCallback on_rate,
-               IntensityCallback on_intensity,
+  LfoComponent(RateCallback on_rate, IntensityCallback on_intensity,
                ModeCallback on_mode);
 
   void resized() override;
@@ -76,21 +75,21 @@ class LfoComponent final : public juce::Component {
   //  Callbacks
   // -------------------------------------------------------------------
 
-  RateCallback      on_rate_;
+  RateCallback on_rate_;
   IntensityCallback on_intensity_;
-  ModeCallback      on_mode_;
+  ModeCallback on_mode_;
 
-  LfoMode current_mode_ { LfoMode::kDisabled };
+  LfoMode current_mode_{LfoMode::kDisabled};
 
   // -------------------------------------------------------------------
   //  Child controls (declaration order matches dependency / destruction)
   // -------------------------------------------------------------------
 
   juce::TextButton mode_button_;
-  juce::Label      rate_label_;
-  juce::Slider     rate_slider_;
+  juce::Label rate_label_;
+  juce::Slider rate_slider_;
   juce::TextEditor rate_value_box_;
-  juce::Label      intensity_label_;
-  juce::Slider     intensity_slider_;
+  juce::Label intensity_label_;
+  juce::Slider intensity_slider_;
   juce::TextEditor intensity_value_box_;
 };

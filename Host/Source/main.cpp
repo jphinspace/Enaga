@@ -27,10 +27,10 @@
 //   import std;               // replaces <cmath>, <array>, <atomic>, etc.
 //   import juce;              // replaces juce_* module headers
 
-#include "plugin_processor.h"
-
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_utils/juce_audio_utils.h>
+
+#include "plugin_processor.h"
 
 // ============================================================================
 //  PluginWindow
@@ -49,13 +49,11 @@ class PluginWindow final : public juce::DocumentWindow {
    * @param name       Window title bar text.
    * @param processor  The plugin whose editor should be displayed.
    */
-  PluginWindow(const juce::String& name,
-               juce::AudioProcessor& processor)
+  PluginWindow(const juce::String& name, juce::AudioProcessor& processor)
       : DocumentWindow(
             name,
-            juce::Desktop::getInstance()
-                .getDefaultLookAndFeel()
-                .findColour(juce::ResizableWindow::backgroundColourId),
+            juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(
+                juce::ResizableWindow::backgroundColourId),
             DocumentWindow::allButtons) {
     setUsingNativeTitleBar(true);
 
@@ -111,9 +109,7 @@ class EnagaHostApplication final : public juce::JUCEApplication {
   [[nodiscard]] const juce::String getApplicationVersion() override {
     return juce::String(JUCE_APPLICATION_VERSION_STRING);
   }
-  [[nodiscard]] bool moreThanOneInstanceAllowed() override {
-    return false;
-  }
+  [[nodiscard]] bool moreThanOneInstanceAllowed() override { return false; }
 
   /**
    * Called by JUCE after all platform initialisation is complete.
@@ -136,20 +132,18 @@ class EnagaHostApplication final : public juce::JUCEApplication {
 
     // Create the window; the window calls processor.createEditorIfNeeded()
     // internally so the host never touches Enaga-specific editor types.
-    plugin_window_ = std::make_unique<PluginWindow>(
-        getApplicationName(), *processor_);
+    plugin_window_ =
+        std::make_unique<PluginWindow>(getApplicationName(), *processor_);
 
     // Open the platform's default audio output device (stereo, no input).
-    const auto error =
-        device_manager_.initialiseWithDefaultDevices(0, 2);
+    const auto error = device_manager_.initialiseWithDefaultDevices(0, 2);
     if (error.isNotEmpty()) {
       juce::Logger::writeToLog("Audio device error: " + error);
       juce::AlertWindow::showMessageBoxAsync(
-          juce::MessageBoxIconType::WarningIcon,
-          "Audio Error",
-          "Could not open the audio device:\n\n" + error
-              + "\n\nClose and re-open the application after checking "
-                "your audio settings.",
+          juce::MessageBoxIconType::WarningIcon, "Audio Error",
+          "Could not open the audio device:\n\n" + error +
+              "\n\nClose and re-open the application after checking "
+              "your audio settings.",
           "OK");
       return;
     }
@@ -175,23 +169,21 @@ class EnagaHostApplication final : public juce::JUCEApplication {
   }
 
   /** OS-level quit request (e.g. Command-Q on macOS, Alt-F4 on Windows). */
-  void systemRequestedQuit() override {
-    quit();
-  }
+  void systemRequestedQuit() override { quit(); }
 
   /** Called when a second instance tries to launch (desktop only). */
-  void anotherInstanceStarted(
-      const juce::String& command_line) override {
+  void anotherInstanceStarted(const juce::String& command_line) override {
     juce::ignoreUnused(command_line);
   }
 
  private:
   // Member declaration order mirrors the dependency chain so that
   // destruction (LIFO) is safe without explicit teardown ordering.
-  juce::AudioDeviceManager        device_manager_;    // owns the hardware device
-  juce::AudioProcessorPlayer      processor_player_;  // bridges AudioProcessor → device
-  std::unique_ptr<EnagaProcessor> processor_;         // the hosted plugin
-  std::unique_ptr<PluginWindow>   plugin_window_;     // destroyed first (UI last)
+  juce::AudioDeviceManager device_manager_;  // owns the hardware device
+  juce::AudioProcessorPlayer
+      processor_player_;  // bridges AudioProcessor → device
+  std::unique_ptr<EnagaProcessor> processor_;    // the hosted plugin
+  std::unique_ptr<PluginWindow> plugin_window_;  // destroyed first (UI last)
 };
 
 // ============================================================================

@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include "audio/lfo_mode.h"
-
 #include <atomic>
+
+#include "audio/lfo_mode.h"
 
 /**
  * Sine-wave LFO oscillator with lock-free parameter updates.
@@ -40,8 +40,7 @@ class LfoEngine final {
    * @param sample_rate  Current hardware sample rate in Hz.
    * @returns            Normalised LFO value: 1 = peak, 0 = trough.
    */
-  [[nodiscard]] float Tick(int num_samples,
-                           double sample_rate) noexcept;
+  [[nodiscard]] float Tick(int num_samples, double sample_rate) noexcept;
 
   /**
    * Apply LFO modulation to a user-defined maximum value.
@@ -50,8 +49,7 @@ class LfoEngine final {
    * @param lfo_norm  Normalised LFO value from Tick() in [0, 1].
    * @returns         A value in [max_val * (1 - intensity/100), max_val].
    */
-  [[nodiscard]] float ApplyToMax(float max_val,
-                                 float lfo_norm) const noexcept;
+  [[nodiscard]] float ApplyToMax(float max_val, float lfo_norm) const noexcept;
 
   /**
    * Set the LFO oscillation rate.
@@ -78,8 +76,8 @@ class LfoEngine final {
   void Reset() noexcept;
 
  private:
-  std::atomic<float> rate_      { 0.1f };  // Hz; clamped to [0.01, 2.0]
-  std::atomic<float> intensity_ { 0.0f };  // 0–100
-  std::atomic<int>   mode_      { 0 };     // cast to LfoMode; UI thread writes
-  double             phase_     { 0.0 };   // radians; audio thread only
+  std::atomic<float> rate_{0.1f};       // Hz; clamped to [0.01, 2.0]
+  std::atomic<float> intensity_{0.0f};  // 0–100
+  std::atomic<int> mode_{0};            // cast to LfoMode; UI thread writes
+  double phase_{0.0};                   // radians; audio thread only
 };

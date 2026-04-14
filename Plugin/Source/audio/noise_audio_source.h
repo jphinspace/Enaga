@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include "audio/generators/brown_noise_generator.h"
-#include "audio/generators/grey_noise_generator.h"
-#include "audio/lfo_engine.h"
-#include "audio/generators/pink_noise_generator.h"
-#include "audio/generators/white_noise_generator.h"
-#include "audio/noise_type.h"
-
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include <array>
 #include <atomic>
+
+#include "audio/generators/brown_noise_generator.h"
+#include "audio/generators/grey_noise_generator.h"
+#include "audio/generators/pink_noise_generator.h"
+#include "audio/generators/white_noise_generator.h"
+#include "audio/lfo_engine.h"
+#include "audio/noise_type.h"
 
 /**
  * JUCE AudioSource that generates noise of a selectable spectral colour.
@@ -97,8 +97,7 @@ class NoiseAudioSource final : public juce::AudioSource {
   void prepareToPlay(int samples_per_block_expected,
                      double new_sample_rate) override;
   void releaseResources() override;
-  void getNextAudioBlock(
-      const juce::AudioSourceChannelInfo& info) override;
+  void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override;
 
  private:
   /** Recompute LP IIR coefficients from last_cutoff_ (audio thread). */
@@ -110,18 +109,18 @@ class NoiseAudioSource final : public juce::AudioSource {
   // One generator per noise type – all prepared simultaneously so that
   // switching between types never requires a re-initialise.
   WhiteNoiseGenerator white_gen_;
-  PinkNoiseGenerator  pink_gen_;
+  PinkNoiseGenerator pink_gen_;
   BrownNoiseGenerator brown_gen_;
-  GreyNoiseGenerator  grey_gen_;
+  GreyNoiseGenerator grey_gen_;
 
-  std::atomic<int>   noise_type_   { 0 };       // cast to NoiseType
-  std::atomic<float> cutoff_       { 100.0f };   // normalised 0-100
-  float              last_cutoff_  { 100.0f };   // applied value (audio thread)
-  std::atomic<float> gain_         { 1.0f };     // amplitude multiplier [0,1]
-  std::atomic<float> fade_target_  { 0.0f };     // 0 = silent, 1 = full
-  float              fade_current_ { 0.0f };     // current fade (audio thread)
-  float              fade_step_    { 0.0f };     // per-sample ramp (audio thread)
-  double             sample_rate_  { 44100.0 };
+  std::atomic<int> noise_type_{0};        // cast to NoiseType
+  std::atomic<float> cutoff_{100.0f};     // normalised 0-100
+  float last_cutoff_{100.0f};             // applied value (audio thread)
+  std::atomic<float> gain_{1.0f};         // amplitude multiplier [0,1]
+  std::atomic<float> fade_target_{0.0f};  // 0 = silent, 1 = full
+  float fade_current_{0.0f};              // current fade (audio thread)
+  float fade_step_{0.0f};                 // per-sample ramp (audio thread)
+  double sample_rate_{44100.0};
 
   std::array<juce::IIRFilter, 2> lp_filters_;  // one per stereo channel
 

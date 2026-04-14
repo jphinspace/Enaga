@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "audio/generators/noise_generator.h"
-
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include <array>
+
+#include "audio/generators/noise_generator.h"
 
 /**
  * Produces brown noise by leaky first-order IIR integration of white noise.
@@ -27,5 +27,5 @@ class BrownNoiseGenerator final : public NoiseGenerator {
 
  private:
   juce::Random random_;
-  std::array<float, 2> state_ {};  // running integration value per channel
+  std::array<float, 2> state_{};  // running integration value per channel
 };

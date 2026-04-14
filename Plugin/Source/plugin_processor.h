@@ -9,11 +9,11 @@
 
 #pragma once
 
-#include "audio/noise_audio_source.h"
-#include "audio/lfo_mode.h"
-#include "audio/noise_type.h"
-
 #include <juce_audio_processors/juce_audio_processors.h>
+
+#include "audio/lfo_mode.h"
+#include "audio/noise_audio_source.h"
+#include "audio/noise_type.h"
 
 /**
  * Audio processor for the Enaga noise generator.
@@ -56,22 +56,19 @@ class EnagaProcessor final : public juce::AudioProcessor {
 
   [[nodiscard]] const juce::String getName() const override;
 
-  [[nodiscard]] bool   acceptsMidi()  const override { return false;  }
-  [[nodiscard]] bool   producesMidi() const override { return false;  }
-  [[nodiscard]] bool   isMidiEffect() const override { return false;  }
+  [[nodiscard]] bool acceptsMidi() const override { return false; }
+  [[nodiscard]] bool producesMidi() const override { return false; }
+  [[nodiscard]] bool isMidiEffect() const override { return false; }
   [[nodiscard]] double getTailLengthSeconds() const override { return 0.0; }
 
-  [[nodiscard]] int  getNumPrograms()    override { return 1;  }
-  [[nodiscard]] int  getCurrentProgram() override { return 0;  }
+  [[nodiscard]] int getNumPrograms() override { return 1; }
+  [[nodiscard]] int getCurrentProgram() override { return 0; }
   void setCurrentProgram(int) override {}
-  [[nodiscard]] const juce::String getProgramName(int) override {
-    return {};
-  }
+  [[nodiscard]] const juce::String getProgramName(int) override { return {}; }
   void changeProgramName(int, const juce::String&) override {}
 
   void getStateInformation(juce::MemoryBlock& dest_data) override;
-  void setStateInformation(const void* data,
-                           int size_in_bytes) override;
+  void setStateInformation(const void* data, int size_in_bytes) override;
 
  private:
   NoiseAudioSource noise_source_;

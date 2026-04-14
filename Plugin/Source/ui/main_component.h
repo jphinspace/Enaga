@@ -9,7 +9,7 @@
 #include "ui/play_button.h"
 
 #if JUCE_IOS
-  #include "platform/ios_volume_view.h"
+#include "platform/ios_volume_view.h"
 #endif
 
 #include <juce_core/juce_core.h>
@@ -44,16 +44,15 @@
  * All menu options are available on every platform; "Quit" is added only
  * on desktop builds.
  */
-class MainComponent final : public juce::Component
-                          , public juce::MenuBarModel {
+class MainComponent final : public juce::Component, public juce::MenuBarModel {
  public:
-  using AudioToggleCallback       = std::function<void(bool)>;
-  using AudioFilterCallback       = std::function<void(float)>;
-  using AudioGainCallback         = std::function<void(float)>;
-  using AudioNoiseTypeCallback    = std::function<void(float)>;
-  using AudioLfoRateCallback      = std::function<void(float)>;
+  using AudioToggleCallback = std::function<void(bool)>;
+  using AudioFilterCallback = std::function<void(float)>;
+  using AudioGainCallback = std::function<void(float)>;
+  using AudioNoiseTypeCallback = std::function<void(float)>;
+  using AudioLfoRateCallback = std::function<void(float)>;
   using AudioLfoIntensityCallback = std::function<void(float)>;
-  using AudioLfoModeCallback      = std::function<void(LfoMode)>;
+  using AudioLfoModeCallback = std::function<void(LfoMode)>;
 
   /** All audio-layer callbacks bundled into a single struct.
    *
@@ -62,13 +61,13 @@ class MainComponent final : public juce::Component
    *  changing this struct definition rather than every call site.
    */
   struct AudioCallbacks {
-    AudioToggleCallback       onToggle;
-    AudioFilterCallback       onFilter;
-    AudioGainCallback         onGain;
-    AudioNoiseTypeCallback    onNoiseType;
-    AudioLfoRateCallback      onLfoRate;
-    AudioLfoIntensityCallback onLfoIntensity;
-    AudioLfoModeCallback      onLfoMode;
+    AudioToggleCallback on_toggle;
+    AudioFilterCallback on_filter;
+    AudioGainCallback on_gain;
+    AudioNoiseTypeCallback on_noise_type;
+    AudioLfoRateCallback on_lfo_rate;
+    AudioLfoIntensityCallback on_lfo_intensity;
+    AudioLfoModeCallback on_lfo_mode;
   };
 
   explicit MainComponent(AudioCallbacks callbacks);
@@ -82,11 +81,9 @@ class MainComponent final : public juce::Component
   [[nodiscard]] juce::StringArray getMenuBarNames() override;
 
   [[nodiscard]] juce::PopupMenu getMenuForIndex(
-      int top_level_menu_index,
-      const juce::String& menu_name) override;
+      int top_level_menu_index, const juce::String& menu_name) override;
 
-  void menuItemSelected(int menu_item_id,
-                        int top_level_menu_index) override;
+  void menuItemSelected(int menu_item_id, int top_level_menu_index) override;
 
   // -------------------------------------------------------------------
   //  juce::Component interface
@@ -140,27 +137,27 @@ class MainComponent final : public juce::Component
   AudioCallbacks callbacks_;
 
   // Default values used at construction and as fallbacks for presets.
-  static constexpr double kDefaultDiscreteValue   = 1.0;  // White noise
+  static constexpr double kDefaultDiscreteValue = 1.0;  // White noise
   static constexpr double kDefaultContinuousValue = 100.0;
-  static constexpr double kDefaultVolumeValue     = 100.0;
+  static constexpr double kDefaultVolumeValue = 100.0;
 
-  PlayButton       play_button_;
-  juce::Slider     discrete_slider_;
-  juce::Slider     continuous_slider_;
+  PlayButton play_button_;
+  juce::Slider discrete_slider_;
+  juce::Slider continuous_slider_;
   juce::TextEditor continuous_value_box_;
-  juce::Label      discrete_label_;
-  juce::Label      continuous_label_;
+  juce::Label discrete_label_;
+  juce::Label continuous_label_;
 
   // Volume control: platform-specific widget + shared label.
   // iOS     – MPVolumeView (native system slider; no text box needed).
   // Android – juce::Slider wired to juce::SystemAudioVolume.
   // Desktop – juce::Slider driving app-level gain.
 #if JUCE_IOS
-  IOSVolumeView    mobile_volume_view_;
+  IOSVolumeView mobile_volume_view_;
 #else
-  juce::Slider     volume_slider_;
+  juce::Slider volume_slider_;
 #endif
-  juce::Label      volume_label_;
+  juce::Label volume_label_;
 
   juce::Rectangle<int> image_area_;
 
