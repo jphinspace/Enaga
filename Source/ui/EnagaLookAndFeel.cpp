@@ -28,7 +28,7 @@ EnagaLookAndFeel::EnagaLookAndFeel()
     setColour(juce::PopupMenu::highlightedTextColourId,           bg);
     // TextButton colours are also used by MenuBarComponent rendering
     // (see LookAndFeel_V4::drawMenuBarBackground / drawMenuBarItem).
-    setColour(juce::TextButton::buttonColourId,                   juce::Colour(0xff212121));
+    setColour(juce::TextButton::buttonColourId,                   juce::Colour(kButtonBackground));
     setColour(juce::TextButton::buttonOnColourId,                 accent);
     setColour(juce::TextButton::textColourOffId,                  textCol);
     setColour(juce::TextButton::textColourOnId,                   bg);
