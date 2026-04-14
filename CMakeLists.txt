@@ -41,67 +41,15 @@ include(CTest)
 add_subdirectory(tests)
 
 # ---------------------------------------------------------------------------
-# Enaga application target
+# Component 1: Enaga VST/AU plugin
 # ---------------------------------------------------------------------------
-# juce_add_gui_app is required to support iOS and Android.
-# For desktop-only builds juce_add_console_app is a lighter alternative.
-juce_add_gui_app(Enaga
-    PRODUCT_NAME     "Enaga"
-    BUNDLE_ID        "com.jphinspace.enaga"
-    COMPANY_NAME     "jphinspace"
-    COMPANY_WEBSITE  "https://github.com/jphinspace"
-    COMPANY_EMAIL    ""
-    VERSION          "${PROJECT_VERSION}"
-)
+# Source lives in Plugin/; builds VST3 and AU formats that can be loaded
+# in any compatible DAW.
+add_subdirectory(Plugin)
 
-target_include_directories(Enaga PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-
-target_sources(Enaga PRIVATE
-    Source/Main.cpp
-    Source/audio/NoiseAudioSource.cpp
-    Source/audio/LfoEngine.cpp
-    Source/audio/generators/WhiteNoiseGenerator.cpp
-    Source/audio/generators/BrownNoiseGenerator.cpp
-    Source/audio/generators/PinkNoiseGenerator.cpp
-    Source/audio/generators/GreyNoiseGenerator.cpp
-    Source/ui/EnagaLookAndFeel.cpp
-    Source/ui/PlayButton.cpp
-    Source/ui/LfoComponent.cpp
-    Source/ui/MainComponent.cpp
-)
-
-# iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
-if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    target_sources(Enaga PRIVATE Source/platform/IOSVolumeView.mm)
-endif()
-
-# Require C++23 for this target explicitly (inherits project default, but
-# explicit is better than implicit — a C++26 TODO marker in its own right).
-target_compile_features(Enaga PRIVATE cxx_std_23)
-
-# JUCE compile-time configuration flags
-target_compile_definitions(Enaga
-    PRIVATE
-        JUCE_WEB_BROWSER=0       # no embedded browser needed
-        JUCE_USE_CURL=0          # no libcurl dependency
-        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:Enaga,JUCE_PRODUCT_NAME>"
-        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:Enaga,JUCE_VERSION>"
-)
-
-target_link_libraries(Enaga
-    PRIVATE
-        juce::juce_gui_basics    # JUCEApplication, GUI lifecycle
-        juce::juce_core          # String, File, Logger, …
-        juce::juce_events        # MessageManager, Timer, …
-        juce::juce_audio_basics  # AudioSource, AudioBuffer, …
-        juce::juce_audio_devices # AudioDeviceManager, AudioSourcePlayer, …
-)
-
-# iOS-specific: UIViewComponent (hosts MPVolumeView) lives in juce_gui_extra;
-# MediaPlayer.framework provides MPVolumeView itself.
-if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    target_link_libraries(Enaga PRIVATE
-        juce::juce_gui_extra
-        "-framework MediaPlayer"
-    )
-endif()
+# ---------------------------------------------------------------------------
+# Component 2: Generic standalone plugin host application
+# ---------------------------------------------------------------------------
+# Source lives in Host/; hosts EnagaProcessor (or any juce::AudioProcessor)
+# via AudioProcessorPlayer and AudioDeviceManager on all target platforms.
+add_subdirectory(Host)

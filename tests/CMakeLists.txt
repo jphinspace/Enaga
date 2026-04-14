@@ -15,17 +15,17 @@ enable_testing()
 
 add_executable(EnagaSmokeTest SmokeTest.cpp
 
-    # Audio sources under test
-    ${CMAKE_SOURCE_DIR}/Source/audio/NoiseAudioSource.cpp
-    ${CMAKE_SOURCE_DIR}/Source/audio/LfoEngine.cpp
-    ${CMAKE_SOURCE_DIR}/Source/audio/generators/WhiteNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Source/audio/generators/PinkNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Source/audio/generators/BrownNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Source/audio/generators/GreyNoiseGenerator.cpp
+    # Audio sources under test (now in Plugin/Source/ after refactoring)
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/NoiseAudioSource.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/LfoEngine.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/WhiteNoiseGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/PinkNoiseGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/BrownNoiseGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/GreyNoiseGenerator.cpp
 )
 
 target_include_directories(EnagaSmokeTest PRIVATE
-    ${CMAKE_SOURCE_DIR}/Source
+    ${CMAKE_SOURCE_DIR}/Plugin/Source
 )
 
 target_compile_features(EnagaSmokeTest PRIVATE cxx_std_23)
