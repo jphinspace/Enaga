@@ -56,7 +56,9 @@ cmake --preset macos
 cmake --build --preset macos
 ```
 
-The built app bundle is at `build/macos/Enaga_artefacts/Debug/Enaga.app`.
+The built app bundle is at `build/macos/Host/EnagaHost_artefacts/Debug/Enaga.app`.
+
+The VST3 plugin is at `build/macos/Plugin/EnagaPlugin_artefacts/Debug/VST3/Enaga.vst3`.
 
 ### Linux
 
@@ -65,7 +67,10 @@ cmake --preset linux
 cmake --build --preset linux
 ```
 
-The built binary is at `build/linux/Enaga_artefacts/Debug/Enaga`.
+The standalone host binary is at `build/linux/Host/EnagaHost_artefacts/Debug/Enaga`.
+
+The VST3 plugin is at
+`build/linux/Plugin/EnagaPlugin_artefacts/Debug/VST3/Enaga.vst3/`.
 
 ### Windows
 
@@ -74,8 +79,11 @@ cmake --preset windows
 cmake --build --preset windows
 ```
 
-The built executable is at
-`build\windows\Enaga_artefacts\Debug\Enaga.exe`.
+The standalone host executable is at
+`build\windows\Host\EnagaHost_artefacts\Debug\Enaga.exe`.
+
+The VST3 plugin is at
+`build\windows\Plugin\EnagaPlugin_artefacts\Debug\VST3\Enaga.vst3\`.
 
 ### iOS (requires macOS host)
 
@@ -139,34 +147,47 @@ from C++26 language features (modules, `std::println`, `std::expected`, etc.).
 
 ## Project structure
 
+The codebase is split into two components that can live in this repo and be
+split into separate repos later:
+
 ```
 Enaga/
 ├── .clang-format              # Code style configuration (100-col, Allman)
 ├── .clang-tidy                # Static analysis checks (readability-*, modernize-*, cppcoreguidelines-*)
-├── CMakeLists.txt             # Build definition; fetches JUCE via FetchContent
+├── CMakeLists.txt             # Top-level build; fetches JUCE, includes Plugin/ and Host/
 ├── CMakePresets.json          # Per-platform Debug + Release configure/build presets
 ├── tests/                     # CTest-registered unit tests
 │   ├── CMakeLists.txt
 │   └── SmokeTest.cpp          # Smoke test: constructs NoiseAudioSource and exercises the audio path
-└── Source/
-    ├── Main.cpp               # Application entry point (JUCEApplication, MainWindow)
-    ├── audio/                 # Audio-domain classes and enumerations
-    │   ├── LfoEngine.h/.cpp   # Sine-wave LFO oscillator with lock-free parameter updates
-    │   ├── LfoMode.h          # enum class LfoMode (Disabled / Volume / Filter / Both)
-    │   ├── NoiseAudioSource.h/.cpp  # JUCE AudioSource: LP filter, gain, fade, LFO
-    │   ├── NoiseType.h        # enum class NoiseType (White / Pink / Brown / Grey)
-    │   └── generators/        # Per-sample noise generator implementations
-    │       ├── NoiseGenerator.h           # Abstract base interface
-    │       ├── WhiteNoiseGenerator.h/.cpp # Flat spectrum (PRNG)
-    │       ├── PinkNoiseGenerator.h/.cpp  # 1/f spectrum (Kellett parallel filter)
-    │       ├── BrownNoiseGenerator.h/.cpp # 1/f² spectrum (leaky integrator)
-    │       └── GreyNoiseGenerator.h/.cpp  # Perceptually flat (inverse A-weighting)
-    ├── ui/                    # UI-domain classes
-    │   ├── EnagaLookAndFeel.h/.cpp  # Dark theme; exposes kBackground/kAccent/etc. constants
-    │   ├── LfoComponent.h/.cpp      # LFO controls panel (mode button, rate/intensity sliders)
-    │   ├── MainComponent.h/.cpp     # Root component: layout, sliders, menus, preset I/O
-    │   └── PlayButton.h/.cpp        # Custom play/stop toggle button
-    └── platform/              # Platform-specific glue code
-        ├── IOSVolumeView.h    # iOS MPVolumeView wrapper interface
-        └── IOSVolumeView.mm   # iOS MPVolumeView wrapper implementation (Objective-C++)
+│
+├── Plugin/                    # Component 1 — Enaga VST/AU plugin (self-contained; can be split out)
+│   ├── CMakeLists.txt         # juce_add_plugin: builds VST3 and AU formats
+│   └── Source/
+│       ├── PluginProcessor.h/.cpp  # AudioProcessor wrapping NoiseAudioSource
+│       ├── PluginEditor.h/.cpp     # AudioProcessorEditor wrapping MainComponent
+│       ├── PluginEntry.cpp         # createPluginFilter() factory (plugin binary only)
+│       ├── audio/             # Audio-domain classes and enumerations
+│       │   ├── LfoEngine.h/.cpp    # Sine-wave LFO oscillator with lock-free parameter updates
+│       │   ├── LfoMode.h           # enum class LfoMode (Disabled / Volume / Filter / Both)
+│       │   ├── NoiseAudioSource.h/.cpp  # JUCE AudioSource: LP filter, gain, fade, LFO
+│       │   ├── NoiseType.h         # enum class NoiseType (White / Pink / Brown / Grey)
+│       │   └── generators/         # Per-sample noise generator implementations
+│       │       ├── NoiseGenerator.h            # Abstract base interface
+│       │       ├── WhiteNoiseGenerator.h/.cpp  # Flat spectrum (PRNG)
+│       │       ├── PinkNoiseGenerator.h/.cpp   # 1/f spectrum (Kellett parallel filter)
+│       │       ├── BrownNoiseGenerator.h/.cpp  # 1/f² spectrum (leaky integrator)
+│       │       └── GreyNoiseGenerator.h/.cpp   # Perceptually flat (inverse A-weighting)
+│       ├── ui/                # UI-domain classes
+│       │   ├── EnagaLookAndFeel.h/.cpp  # Dark theme; exposes kBackground/kAccent/etc. constants
+│       │   ├── LfoComponent.h/.cpp      # LFO controls panel (mode button, rate/intensity sliders)
+│       │   ├── MainComponent.h/.cpp     # Root component: layout, sliders, menus, preset I/O
+│       │   └── PlayButton.h/.cpp        # Custom play/stop toggle button
+│       └── platform/          # Platform-specific glue code
+│           ├── IOSVolumeView.h    # iOS MPVolumeView wrapper interface
+│           └── IOSVolumeView.mm   # iOS MPVolumeView wrapper implementation (Objective-C++)
+│
+└── Host/                      # Component 2 — Generic standalone plugin host (not Enaga-specific)
+    ├── CMakeLists.txt         # juce_add_gui_app: builds the standalone application
+    └── Source/
+        └── Main.cpp           # PluginWindow + EnagaHostApplication; hosts any juce::AudioProcessor
 ```
