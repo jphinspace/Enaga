@@ -13,15 +13,15 @@ enable_testing()
 # Smoke test: constructs NoiseAudioSource and exercises the audio path
 # ---------------------------------------------------------------------------
 
-add_executable(EnagaSmokeTest SmokeTest.cpp
+add_executable(EnagaSmokeTest smoke_test.cpp
 
     # Audio sources under test (now in Plugin/Source/ after refactoring)
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/NoiseAudioSource.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/LfoEngine.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/WhiteNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/PinkNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/BrownNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/GreyNoiseGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/noise_audio_source.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/lfo_engine.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/white_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/pink_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/brown_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/grey_noise_generator.cpp
 )
 
 target_include_directories(EnagaSmokeTest PRIVATE

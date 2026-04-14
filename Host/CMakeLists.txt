@@ -24,34 +24,34 @@ target_include_directories(EnagaHost PRIVATE
 )
 
 target_sources(EnagaHost PRIVATE
-    Source/Main.cpp
+    Source/main.cpp
 
     # Plugin sources compiled directly into the host so that EnagaProcessor
     # can be instantiated without loading a plugin binary at runtime.
-    # PluginEntry.cpp is intentionally omitted — createPluginFilter() is not
+    # plugin_entry.cpp is intentionally omitted — createPluginFilter() is not
     # needed in the host context.
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/PluginProcessor.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/PluginEditor.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/plugin_processor.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/plugin_editor.cpp
 
     # Audio engine
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/NoiseAudioSource.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/LfoEngine.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/WhiteNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/BrownNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/PinkNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/GreyNoiseGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/noise_audio_source.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/lfo_engine.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/white_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/brown_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/pink_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/grey_noise_generator.cpp
 
     # UI
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/EnagaLookAndFeel.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/PlayButton.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/LfoComponent.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/MainComponent.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/enaga_look_and_feel.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/play_button.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/lfo_component.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/ui/main_component.cpp
 )
 
 # iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     target_sources(EnagaHost PRIVATE
-        ${CMAKE_SOURCE_DIR}/Plugin/Source/platform/IOSVolumeView.mm
+        ${CMAKE_SOURCE_DIR}/Plugin/Source/platform/ios_volume_view.mm
     )
 endif()
 

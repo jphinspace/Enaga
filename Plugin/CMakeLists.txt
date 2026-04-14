@@ -43,30 +43,30 @@ target_include_directories(EnagaPlugin
 
 target_sources(EnagaPlugin PRIVATE
     # Plugin-binary entry point (createPluginFilter) — plugin targets only
-    Source/PluginEntry.cpp
+    Source/plugin_entry.cpp
 
     # Plugin processor and editor
-    Source/PluginProcessor.cpp
-    Source/PluginEditor.cpp
+    Source/plugin_processor.cpp
+    Source/plugin_editor.cpp
 
     # Audio engine
-    Source/audio/NoiseAudioSource.cpp
-    Source/audio/LfoEngine.cpp
-    Source/audio/generators/WhiteNoiseGenerator.cpp
-    Source/audio/generators/BrownNoiseGenerator.cpp
-    Source/audio/generators/PinkNoiseGenerator.cpp
-    Source/audio/generators/GreyNoiseGenerator.cpp
+    Source/audio/noise_audio_source.cpp
+    Source/audio/lfo_engine.cpp
+    Source/audio/generators/white_noise_generator.cpp
+    Source/audio/generators/brown_noise_generator.cpp
+    Source/audio/generators/pink_noise_generator.cpp
+    Source/audio/generators/grey_noise_generator.cpp
 
     # UI
-    Source/ui/EnagaLookAndFeel.cpp
-    Source/ui/PlayButton.cpp
-    Source/ui/LfoComponent.cpp
-    Source/ui/MainComponent.cpp
+    Source/ui/enaga_look_and_feel.cpp
+    Source/ui/play_button.cpp
+    Source/ui/lfo_component.cpp
+    Source/ui/main_component.cpp
 )
 
 # iOS-specific: native MPVolumeView wrapper (Objective-C++, .mm extension required).
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    target_sources(EnagaPlugin PRIVATE Source/platform/IOSVolumeView.mm)
+    target_sources(EnagaPlugin PRIVATE Source/platform/ios_volume_view.mm)
 endif()
 
 target_compile_features(EnagaPlugin PRIVATE cxx_std_23)
