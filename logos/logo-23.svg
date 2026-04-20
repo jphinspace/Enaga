@@ -1,0 +1,11 @@
+<!-- Logo 23: White rounded square, eyes set lower (cuter proportions), beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes (lower center) -->
+  <circle cx="74" cy="104" r="10" fill="#1A1A1A"/>
+  <circle cx="78" cy="100" r="3" fill="#FFFFFF"/>
+  <circle cx="126" cy="104" r="10" fill="#1A1A1A"/>
+  <circle cx="130" cy="100" r="3" fill="#FFFFFF"/>
+  <!-- Beak (lower) -->
+  <path d="M93 122 L100 134 L107 122Z" fill="#1A1A1A"/>
+</svg>

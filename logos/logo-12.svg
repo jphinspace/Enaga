@@ -1,0 +1,11 @@
+<!-- Logo 12: Soft grey rounded square bg, black eyes, black beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#F2F2F2"/>
+  <!-- Eyes -->
+  <circle cx="74" cy="96" r="10" fill="#111111"/>
+  <circle cx="78" cy="92" r="3" fill="#F2F2F2"/>
+  <circle cx="126" cy="96" r="10" fill="#111111"/>
+  <circle cx="130" cy="92" r="3" fill="#F2F2F2"/>
+  <!-- Beak -->
+  <path d="M93 116 L100 128 L107 116Z" fill="#111111"/>
+</svg>

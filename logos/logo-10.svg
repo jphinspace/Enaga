@@ -1,0 +1,11 @@
+<!-- Logo 10: White rounded square, eyes slightly lower, half-open beak (V shape) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes -->
+  <circle cx="74" cy="100" r="10" fill="#1A1A1A"/>
+  <circle cx="78" cy="96" r="3" fill="#FFFFFF"/>
+  <circle cx="126" cy="100" r="10" fill="#1A1A1A"/>
+  <circle cx="130" cy="96" r="3" fill="#FFFFFF"/>
+  <!-- Open beak (V) -->
+  <path d="M93 118 L100 130 L107 118" fill="none" stroke="#1A1A1A" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
