@@ -7,7 +7,8 @@
  * standalone host application.
  */
 
-#pragma once
+#ifndef ENAGA_PLUGIN_PROCESSOR_H_
+#define ENAGA_PLUGIN_PROCESSOR_H_
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -75,3 +76,5 @@ class EnagaProcessor final : public juce::AudioProcessor {
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnagaProcessor)
 };
+
+#endif  // ENAGA_PLUGIN_PROCESSOR_H_

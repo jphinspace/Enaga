@@ -13,7 +13,8 @@
  * changes value.
  */
 
-#pragma once
+#ifndef ENAGA_UI_LFO_COMPONENT_H_
+#define ENAGA_UI_LFO_COMPONENT_H_
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -93,3 +94,5 @@ class LfoComponent final : public juce::Component {
   juce::Slider intensity_slider_;
   juce::TextEditor intensity_value_box_;
 };
+
+#endif  // ENAGA_UI_LFO_COMPONENT_H_

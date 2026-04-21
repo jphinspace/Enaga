@@ -3,7 +3,8 @@
  * @brief  Application-wide dark look and feel for Enaga.
  */
 
-#pragma once
+#ifndef ENAGA_UI_ENAGA_LOOK_AND_FEEL_H_
+#define ENAGA_UI_ENAGA_LOOK_AND_FEEL_H_
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -53,3 +54,5 @@ class EnagaLookAndFeel final : public juce::LookAndFeel_V4 {
                         float max_slider_pos, juce::Slider::SliderStyle style,
                         juce::Slider& slider) override;
 };
+
+#endif  // ENAGA_UI_ENAGA_LOOK_AND_FEEL_H_

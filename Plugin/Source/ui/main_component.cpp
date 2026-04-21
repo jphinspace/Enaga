@@ -11,17 +11,18 @@
 //  Constructor / Destructor
 // ============================================================================
 
-MainComponent::MainComponent(AudioCallbacks cbs)
-    : callbacks_(std::move(cbs)),
+MainComponent::MainComponent(AudioCallbacks callbacks)
+    : callbacks_(std::move(callbacks)),
       lfo_component_(
-          [this](float r) {
-            if (callbacks_.on_lfo_rate) callbacks_.on_lfo_rate(r);
+          [this](float rate_hz) {
+            if (callbacks_.on_lfo_rate) callbacks_.on_lfo_rate(rate_hz);
           },
-          [this](float i) {
-            if (callbacks_.on_lfo_intensity) callbacks_.on_lfo_intensity(i);
+          [this](float intensity) {
+            if (callbacks_.on_lfo_intensity)
+              callbacks_.on_lfo_intensity(intensity);
           },
-          [this](LfoMode m) {
-            if (callbacks_.on_lfo_mode) callbacks_.on_lfo_mode(m);
+          [this](LfoMode mode) {
+            if (callbacks_.on_lfo_mode) callbacks_.on_lfo_mode(mode);
           }) {
   SetupPlayButton();
   SetupDiscreteSlider();

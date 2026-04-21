@@ -25,9 +25,9 @@ EnagaEditor::EnagaEditor(EnagaProcessor& proc)
             processor_.SetNoiseType(static_cast<NoiseType>(
                 juce::jlimit(0, 3, static_cast<int>(v) - 1)));
           },
-          [this](float r) { processor_.SetLfoRate(r); },
-          [this](float i) { processor_.SetLfoIntensity(i); },
-          [this](LfoMode m) { processor_.SetLfoMode(m); }}) {
+          [this](float rate_hz) { processor_.SetLfoRate(rate_hz); },
+          [this](float intensity) { processor_.SetLfoIntensity(intensity); },
+          [this](LfoMode mode) { processor_.SetLfoMode(mode); }}) {
   juce::LookAndFeel::setDefaultLookAndFeel(&look_and_feel_);
 
   addAndMakeVisible(content_);

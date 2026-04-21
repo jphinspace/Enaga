@@ -3,7 +3,8 @@
  * @brief  White noise generator – flat frequency spectrum.
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_GENERATORS_WHITE_NOISE_GENERATOR_H_
+#define ENAGA_AUDIO_GENERATORS_WHITE_NOISE_GENERATOR_H_
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -22,3 +23,5 @@ class WhiteNoiseGenerator final : public NoiseGenerator {
  private:
   juce::Random random_;
 };
+
+#endif  // ENAGA_AUDIO_GENERATORS_WHITE_NOISE_GENERATOR_H_

@@ -3,7 +3,8 @@
  * @brief  iOS-only native system volume slider using MPVolumeView.
  */
 
-#pragma once
+#ifndef ENAGA_PLATFORM_IOS_VOLUME_VIEW_H_
+#define ENAGA_PLATFORM_IOS_VOLUME_VIEW_H_
 
 #if JUCE_IOS
 
@@ -25,3 +26,5 @@ class IOSVolumeView final : public juce::UIViewComponent {
 };
 
 #endif  // JUCE_IOS
+
+#endif  // ENAGA_PLATFORM_IOS_VOLUME_VIEW_H_

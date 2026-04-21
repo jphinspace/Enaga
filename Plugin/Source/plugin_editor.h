@@ -6,7 +6,8 @@
  * wires all UI callbacks back to EnagaProcessor.
  */
 
-#pragma once
+#ifndef ENAGA_PLUGIN_EDITOR_H_
+#define ENAGA_PLUGIN_EDITOR_H_
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -39,3 +40,5 @@ class EnagaEditor final : public juce::AudioProcessorEditor {
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnagaEditor)
 };
+
+#endif  // ENAGA_PLUGIN_EDITOR_H_

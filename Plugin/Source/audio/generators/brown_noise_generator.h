@@ -4,7 +4,8 @@
  *         (−6 dB/octave).
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_GENERATORS_BROWN_NOISE_GENERATOR_H_
+#define ENAGA_AUDIO_GENERATORS_BROWN_NOISE_GENERATOR_H_
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -29,3 +30,5 @@ class BrownNoiseGenerator final : public NoiseGenerator {
   juce::Random random_;
   std::array<float, 2> state_{};  // running integration value per channel
 };
+
+#endif  // ENAGA_AUDIO_GENERATORS_BROWN_NOISE_GENERATOR_H_

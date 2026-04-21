@@ -14,7 +14,8 @@
  * @endcode
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_LFO_ENGINE_H_
+#define ENAGA_AUDIO_LFO_ENGINE_H_
 
 #include <atomic>
 
@@ -59,12 +60,12 @@ class LfoEngine final {
 
   /**
    * Set the LFO modulation depth.
-   * @param i  Intensity 0–100; 0 = no modulation, 100 = full swing.
+   * @param intensity  Intensity 0–100; 0 = no modulation, 100 = full swing.
    */
-  void SetIntensity(float i) noexcept;
+  void SetIntensity(float intensity) noexcept;
 
   /** Set which audio parameter(s) the LFO modulates. */
-  void SetMode(LfoMode m) noexcept;
+  void SetMode(LfoMode mode) noexcept;
 
   /** Return the current LFO mode. */
   [[nodiscard]] LfoMode GetMode() const noexcept;
@@ -81,3 +82,5 @@ class LfoEngine final {
   std::atomic<int> mode_{0};            // cast to LfoMode; UI thread writes
   double phase_{0.0};                   // radians; audio thread only
 };
+
+#endif  // ENAGA_AUDIO_LFO_ENGINE_H_

@@ -3,7 +3,8 @@
  * @brief  Spectral colour enumeration for the noise generator.
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_NOISE_TYPE_H_
+#define ENAGA_AUDIO_NOISE_TYPE_H_
 
 /** Spectral colour of the generated noise. */
 enum class NoiseType {
@@ -12,3 +13,5 @@ enum class NoiseType {
   kBrown,      ///< 1/f² spectrum (−6 dB/octave, Brownian noise).
   kGrey        ///< Perceptually flat (inverse A-weighting shaped).
 };
+
+#endif  // ENAGA_AUDIO_NOISE_TYPE_H_

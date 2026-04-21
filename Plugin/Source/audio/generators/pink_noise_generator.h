@@ -3,7 +3,8 @@
  * @brief  Pink noise generator – 1/f spectrum (−3 dB/octave).
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_GENERATORS_PINK_NOISE_GENERATOR_H_
+#define ENAGA_AUDIO_GENERATORS_PINK_NOISE_GENERATOR_H_
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -30,3 +31,5 @@ class PinkNoiseGenerator final : public NoiseGenerator {
   // 7 filter-state variables per stereo channel (Paul Kellett algorithm).
   std::array<std::array<float, 7>, 2> state_{};
 };
+
+#endif  // ENAGA_AUDIO_GENERATORS_PINK_NOISE_GENERATOR_H_

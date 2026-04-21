@@ -25,7 +25,9 @@
 // ---------------------------------------------------------------------------
 #include <juce_audio_basics/juce_audio_basics.h>
 
-static bool RunSmokeTest() {
+namespace {
+
+bool RunSmokeTest() {
   constexpr double kSampleRate = 44100.0;
   constexpr int kSamplesPerBlock = 512;
   constexpr int kNumChannels = 2;
@@ -35,12 +37,12 @@ static bool RunSmokeTest() {
   source.prepareToPlay(kSamplesPerBlock, kSampleRate);
 
   // Exercise all four noise types.
-  const NoiseType noise_types[] = {NoiseType::kWhite, NoiseType::kPink,
-                                   NoiseType::kBrown, NoiseType::kGrey};
+  constexpr NoiseType kNoiseTypes[] = {NoiseType::kWhite, NoiseType::kPink,
+                                       NoiseType::kBrown, NoiseType::kGrey};
 
   juce::AudioBuffer<float> buffer(kNumChannels, kSamplesPerBlock);
 
-  for (const auto type : noise_types) {
+  for (const auto type : kNoiseTypes) {
     source.SetNoiseType(type);
     source.StartFadeIn();
 
@@ -72,5 +74,7 @@ static bool RunSmokeTest() {
   std::puts("PASS: NoiseAudioSource smoke test");
   return true;
 }
+
+}  // namespace
 
 int main() { return RunSmokeTest() ? 0 : 1; }

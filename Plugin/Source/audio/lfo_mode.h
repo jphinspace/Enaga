@@ -3,7 +3,8 @@
  * @brief  LFO modulation target enumeration.
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_LFO_MODE_H_
+#define ENAGA_AUDIO_LFO_MODE_H_
 
 /** Which audio parameter(s) the LFO modulates. */
 enum class LfoMode {
@@ -12,3 +13,5 @@ enum class LfoMode {
   kFilter,  ///< Modulates LP filter cutoff within the Cutoff-slider bound.
   kBoth     ///< Modulates both gain and cutoff simultaneously.
 };
+
+#endif  // ENAGA_AUDIO_LFO_MODE_H_

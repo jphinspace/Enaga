@@ -3,7 +3,8 @@
  * @brief  Abstract base class for per-sample noise generators.
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_GENERATORS_NOISE_GENERATOR_H_
+#define ENAGA_AUDIO_GENERATORS_NOISE_GENERATOR_H_
 
 #include <cstddef>
 
@@ -29,3 +30,5 @@ class NoiseGenerator {
    */
   [[nodiscard]] virtual float NextSample(std::size_t channel) noexcept = 0;
 };
+
+#endif  // ENAGA_AUDIO_GENERATORS_NOISE_GENERATOR_H_

@@ -3,7 +3,8 @@
  * @brief  Root UI component for the Enaga application window.
  */
 
-#pragma once
+#ifndef ENAGA_UI_MAIN_COMPONENT_H_
+#define ENAGA_UI_MAIN_COMPONENT_H_
 
 #include "ui/lfo_component.h"
 #include "ui/play_button.h"
@@ -173,3 +174,5 @@ class MainComponent final : public juce::Component, public juce::MenuBarModel {
 
   std::unique_ptr<juce::FileChooser> file_chooser_;
 };
+
+#endif  // ENAGA_UI_MAIN_COMPONENT_H_

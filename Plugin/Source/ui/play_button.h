@@ -3,7 +3,8 @@
  * @brief  Custom toggle button drawn as a play triangle or stop square.
  */
 
-#pragma once
+#ifndef ENAGA_UI_PLAY_BUTTON_H_
+#define ENAGA_UI_PLAY_BUTTON_H_
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -27,3 +28,5 @@ class PlayButton final : public juce::Button {
   void paintButton(juce::Graphics& g, bool is_mouse_over,
                    bool is_button_down) override;
 };
+
+#endif  // ENAGA_UI_PLAY_BUTTON_H_

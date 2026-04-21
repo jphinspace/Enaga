@@ -27,20 +27,21 @@ float LfoEngine::Tick(int num_samples, double sample_rate) noexcept {
 }
 
 float LfoEngine::ApplyToMax(float max_val, float lfo_norm) const noexcept {
-  const float i = intensity_.load(std::memory_order_relaxed) * 0.01f;
-  return max_val * (1.0f - i * (1.0f - lfo_norm));
+  const float depth = intensity_.load(std::memory_order_relaxed) * 0.01f;
+  return max_val * (1.0f - depth * (1.0f - lfo_norm));
 }
 
 void LfoEngine::SetRate(float rate_hz) noexcept {
   rate_.store(juce::jlimit(0.01f, 2.0f, rate_hz), std::memory_order_relaxed);
 }
 
-void LfoEngine::SetIntensity(float i) noexcept {
-  intensity_.store(juce::jlimit(0.0f, 100.0f, i), std::memory_order_relaxed);
+void LfoEngine::SetIntensity(float intensity) noexcept {
+  intensity_.store(juce::jlimit(0.0f, 100.0f, intensity),
+                   std::memory_order_relaxed);
 }
 
-void LfoEngine::SetMode(LfoMode m) noexcept {
-  mode_.store(static_cast<int>(m), std::memory_order_relaxed);
+void LfoEngine::SetMode(LfoMode mode) noexcept {
+  mode_.store(static_cast<int>(mode), std::memory_order_relaxed);
 }
 
 LfoMode LfoEngine::GetMode() const noexcept {

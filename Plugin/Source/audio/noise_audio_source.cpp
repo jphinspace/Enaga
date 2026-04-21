@@ -24,8 +24,8 @@ void NoiseAudioSource::SetLfoRate(float rate_hz) noexcept {
   lfo_.SetRate(rate_hz);
 }
 
-void NoiseAudioSource::SetLfoIntensity(float i) noexcept {
-  lfo_.SetIntensity(i);
+void NoiseAudioSource::SetLfoIntensity(float intensity) noexcept {
+  lfo_.SetIntensity(intensity);
 }
 
 void NoiseAudioSource::SetLfoMode(LfoMode mode) noexcept { lfo_.SetMode(mode); }

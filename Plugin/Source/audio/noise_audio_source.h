@@ -5,7 +5,8 @@
  *         LFO.
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_NOISE_AUDIO_SOURCE_H_
+#define ENAGA_AUDIO_NOISE_AUDIO_SOURCE_H_
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -36,6 +37,9 @@
  */
 class NoiseAudioSource final : public juce::AudioSource {
  public:
+  /** Duration of the fade-in and fade-out ramp in seconds. */
+  static constexpr float kFadeDurationSeconds = 0.25f;
+
   /**
    * Set the low-pass filter cutoff on a normalised 0–100 scale.
    * 0 -> 20 Hz (heavy filtering), 100 -> 20 kHz (wide open).
@@ -69,9 +73,10 @@ class NoiseAudioSource final : public juce::AudioSource {
 
   /**
    * Set the LFO modulation depth.
-   * @param i  Intensity on a 0-100 scale; 0 = no mod, 100 = full swing.
+   * @param intensity  Intensity on a 0-100 scale; 0 = no mod, 100 = full
+   *                   swing.
    */
-  void SetLfoIntensity(float i) noexcept;
+  void SetLfoIntensity(float intensity) noexcept;
 
   /**
    * Set which audio parameter(s) the LFO modulates.
@@ -90,9 +95,6 @@ class NoiseAudioSource final : public juce::AudioSource {
    * kFadeDurationSeconds. Thread-safe.
    */
   void StartFadeOut() noexcept;
-
-  /** Duration of the fade-in and fade-out ramp in seconds. */
-  static constexpr float kFadeDurationSeconds = 0.25f;
 
   void prepareToPlay(int samples_per_block_expected,
                      double new_sample_rate) override;
@@ -126,3 +128,5 @@ class NoiseAudioSource final : public juce::AudioSource {
 
   LfoEngine lfo_;  // rate/intensity/mode atomics, phase audio-thread only
 };
+
+#endif  // ENAGA_AUDIO_NOISE_AUDIO_SOURCE_H_

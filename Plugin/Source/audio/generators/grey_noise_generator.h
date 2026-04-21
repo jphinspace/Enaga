@@ -3,7 +3,8 @@
  * @brief  Grey noise generator – perceptually flat (inverse A-weighting).
  */
 
-#pragma once
+#ifndef ENAGA_AUDIO_GENERATORS_GREY_NOISE_GENERATOR_H_
+#define ENAGA_AUDIO_GENERATORS_GREY_NOISE_GENERATOR_H_
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
@@ -36,3 +37,5 @@ class GreyNoiseGenerator final : public NoiseGenerator {
   juce::Random random_;
   std::array<std::array<juce::IIRFilter, kStages>, 2> filters_{};
 };
+
+#endif  // ENAGA_AUDIO_GENERATORS_GREY_NOISE_GENERATOR_H_
