@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.25)  # 3.25+ required for cxx_std_26
 
 project(Enaga
     VERSION      0.1.0
@@ -8,10 +8,8 @@ project(Enaga
 
 # ---------------------------------------------------------------------------
 # C++ standard
-# Using C++23 now; migrate to C++26 by changing 23 → 26 below once toolchain
-# support is widespread.  See the Source/ directory for per-file C++26 TODO notes.
 # ---------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD          23)
+set(CMAKE_CXX_STANDARD          26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS        OFF)
 
@@ -25,7 +23,8 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 
 # --- JUCE -----------------------------------------------------------------
 # JUCE handles the platform lifecycle for iOS, Android, macOS, Windows, Linux.
-# TODO:C++26  Update to the JUCE release that ships first-class C++26 support.
+# NOTE: Update to a JUCE release with first-class C++26 support when available;
+#       currently pinned to 8.0.4 (targets C++17 internally).
 FetchContent_Declare(
     JUCE
     GIT_REPOSITORY https://github.com/juce-framework/JUCE.git

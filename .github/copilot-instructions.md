@@ -2,8 +2,8 @@
 
 ## Project Overview
 
-**Enaga** is a cross-platform, relaxing white noise generator built in **C++23**
-(migrating to C++26 over time) using the [JUCE](https://juce.com/) framework for
+**Enaga** is a cross-platform, relaxing white noise generator built in **C++26**
+using the [JUCE](https://juce.com/) framework for
 platform lifecycle, audio device management, and UI.
 
 Supported platforms: **macOS**, **Windows**, **Linux**, **iOS**, **Android**.
@@ -34,7 +34,7 @@ Key classes in `Source/Main.cpp`:
 
 ## Build System
 
-CMake 3.22+ with `CMakePresets.json`. JUCE is fetched automatically on first configure.
+CMake 3.25+ with `CMakePresets.json`. JUCE is fetched automatically on first configure.
 
 | Preset | Platform | Generator |
 |---|---|---|
@@ -54,10 +54,10 @@ cmake --build --preset linux
 
 ## C++ Conventions
 
-- **Standard**: C++23 (`CMAKE_CXX_STANDARD 23`). Extensions are **off**.
-- **Migration marker**: Every place that will benefit from a C++26 language
-  feature is annotated with a `// TODO:C++26` comment (e.g. modules, `std::println`,
-  `std::expected`, `std::span`). When adding new code, follow the same pattern.
+- **Standard**: C++26 (`CMAKE_CXX_STANDARD 26`). Extensions are **off**.
+- **JUCE blockers**: Some C++26 idioms (modules, `std::string_view` returns,
+  `std::execution::main`) cannot be adopted until JUCE ships matching support.
+  These spots are annotated with a `// NOTE(juce)` comment.
 - **`[[nodiscard]]`** on all functions that return values the caller must not
   silently discard.
 - **`final`** on leaf classes; virtual destructors are not needed when `final`

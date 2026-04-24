@@ -11,7 +11,7 @@
  * without any audio hardware.
  */
 
-// TODO:C++26  Replace #include with module imports once JUCE ships modules.
+// NOTE(juce)  Replace #include with module imports once JUCE ships modules.
 
 #include <cassert>
 #include <cmath>

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.25)  # 3.25+ required for cxx_std_26
 
 # ---------------------------------------------------------------------------
 # Enaga offline unit tests
@@ -28,7 +28,7 @@ target_include_directories(EnagaSmokeTest PRIVATE
     ${CMAKE_SOURCE_DIR}/Plugin/Source
 )
 
-target_compile_features(EnagaSmokeTest PRIVATE cxx_std_23)
+target_compile_features(EnagaSmokeTest PRIVATE cxx_std_26)
 
 target_compile_definitions(EnagaSmokeTest PRIVATE
     JUCE_WEB_BROWSER=0

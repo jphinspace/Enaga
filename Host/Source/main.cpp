@@ -10,8 +10,9 @@
  * appears; swapping in a different plugin requires only changing that
  * instantiation.
  *
- * Built with C++23. All areas that benefit from C++26 features are marked
- * with a "TODO:C++26" comment so the eventual migration is straightforward.
+ * Built with C++26. Items that depend on JUCE adopting C++26 interfaces
+ * (modules, `std::string_view` return types, `std::execution::main`, etc.)
+ * are noted inline with a "NOTE(juce)" comment.
  *
  * Supported platforms (via JUCE):
  *   - macOS, Windows, Linux  (desktop)
@@ -21,8 +22,8 @@
  *   cmake --preset <platform>    (see CMakePresets.json)
  */
 
-// TODO:C++26  Replace the #include directives below with named module imports
-//             once JUCE and the standard library ship module interfaces:
+// NOTE(juce)  Replace the #include directives below with named module imports
+//             once JUCE ships module interfaces:
 //
 //   import std;               // replaces <cmath>, <array>, <atomic>, etc.
 //   import juce;              // replaces juce_* module headers
@@ -92,9 +93,8 @@ class PluginWindow final : public juce::DocumentWindow {
  * The host is generic: audio routing uses only the juce::AudioProcessor
  * interface; only the instantiation of EnagaProcessor is plugin-specific.
  *
- * TODO:C++26  'final' is already C++11, but once reflection lands in C++26
- *             consider annotating with [[clang::trivially_relocatable]] or
- *             the equivalent standard attribute for move-optimisation.
+ * NOTE(juce)  Once JUCE adopts `std::string_view` return types, these
+ *             overrides can drop the heap-allocating `juce::String`.
  */
 class EnagaHostApplication final : public juce::JUCEApplication {
  public:
@@ -102,7 +102,7 @@ class EnagaHostApplication final : public juce::JUCEApplication {
   //  JUCEApplication interface
   // -------------------------------------------------------------------
 
-  // TODO:C++26  Return type could become std::string_view when JUCE adopts it.
+  // NOTE(juce)  Return type could become std::string_view once JUCE adopts it.
   [[nodiscard]] const juce::String getApplicationName() override {
     return juce::String(JUCE_APPLICATION_NAME_STRING);
   }
@@ -120,7 +120,8 @@ class EnagaHostApplication final : public juce::JUCEApplication {
    *
    * @param commandLine  Space-separated command-line arguments provided
    *                     by the platform. Unused here.
-   *                     TODO:C++26  Prefer std::span<std::string_view>.
+   *                     NOTE(juce)  Prefer std::span<std::string_view> once
+   *                     JUCE exposes that signature.
    */
   void initialise(const juce::String& command_line) override {
     juce::ignoreUnused(command_line);
@@ -195,6 +196,6 @@ class EnagaHostApplication final : public juce::JUCEApplication {
 //   • UIApplicationMain(…)      on iOS
 //   • android_main(…)           on Android
 //
-// TODO:C++26  If JUCE adopts std::execution::main this macro may be removed
-//             in favour of a standard mechanism.
+// NOTE(juce)  START_JUCE_APPLICATION may be replaced by std::execution::main
+//             once JUCE adopts the C++26 execution model.
 START_JUCE_APPLICATION(EnagaHostApplication)

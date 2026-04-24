@@ -1,7 +1,10 @@
 ---
 # Enaga project clang-format configuration.
-# Style: Google C++ Style Guide with C++23 standard override.
+# Style: Google C++ Style Guide targeting C++26.
 # https://google.github.io/styleguide/cppguide.html
+#
+# Standard: Latest — tells clang-format to parse using the newest C++ syntax
+# it supports, which aligns with the project's C++26 compiler standard.
 
 Language:     Cpp
 Standard:     Latest

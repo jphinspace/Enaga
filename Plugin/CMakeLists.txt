@@ -69,7 +69,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     target_sources(EnagaPlugin PRIVATE Source/platform/ios_volume_view.mm)
 endif()
 
-target_compile_features(EnagaPlugin PRIVATE cxx_std_23)
+target_compile_features(EnagaPlugin PRIVATE cxx_std_26)
 
 target_compile_definitions(EnagaPlugin
     PUBLIC

@@ -55,7 +55,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     )
 endif()
 
-target_compile_features(EnagaHost PRIVATE cxx_std_23)
+target_compile_features(EnagaHost PRIVATE cxx_std_26)
 
 target_compile_definitions(EnagaHost
     PRIVATE
