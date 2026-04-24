@@ -7,6 +7,27 @@ on:
     branches: [ "main" ]
 
 jobs:
+  format-check:
+    name: Format – Google C++ Style (clang-format)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang-format
+
+      - name: Check formatting (Google C++ Style Guide)
+        # Uses .clang-format at the repo root (BasedOnStyle: Google).
+        # --dry-run --Werror exits non-zero if any file would be reformatted.
+        run: |
+          find Plugin/Source Host/Source tests \
+            \( -name '*.cpp' -o -name '*.h' \) \
+            | xargs clang-format --dry-run --Werror --style=file
+
   build-and-test:
     name: Linux – Ninja – Debug
     runs-on: ubuntu-latest
@@ -21,6 +42,8 @@ jobs:
           sudo apt-get install -y \
             ninja-build \
             cmake \
+            gcc-14 \
+            g++-14 \
             libasound2-dev \
             libx11-dev \
             libxext-dev \
@@ -38,6 +61,9 @@ jobs:
 
       - name: Configure (Debug)
         run: cmake --preset linux
+        env:
+          CC: gcc-14
+          CXX: g++-14
 
       - name: Build (Debug)
         run: cmake --build --preset linux

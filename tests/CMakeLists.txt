@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.25)  # 3.25+ required for cxx_std_26
 
 # ---------------------------------------------------------------------------
 # Enaga offline unit tests
@@ -13,22 +13,22 @@ enable_testing()
 # Smoke test: constructs NoiseAudioSource and exercises the audio path
 # ---------------------------------------------------------------------------
 
-add_executable(EnagaSmokeTest SmokeTest.cpp
+add_executable(EnagaSmokeTest smoke_test.cpp
 
     # Audio sources under test (now in Plugin/Source/ after refactoring)
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/NoiseAudioSource.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/LfoEngine.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/WhiteNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/PinkNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/BrownNoiseGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/GreyNoiseGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/noise_audio_source.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/lfo_engine.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/white_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/pink_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/brown_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/grey_noise_generator.cpp
 )
 
 target_include_directories(EnagaSmokeTest PRIVATE
     ${CMAKE_SOURCE_DIR}/Plugin/Source
 )
 
-target_compile_features(EnagaSmokeTest PRIVATE cxx_std_23)
+target_compile_features(EnagaSmokeTest PRIVATE cxx_std_26)
 
 target_compile_definitions(EnagaSmokeTest PRIVATE
     JUCE_WEB_BROWSER=0

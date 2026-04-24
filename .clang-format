@@ -1,74 +1,12 @@
 ---
 # Enaga project clang-format configuration.
-# Style: Allman braces, 4-space indentation, 100-column limit.
-# Encodes the conventions already present in Source/ so that automated
-# formatting matches the hand-written code.
+# Style: Google C++ Style Guide targeting C++26.
+# https://google.github.io/styleguide/cppguide.html
+#
+# Standard: Latest — tells clang-format to parse using the newest C++ syntax
+# it supports, which aligns with the project's C++26 compiler standard.
 
-Language:        Cpp
-Standard:        c++23
+Language:     Cpp
+Standard:     Latest
 
-BasedOnStyle:    LLVM
-
-# ---- Column / line length --------------------------------------------------
-ColumnLimit:     100
-
-# ---- Indentation -----------------------------------------------------------
-IndentWidth:                 4
-ContinuationIndentWidth:     4
-AccessModifierOffset:        -4
-IndentCaseLabels:            true
-IndentPPDirectives:          BeforeHash
-
-# ---- Braces (Allman) -------------------------------------------------------
-BreakBeforeBraces:           Allman
-
-# ---- Alignment -------------------------------------------------------------
-AlignAfterOpenBracket:       Align
-AlignConsecutiveAssignments: Consecutive
-AlignConsecutiveDeclarations: None
-AlignOperands:               Align
-AlignTrailingComments:
-  Kind:     Always
-  OverEmptyLines: 1
-
-# ---- Spaces ----------------------------------------------------------------
-SpaceBeforeParens:           ControlStatements
-SpaceInEmptyParentheses:     false
-SpacesInAngles:              Never
-SpacesInContainerLiterals:   false
-SpacesInParentheses:         false
-SpacesInSquareBrackets:      false
-
-# ---- Includes --------------------------------------------------------------
-SortIncludes:                CaseSensitive
-IncludeBlocks:               Regroup
-IncludeCategories:
-  # Project headers (no path prefix or relative)
-  - Regex:    '^"'
-    Priority: 1
-  # JUCE module headers
-  - Regex:    '^<juce_'
-    Priority: 2
-  # Standard library headers
-  - Regex:    '^<'
-    Priority: 3
-
-# ---- Short constructs ------------------------------------------------------
-AllowShortFunctionsOnASingleLine:  Inline
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLambdasOnASingleLine:    Inline
-AllowShortLoopsOnASingleLine:      false
-
-# ---- Breaking --------------------------------------------------------------
-BreakConstructorInitializers:     BeforeComma
-BreakInheritanceList:             BeforeComma
-PackConstructorInitializers:      Never
-ConstructorInitializerIndentWidth: 4
-
-# ---- Penalties (keep long lines together when possible) -------------------
-PenaltyBreakBeforeFirstCallParameter: 1
-PenaltyBreakComment:                  300
-PenaltyBreakFirstLessLess:            120
-PenaltyBreakString:                   1000
-PenaltyExcessCharacter:               1000000
-PenaltyReturnTypeOnItsOwnLine:        200
+BasedOnStyle: Google
