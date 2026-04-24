@@ -7,6 +7,25 @@ on:
     branches: [ "main" ]
 
 jobs:
+  format-check:
+    name: Format – clang-format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang-format
+
+      - name: Check formatting
+        run: |
+          find Plugin/Source Host/Source tests \
+            \( -name '*.cpp' -o -name '*.h' \) \
+            | xargs clang-format --dry-run --Werror --style=file
+
   build-and-test:
     name: Linux – Ninja – Debug
     runs-on: ubuntu-latest
