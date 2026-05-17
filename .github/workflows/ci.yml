@@ -24,7 +24,7 @@ jobs:
         # Uses .clang-format at the repo root (BasedOnStyle: Google).
         # --dry-run --Werror exits non-zero if any file would be reformatted.
         run: |
-          find Plugin/Source Host/Source tests \
+          find Plugin/Source tests \
             \( -name '*.cpp' -o -name '*.h' \) \
             | xargs clang-format --dry-run --Werror --style=file
 
