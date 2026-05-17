@@ -119,25 +119,27 @@ jobs:
         id: release_meta
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="manual-${GITHUB_RUN_NUMBER}"
-            NAME="Manual build ${GITHUB_RUN_NUMBER}"
+            TS="$(date -u +%Y%m%d-%H%M%S)"
+            TAG="manual-${TS}-${GITHUB_RUN_NUMBER}"
+            NAME="Manual build ${TS}"
+            TARGET="${GITHUB_SHA}"
           else
-            SHORT_SHA="${GITHUB_SHA::7}"
+            SHORT_SHA="$(echo "${GITHUB_SHA}" | cut -c1-7)"
             TAG="pr-merge-${SHORT_SHA}"
             NAME="PR #${{ github.event.pull_request.number }} merge ${SHORT_SHA}"
-            echo "target=${{ github.event.pull_request.merge_commit_sha }}" >> "$GITHUB_OUTPUT"
+            TARGET="${{ github.event.pull_request.merge_commit_sha || github.sha }}"
           fi
 
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          echo "target=${TARGET}" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release_meta.outputs.tag }}
           name: ${{ steps.release_meta.outputs.name }}
-          target_commitish: ${{ steps.release_meta.outputs.target || github.sha }}
+          target_commitish: ${{ steps.release_meta.outputs.target }}
           generate_release_notes: true
-          overwrite_files: true
           files: |
             release-assets/**/*.zip
