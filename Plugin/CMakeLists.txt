@@ -45,7 +45,9 @@ target_sources(EnagaPlugin PRIVATE
 
     # Plugin processor and editor
     Source/processor.cpp
+    Source/processor_core.cpp
     Source/editor.cpp
+    Source/editor_actions.cpp
 
     # Audio engine
     Source/audio/noise_audio_source.cpp

@@ -5,29 +5,31 @@
 
 #include "editor.h"
 
+#include "audio/noise_type.h"
+
+namespace {
+
+MainComponent::AudioCallbacks BuildAudioCallbacks(EnagaEditorActions& actions) {
+  return MainComponent::AudioCallbacks{
+      [&actions](bool should_play) { actions.HandlePlayToggle(should_play); },
+      [&actions](float value) { actions.HandleCutoff(value); },
+      [&actions](float gain) { actions.HandleGain(gain); },
+      [&actions](float value) { actions.HandleNoiseTypeSelection(value); },
+      [&actions](float rate_hz) { actions.HandleLfoRate(rate_hz); },
+      [&actions](float intensity) { actions.HandleLfoIntensity(intensity); },
+      [&actions](LfoMode mode) { actions.HandleLfoMode(mode); }};
+}
+
+}  // namespace
+
 // ============================================================================
 //  Constructor / Destructor
 // ============================================================================
 
 EnagaEditor::EnagaEditor(EnagaProcessor& proc)
     : AudioProcessorEditor(proc),
-      processor_(proc),
-      content_(MainComponent::AudioCallbacks{
-          [this](bool should_play) {
-            if (should_play)
-              processor_.StartFadeIn();
-            else
-              processor_.StartFadeOut();
-          },
-          [this](float v) { processor_.SetCutoff(v); },
-          [this](float g) { processor_.SetGain(g); },
-          [this](float v) {
-            processor_.SetNoiseType(static_cast<NoiseType>(
-                juce::jlimit(0, 3, static_cast<int>(v) - 1)));
-          },
-          [this](float rate_hz) { processor_.SetLfoRate(rate_hz); },
-          [this](float intensity) { processor_.SetLfoIntensity(intensity); },
-          [this](LfoMode mode) { processor_.SetLfoMode(mode); }}) {
+      actions_(proc),
+      content_(BuildAudioCallbacks(actions_)) {
   juce::LookAndFeel::setDefaultLookAndFeel(&look_and_feel_);
 
   addAndMakeVisible(content_);

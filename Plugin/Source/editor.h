@@ -11,6 +11,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "editor_actions.h"
 #include "processor.h"
 #include "ui/enaga_look_and_feel.h"
 #include "ui/main_component.h"
@@ -34,7 +35,7 @@ class EnagaEditor final : public juce::AudioProcessorEditor {
   void resized() override;
 
  private:
-  EnagaProcessor& processor_;
+  EnagaEditorActions actions_;
   EnagaLookAndFeel look_and_feel_;  // must outlive content_
   MainComponent content_;
 
