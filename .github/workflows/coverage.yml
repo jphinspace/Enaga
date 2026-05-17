@@ -62,6 +62,7 @@ jobs:
           lcov \
             --capture \
             --directory build/linux \
+            --gcov-tool /usr/bin/gcov-14 \
             --output-file coverage.info \
             --rc branch_coverage=1
 
