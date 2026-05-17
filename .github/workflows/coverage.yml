@@ -77,6 +77,10 @@ jobs:
             '*/_deps/*' \
             '*/tests/*' \
             '*/CMakeFiles/*' \
+            '*/build/linux/hb-*.hh' \
+            '*/build/linux/hb-*.rl' \
+            '*/build/linux/NONE' \
+            --ignore-errors unused \
             --output-file coverage.filtered.info \
             --rc branch_coverage=1
 
