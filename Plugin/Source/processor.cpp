@@ -1,11 +1,11 @@
 /**
- * @file   plugin_processor.cpp
+ * @file   processor.cpp
  * @brief  EnagaProcessor implementation.
  */
 
-#include "plugin_processor.h"
+#include "processor.h"
 
-#include "plugin_editor.h"
+#include "editor.h"
 
 // ============================================================================
 //  Constructor
@@ -20,32 +20,32 @@ EnagaProcessor::EnagaProcessor()
 // ============================================================================
 
 void EnagaProcessor::SetCutoff(float normalised_0_to_100) noexcept {
-  noise_source_.SetCutoff(normalised_0_to_100);
+  core_.SetCutoff(normalised_0_to_100);
 }
 
 void EnagaProcessor::SetGain(float new_gain) noexcept {
-  noise_source_.SetGain(new_gain);
+  core_.SetGain(new_gain);
 }
 
 void EnagaProcessor::SetNoiseType(NoiseType type) noexcept {
-  noise_source_.SetNoiseType(type);
+  core_.SetNoiseType(type);
 }
 
 void EnagaProcessor::SetLfoRate(float rate_hz) noexcept {
-  noise_source_.SetLfoRate(rate_hz);
+  core_.SetLfoRate(rate_hz);
 }
 
 void EnagaProcessor::SetLfoIntensity(float intensity) noexcept {
-  noise_source_.SetLfoIntensity(intensity);
+  core_.SetLfoIntensity(intensity);
 }
 
 void EnagaProcessor::SetLfoMode(LfoMode mode) noexcept {
-  noise_source_.SetLfoMode(mode);
+  core_.SetLfoMode(mode);
 }
 
-void EnagaProcessor::StartFadeIn() noexcept { noise_source_.StartFadeIn(); }
+void EnagaProcessor::StartFadeIn() noexcept { core_.StartFadeIn(); }
 
-void EnagaProcessor::StartFadeOut() noexcept { noise_source_.StartFadeOut(); }
+void EnagaProcessor::StartFadeOut() noexcept { core_.StartFadeOut(); }
 
 // ============================================================================
 //  juce::AudioProcessor interface
@@ -53,15 +53,14 @@ void EnagaProcessor::StartFadeOut() noexcept { noise_source_.StartFadeOut(); }
 
 void EnagaProcessor::prepareToPlay(double sample_rate,
                                    int maximum_expected_samples_per_block) {
-  noise_source_.prepareToPlay(maximum_expected_samples_per_block, sample_rate);
+  core_.PrepareToPlay(sample_rate, maximum_expected_samples_per_block);
 }
 
-void EnagaProcessor::releaseResources() { noise_source_.releaseResources(); }
+void EnagaProcessor::releaseResources() { core_.ReleaseResources(); }
 
 void EnagaProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                   juce::MidiBuffer& /*midi_messages*/) {
-  juce::AudioSourceChannelInfo info(&buffer, 0, buffer.getNumSamples());
-  noise_source_.getNextAudioBlock(info);
+  core_.ProcessBlock(buffer);
 }
 
 juce::AudioProcessorEditor* EnagaProcessor::createEditor() {

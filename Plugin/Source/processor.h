@@ -1,10 +1,9 @@
 /**
- * @file   plugin_processor.h
+ * @file   processor.h
  * @brief  AudioProcessor for the Enaga plugin.
  *
  * Wraps NoiseAudioSource inside JUCE's AudioProcessor interface so that
- * Enaga can be loaded by any VST3/AU-compatible DAW as well as by the
- * standalone host application.
+ * Enaga can be loaded by any VST3/AU-compatible DAW.
  */
 
 #ifndef ENAGA_PLUGIN_PROCESSOR_H_
@@ -12,19 +11,19 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "audio/lfo_mode.h"
-#include "audio/noise_audio_source.h"
-#include "audio/noise_type.h"
+#include "processor_controls.h"
+#include "processor_core.h"
 
 /**
  * Audio processor for the Enaga noise generator.
  *
  * All parameter mutations are delegated to the underlying NoiseAudioSource
- * via the same lock-free atomics that the original standalone app used.
+ * via the same lock-free atomics used by the plugin UI callbacks.
  * The processBlock() method converts JUCE's buffer/MIDI block pair into the
  * AudioSourceChannelInfo expected by NoiseAudioSource.
  */
-class EnagaProcessor final : public juce::AudioProcessor {
+class EnagaProcessor final : public juce::AudioProcessor,
+                             public EnagaProcessorControls {
  public:
   EnagaProcessor();
   ~EnagaProcessor() override = default;
@@ -72,7 +71,7 @@ class EnagaProcessor final : public juce::AudioProcessor {
   void setStateInformation(const void* data, int size_in_bytes) override;
 
  private:
-  NoiseAudioSource noise_source_;
+  EnagaProcessorCore core_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnagaProcessor)
 };

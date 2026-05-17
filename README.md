@@ -56,8 +56,6 @@ cmake --preset macos
 cmake --build --preset macos
 ```
 
-The built app bundle is at `build/macos/Host/EnagaHost_artefacts/Debug/Enaga.app`.
-
 The VST3 plugin is at `build/macos/Plugin/EnagaPlugin_artefacts/Debug/VST3/Enaga.vst3`.
 
 ### Linux
@@ -66,8 +64,6 @@ The VST3 plugin is at `build/macos/Plugin/EnagaPlugin_artefacts/Debug/VST3/Enaga
 cmake --preset linux
 cmake --build --preset linux
 ```
-
-The standalone host binary is at `build/linux/Host/EnagaHost_artefacts/Debug/Enaga`.
 
 The VST3 plugin is at
 `build/linux/Plugin/EnagaPlugin_artefacts/Debug/VST3/Enaga.vst3/`.
@@ -78,9 +74,6 @@ The VST3 plugin is at
 cmake --preset windows
 cmake --build --preset windows
 ```
-
-The standalone host executable is at
-`build\windows\Host\EnagaHost_artefacts\Debug\Enaga.exe`.
 
 The VST3 plugin is at
 `build\windows\Plugin\EnagaPlugin_artefacts\Debug\VST3\Enaga.vst3\`.
@@ -147,14 +140,13 @@ from C++26 language features (modules, `std::println`, `std::expected`, etc.).
 
 ## Project structure
 
-The codebase is split into two components that can live in this repo and be
-split into separate repos later:
+The codebase contains the plugin and plugin-focused tests:
 
 ```
 Enaga/
 ├── .clang-format              # Code style configuration (100-col, Allman)
 ├── .clang-tidy                # Static analysis checks (readability-*, modernize-*, cppcoreguidelines-*)
-├── CMakeLists.txt             # Top-level build; fetches JUCE, includes Plugin/ and Host/
+├── CMakeLists.txt             # Top-level build; fetches JUCE, includes Plugin/ and tests/
 ├── CMakePresets.json          # Per-platform Debug + Release configure/build presets
 ├── tests/                     # CTest-registered unit tests
 │   ├── CMakeLists.txt
@@ -186,8 +178,4 @@ Enaga/
 │           ├── IOSVolumeView.h    # iOS MPVolumeView wrapper interface
 │           └── IOSVolumeView.mm   # iOS MPVolumeView wrapper implementation (Objective-C++)
 │
-└── Host/                      # Component 2 — Generic standalone plugin host (not Enaga-specific)
-    ├── CMakeLists.txt         # juce_add_gui_app: builds the standalone application
-    └── Source/
-        └── Main.cpp           # PluginWindow + EnagaHostApplication; hosts any juce::AudioProcessor
 ```
