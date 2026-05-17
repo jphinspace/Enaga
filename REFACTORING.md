@@ -68,7 +68,6 @@ Google style requires filenames to be all-lowercase with underscores.
 | `PlayButton.{h,cpp}` | `play_button.{h,cpp}` |
 | `LfoComponent.{h,cpp}` | `lfo_component.{h,cpp}` |
 | `IOSVolumeView.{h,mm}` | `ios_volume_view.{h,mm}` |
-| `Host/Source/Main.cpp` | `Host/Source/main.cpp` |
 | `tests/SmokeTest.cpp` | `tests/smoke_test.cpp` |
 
 ---
@@ -142,7 +141,7 @@ unchanged.  New constants added:
 ## 6. Formatting
 
 `clang-format -i --style=file` applied to every `.h` and `.cpp` file under
-`Plugin/Source/`, `Host/Source/`, and `tests/`.  The new Google-based
+`Plugin/Source/` and `tests/`.  The new Google-based
 `.clang-format` produces: 2-space indent, same-line braces, 80-column limit.
 
 ---
@@ -157,4 +156,3 @@ splits, and the `AudioCallbacks` struct.  Round 2 addressed:
 - `kPlayColour`/`kStopColour` constants added to `PlayButton`
 - `LfoComponent.h` include changed from `LfoEngine.h` to `LfoMode.h`
 - `IOSVolumeView.mm` include path corrected to `platform/IOSVolumeView.h`
-

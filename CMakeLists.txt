@@ -45,10 +45,3 @@ add_subdirectory(tests)
 # Source lives in Plugin/; builds VST3 and AU formats that can be loaded
 # in any compatible DAW.
 add_subdirectory(Plugin)
-
-# ---------------------------------------------------------------------------
-# Component 2: Generic standalone plugin host application
-# ---------------------------------------------------------------------------
-# Source lives in Host/; hosts EnagaProcessor (or any juce::AudioProcessor)
-# via AudioProcessorPlayer and AudioDeviceManager on all target platforms.
-add_subdirectory(Host)

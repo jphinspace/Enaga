@@ -3,8 +3,7 @@
  * @brief  AudioProcessor for the Enaga plugin.
  *
  * Wraps NoiseAudioSource inside JUCE's AudioProcessor interface so that
- * Enaga can be loaded by any VST3/AU-compatible DAW as well as by the
- * standalone host application.
+ * Enaga can be loaded by any VST3/AU-compatible DAW.
  */
 
 #ifndef ENAGA_PLUGIN_PROCESSOR_H_
@@ -20,7 +19,7 @@
  * Audio processor for the Enaga noise generator.
  *
  * All parameter mutations are delegated to the underlying NoiseAudioSource
- * via the same lock-free atomics that the original standalone app used.
+ * via the same lock-free atomics used by the plugin UI callbacks.
  * The processBlock() method converts JUCE's buffer/MIDI block pair into the
  * AudioSourceChannelInfo expected by NoiseAudioSource.
  */

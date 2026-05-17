@@ -4,9 +4,8 @@
 # Builds the Enaga noise generator as a standard audio plugin that can be
 # loaded in any VST3- or AU-compatible DAW on macOS, Windows, and Linux.
 #
-# The standalone application is provided by the Host/ target instead of the
-# built-in JUCE Standalone wrapper, so the Standalone format is intentionally
-# omitted here.
+# Standalone format is intentionally omitted; this repository builds plugin
+# formats only.
 # ---------------------------------------------------------------------------
 
 juce_add_plugin(EnagaPlugin
@@ -29,7 +28,6 @@ juce_add_plugin(EnagaPlugin
     PLUGIN_CODE               Enag
 
     # Build VST3 and AU plugin binaries.
-    # The standalone application is the separate Host/ target.
     FORMATS                   VST3 AU
 
     # Category metadata
