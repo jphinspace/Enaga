@@ -63,6 +63,7 @@ jobs:
             --capture \
             --directory build/linux \
             --gcov-tool /usr/bin/gcov-14 \
+            --ignore-errors mismatch \
             --output-file coverage.info \
             --rc branch_coverage=1
 
