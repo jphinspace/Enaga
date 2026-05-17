@@ -1,5 +1,5 @@
 /**
- * @file   plugin_processor.h
+ * @file   processor.h
  * @brief  AudioProcessor for the Enaga plugin.
  *
  * Wraps NoiseAudioSource inside JUCE's AudioProcessor interface so that

@@ -41,11 +41,11 @@ target_include_directories(EnagaPlugin
 
 target_sources(EnagaPlugin PRIVATE
     # Plugin-binary entry point (createPluginFilter) — plugin targets only
-    Source/plugin_entry.cpp
+    Source/entry.cpp
 
     # Plugin processor and editor
-    Source/plugin_processor.cpp
-    Source/plugin_editor.cpp
+    Source/processor.cpp
+    Source/editor.cpp
 
     # Audio engine
     Source/audio/noise_audio_source.cpp

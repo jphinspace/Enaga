@@ -1,11 +1,11 @@
 /**
- * @file   plugin_processor.cpp
+ * @file   processor.cpp
  * @brief  EnagaProcessor implementation.
  */
 
-#include "plugin_processor.h"
+#include "processor.h"
 
-#include "plugin_editor.h"
+#include "editor.h"
 
 // ============================================================================
 //  Constructor

@@ -1,9 +1,9 @@
 /**
- * @file   plugin_editor.cpp
+ * @file   editor.cpp
  * @brief  EnagaEditor implementation.
  */
 
-#include "plugin_editor.h"
+#include "editor.h"
 
 // ============================================================================
 //  Constructor / Destructor

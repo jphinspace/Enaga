@@ -54,9 +54,9 @@ Google style requires filenames to be all-lowercase with underscores.
 
 | Old name | New name |
 |---|---|
-| `PluginProcessor.{h,cpp}` | `plugin_processor.{h,cpp}` |
-| `PluginEditor.{h,cpp}` | `plugin_editor.{h,cpp}` |
-| `PluginEntry.cpp` | `plugin_entry.cpp` |
+| `PluginProcessor.{h,cpp}` | `processor.{h,cpp}` |
+| `PluginEditor.{h,cpp}` | `editor.{h,cpp}` |
+| `PluginEntry.cpp` | `entry.cpp` |
 | `NoiseAudioSource.{h,cpp}` | `noise_audio_source.{h,cpp}` |
 | `LfoEngine.{h,cpp}` | `lfo_engine.{h,cpp}` |
 | `LfoMode.h` | `lfo_mode.h` |
