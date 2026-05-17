@@ -1,0 +1,143 @@
+name: Release plugins on PR merge
+
+on:
+  pull_request:
+    branches: ["main"]
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            preset: linux-release
+            platform: linux
+            package_name: enaga-linux-vst3
+          - os: windows-latest
+            preset: windows-release
+            platform: windows
+            package_name: enaga-windows-vst3
+          - os: macos-latest
+            preset: macos-release
+            platform: macos
+            package_name: enaga-macos-vst3-au
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            ninja-build \
+            cmake \
+            gcc-14 \
+            g++-14 \
+            libasound2-dev \
+            libx11-dev \
+            libxext-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libfreetype6-dev \
+            libfontconfig1-dev \
+            libpng-dev
+          sudo ln -sf /usr/include/freetype2/ft2build.h /usr/include/ft2build.h
+          sudo ln -sf /usr/include/freetype2/freetype /usr/include/freetype
+
+      - name: Configure
+        if: runner.os == 'Linux'
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Configure (non-Linux)
+        if: runner.os != 'Linux'
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --config Release
+
+      - name: Package artifacts
+        shell: pwsh
+        run: |
+          $staging = "release-staging"
+          New-Item -ItemType Directory -Path $staging -Force | Out-Null
+
+          $root = "build/${{ matrix.preset }}/Plugin/EnagaPlugin_artefacts/Release"
+
+          if (Test-Path "$root/VST3/Enaga.vst3") {
+            Copy-Item "$root/VST3/Enaga.vst3" -Destination $staging -Recurse -Force
+          } else {
+            throw "Expected VST3 artifact not found at $root/VST3/Enaga.vst3"
+          }
+
+          if ("${{ matrix.platform }}" -eq "macos") {
+            if (Test-Path "$root/AU/Enaga.component") {
+              Copy-Item "$root/AU/Enaga.component" -Destination $staging -Recurse -Force
+            } else {
+              throw "Expected AU artifact not found at $root/AU/Enaga.component"
+            }
+          }
+
+          Compress-Archive -Path "$staging/*" -DestinationPath "${{ matrix.package_name }}.zip" -Force
+
+      - name: Upload packaged artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package_name }}
+          path: ${{ matrix.package_name }}.zip
+
+  publish-release:
+    name: Publish GitHub Release
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download packaged artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Compute release metadata
+        id: release_meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="manual-${GITHUB_RUN_NUMBER}"
+            NAME="Manual build ${GITHUB_RUN_NUMBER}"
+          else
+            SHORT_SHA="${GITHUB_SHA::7}"
+            TAG="pr-merge-${SHORT_SHA}"
+            NAME="PR #${{ github.event.pull_request.number }} merge ${SHORT_SHA}"
+            echo "target=${{ github.event.pull_request.merge_commit_sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          name: ${{ steps.release_meta.outputs.name }}
+          target_commitish: ${{ steps.release_meta.outputs.target || github.sha }}
+          generate_release_notes: true
+          overwrite_files: true
+          files: |
+            release-assets/**/*.zip
