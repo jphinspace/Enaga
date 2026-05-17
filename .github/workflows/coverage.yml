@@ -58,14 +58,14 @@ jobs:
         run: ctest --preset linux --output-on-failure
 
       - name: Generate coverage report
+        # lcov/geninfo can report false-positive exception-tag mismatches
+        # in transitive system/dependency headers; those paths are filtered
+        # out below from the published report.
         run: |
           lcov \
             --capture \
             --directory build/linux \
             --gcov-tool /usr/bin/gcov-14 \
-            # lcov/geninfo can report false-positive exception-tag mismatches
-            # in transitive system/dependency headers; those paths are filtered
-            # out below from the published report.
             --ignore-errors mismatch \
             --output-file coverage.info \
             --rc branch_coverage=1
