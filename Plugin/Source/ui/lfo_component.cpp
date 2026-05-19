@@ -9,7 +9,7 @@
 #include <utility>
 
 namespace {
-constexpr std::array kLfoModeCycle = {
+constexpr std::array<LfoMode, 4> kLfoModeCycle = {
     LfoMode::kDisabled,
     LfoMode::kVolume,
     LfoMode::kFilter,
@@ -30,6 +30,7 @@ constexpr std::array<const char*, kLfoModeCycle.size()> kLfoModeLabels = {
 
 [[nodiscard]] std::size_t ToModeIndex(LfoMode mode) {
   const auto mode_index = static_cast<std::size_t>(std::to_underlying(mode));
+  jassert(mode_index < kLfoModeCycle.size());
   if (mode_index >= kLfoModeCycle.size()) {
     return 0;
   }
