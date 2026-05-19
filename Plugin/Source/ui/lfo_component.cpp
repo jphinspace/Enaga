@@ -31,6 +31,9 @@ constexpr std::array<const char*, kLfoModeCycle.size()> kLfoModeLabels = {
 [[nodiscard]] std::size_t ToModeIndex(LfoMode mode) {
   const auto mode_index = static_cast<std::size_t>(std::to_underlying(mode));
   jassert(mode_index < kLfoModeCycle.size());
+  if (mode_index < kLfoModeCycle.size()) {
+    jassert(kLfoModeCycle[mode_index] == mode);
+  }
   if (mode_index >= kLfoModeCycle.size()) {
     return 0;
   }
