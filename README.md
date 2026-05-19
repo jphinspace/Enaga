@@ -2,7 +2,7 @@
 
 Relaxing noise generator.
 
-Built in C++23 (targeting C++26), using [JUCE](https://juce.com/) for platform
+Built in C++26, using [JUCE](https://juce.com/) for platform
 lifecycle, audio, and UI.
 
 ---
@@ -132,9 +132,6 @@ When compiler support is ready, change one line in `CMakeLists.txt`:
 ```cmake
 set(CMAKE_CXX_STANDARD 26)   # was 23
 ```
-
-All `TODO:C++26` comments in the source files mark the exact spots that benefit
-from C++26 language features (modules, `std::println`, `std::expected`, etc.).
 
 ---
 
