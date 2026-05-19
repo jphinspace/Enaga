@@ -42,14 +42,13 @@ void EnagaEditorActions::HandleNoiseTypeSelection(
                 std::to_underlying(kNoiseTypes[3]));
 
   constexpr int kUiSelectionBase = 1;
-  constexpr int kMinSelection = kUiSelectionBase;
   constexpr int kMaxSelection =
       kUiSelectionBase + static_cast<int>(kNoiseTypes.size()) - 1;
 
   const int clamped_index = std::clamp(static_cast<int>(selected_index),
-                                       kMinSelection, kMaxSelection);
+                                       kUiSelectionBase, kMaxSelection);
   const auto table_index =
-      static_cast<std::size_t>(clamped_index - kMinSelection);
+      static_cast<std::size_t>(clamped_index - kUiSelectionBase);
   controls_.SetNoiseType(kNoiseTypes[table_index]);
 }
 
