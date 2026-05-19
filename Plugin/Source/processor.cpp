@@ -5,6 +5,8 @@
 
 #include "processor.h"
 
+#include <memory>
+
 #include "editor.h"
 
 // ============================================================================
@@ -64,7 +66,7 @@ void EnagaProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 }
 
 juce::AudioProcessorEditor* EnagaProcessor::createEditor() {
-  return new EnagaEditor(*this);
+  return std::make_unique<EnagaEditor>(*this).release();
 }
 
 const juce::String EnagaProcessor::getName() const { return "Enaga"; }
