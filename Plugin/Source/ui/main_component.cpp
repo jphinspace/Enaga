@@ -5,7 +5,17 @@
 
 #include "ui/main_component.h"
 
+#include <utility>
+
 #include "ui/enaga_look_and_feel.h"
+
+namespace {
+enum class MenuCommandId : int {
+  kSavePreset = 1,
+  kLoadPreset = 2,
+  kQuit = 3,
+};
+}
 
 // ============================================================================
 //  Constructor / Destructor
@@ -55,26 +65,30 @@ juce::StringArray MainComponent::getMenuBarNames() { return {"File"}; }
 juce::PopupMenu MainComponent::getMenuForIndex(
     int /*top_level_menu_index*/, const juce::String& /*menu_name*/) {
   juce::PopupMenu menu;
-  menu.addItem(1, "Save Preset");
-  menu.addItem(2, "Load Preset");
+  menu.addItem(std::to_underlying(MenuCommandId::kSavePreset), "Save Preset");
+  menu.addItem(std::to_underlying(MenuCommandId::kLoadPreset), "Load Preset");
 #if !(JUCE_IOS || JUCE_ANDROID)
   menu.addSeparator();
-  menu.addItem(3, "Quit");
+  menu.addItem(std::to_underlying(MenuCommandId::kQuit), "Quit");
 #endif
   return menu;
 }
 
 void MainComponent::menuItemSelected(int menu_item_id,
                                      int /*top_level_menu_index*/) {
-  switch (menu_item_id) {
-    case 1:
+  HandleMenuCommand(menu_item_id);
+}
+
+void MainComponent::HandleMenuCommand(int menu_item_id) {
+  switch (static_cast<MenuCommandId>(menu_item_id)) {
+    case MenuCommandId::kSavePreset:
       SavePreset();
       break;
-    case 2:
+    case MenuCommandId::kLoadPreset:
       LoadPreset();
       break;
 #if !(JUCE_IOS || JUCE_ANDROID)
-    case 3:
+    case MenuCommandId::kQuit:
       juce::JUCEApplication::getInstance()->systemRequestedQuit();
       break;
 #endif
@@ -433,21 +447,10 @@ void MainComponent::LoadPreset() {
 #if JUCE_IOS || JUCE_ANDROID
 void MainComponent::ShowMobileMenu() {
   juce::PopupMenu menu;
-  menu.addItem(1, "Save Preset");
-  menu.addItem(2, "Load Preset");
+  menu.addItem(std::to_underlying(MenuCommandId::kSavePreset), "Save Preset");
+  menu.addItem(std::to_underlying(MenuCommandId::kLoadPreset), "Load Preset");
   menu.showMenuAsync(
       juce::PopupMenu::Options{}.withTargetComponent(&mobile_menu_button_),
-      [this](int id) {
-        switch (id) {
-          case 1:
-            SavePreset();
-            break;
-          case 2:
-            LoadPreset();
-            break;
-          default:
-            break;
-        }
-      });
+      [this](int id) { HandleMenuCommand(id); });
 }
 #endif

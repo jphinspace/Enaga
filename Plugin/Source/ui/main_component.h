@@ -118,6 +118,7 @@ class MainComponent final : public juce::Component, public juce::MenuBarModel {
 
   void SyncValueBox();
   void ApplyValueBox();
+  void HandleMenuCommand(int menu_item_id);
 
   // -------------------------------------------------------------------
   //  Preset I/O
