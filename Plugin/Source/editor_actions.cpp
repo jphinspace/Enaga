@@ -34,14 +34,19 @@ void EnagaEditorActions::HandleNoiseTypeSelection(
       NoiseType::kBrown,
       NoiseType::kGrey,
   };
-  constexpr int kMinSelection = std::to_underlying(NoiseType::kWhite) + 1;
-  constexpr int kMaxSelection = static_cast<int>(kNoiseTypes.size());
-  static_assert(kMaxSelection == std::to_underlying(NoiseType::kGrey) + 1);
+  constexpr int kUiSelectionBase = 1;
+  constexpr int kMinSelection =
+      std::to_underlying(kNoiseTypes.front()) + kUiSelectionBase;
+  constexpr int kMaxSelection =
+      std::to_underlying(kNoiseTypes.back()) + kUiSelectionBase;
+  static_assert(kMaxSelection - kMinSelection + 1 ==
+                static_cast<int>(kNoiseTypes.size()));
 
   const int clamped_index = std::clamp(static_cast<int>(selected_index),
                                        kMinSelection, kMaxSelection);
-  controls_.SetNoiseType(
-      kNoiseTypes[static_cast<std::size_t>(clamped_index - kMinSelection)]);
+  const auto table_index =
+      static_cast<std::size_t>(clamped_index - kMinSelection);
+  controls_.SetNoiseType(kNoiseTypes[table_index]);
 }
 
 void EnagaEditorActions::HandleLfoRate(float rate_hz) noexcept {
