@@ -80,10 +80,10 @@ void NoiseAudioSource::releaseResources() {
 NoiseGenerator* NoiseAudioSource::ActiveGenerator() noexcept {
   const auto index = static_cast<std::size_t>(
       std::to_underlying(noise_type_.load(std::memory_order_relaxed)));
+  jassert(index < generators_.size());
   if (index < generators_.size()) {
     return generators_[index];
   }
-  jassert(index < generators_.size());
   return generators_[0];
 }
 
