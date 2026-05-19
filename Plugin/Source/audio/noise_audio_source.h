@@ -115,7 +115,7 @@ class NoiseAudioSource final : public juce::AudioSource {
   BrownNoiseGenerator brown_gen_;
   GreyNoiseGenerator grey_gen_;
 
-  std::atomic<int> noise_type_{0};        // cast to NoiseType
+  std::atomic<NoiseType> noise_type_{NoiseType::kWhite};
   std::atomic<float> cutoff_{100.0f};     // normalised 0-100
   float last_cutoff_{100.0f};             // applied value (audio thread)
   std::atomic<float> gain_{1.0f};         // amplitude multiplier [0,1]

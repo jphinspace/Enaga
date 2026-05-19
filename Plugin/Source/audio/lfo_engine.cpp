@@ -41,11 +41,11 @@ void LfoEngine::SetIntensity(float intensity) noexcept {
 }
 
 void LfoEngine::SetMode(LfoMode mode) noexcept {
-  mode_.store(static_cast<int>(mode), std::memory_order_relaxed);
+  mode_.store(mode, std::memory_order_relaxed);
 }
 
 LfoMode LfoEngine::GetMode() const noexcept {
-  return static_cast<LfoMode>(mode_.load(std::memory_order_relaxed));
+  return mode_.load(std::memory_order_relaxed);
 }
 
 float LfoEngine::GetIntensity() const noexcept {

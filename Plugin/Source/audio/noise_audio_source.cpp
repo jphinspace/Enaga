@@ -17,7 +17,7 @@ void NoiseAudioSource::SetGain(float new_gain) noexcept {
 }
 
 void NoiseAudioSource::SetNoiseType(NoiseType type) noexcept {
-  noise_type_.store(static_cast<int>(type), std::memory_order_relaxed);
+  noise_type_.store(type, std::memory_order_relaxed);
 }
 
 void NoiseAudioSource::SetLfoRate(float rate_hz) noexcept {
@@ -69,7 +69,7 @@ void NoiseAudioSource::releaseResources() {
 }
 
 NoiseGenerator* NoiseAudioSource::ActiveGenerator() noexcept {
-  switch (static_cast<NoiseType>(noise_type_.load(std::memory_order_relaxed))) {
+  switch (noise_type_.load(std::memory_order_relaxed)) {
     case NoiseType::kPink:
       return &pink_gen_;
     case NoiseType::kBrown:
