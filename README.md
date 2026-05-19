@@ -31,9 +31,12 @@ lifecycle, audio, and UI.
 ### Linux
 | Tool | Install |
 |------|---------|
-| GCC 14+ or Clang 18+ | `sudo apt install gcc g++` / `sudo apt install clang` (default packages may not provide required versions; use appropriate toolchain repositories or packages for your distro) |
+| GCC 14+ or Clang 18+ | `sudo apt install gcc g++` / `sudo apt install clang` |
 | Ninja | `sudo apt install ninja-build` |
 | JUCE system dependencies | `sudo apt install libasound2-dev libx11-dev libxext-dev libxinerama-dev libxrandr-dev libxcursor-dev libfreetype6-dev libcurl4-openssl-dev` |
+
+If default distro packages are older, use toolchain repositories/packages that
+provide GCC 14+ or Clang 18+.
 
 ### Android
 | Tool | Notes |
