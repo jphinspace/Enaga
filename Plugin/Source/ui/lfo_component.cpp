@@ -16,6 +16,11 @@ constexpr std::array kLfoModeCycle = {
     LfoMode::kBoth,
 };
 
+static_assert(std::to_underlying(LfoMode::kDisabled) == 0);
+static_assert(std::to_underlying(LfoMode::kVolume) == 1);
+static_assert(std::to_underlying(LfoMode::kFilter) == 2);
+static_assert(std::to_underlying(LfoMode::kBoth) == 3);
+
 constexpr std::array<const char*, kLfoModeCycle.size()> kLfoModeLabels = {
     "LFO: Disabled",
     "LFO: Volume",
@@ -24,12 +29,11 @@ constexpr std::array<const char*, kLfoModeCycle.size()> kLfoModeLabels = {
 };
 
 [[nodiscard]] std::size_t ToModeIndex(LfoMode mode) {
-  const auto raw_mode = std::to_underlying(mode);
-  if (raw_mode < 0 ||
-      raw_mode >= static_cast<decltype(raw_mode)>(kLfoModeCycle.size())) {
+  const auto mode_index = static_cast<std::size_t>(std::to_underlying(mode));
+  if (mode_index >= kLfoModeCycle.size()) {
     return 0;
   }
-  return static_cast<std::size_t>(raw_mode);
+  return mode_index;
 }
 }  // namespace
 
