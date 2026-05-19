@@ -5,16 +5,8 @@
 
 #include "audio/noise_audio_source.h"
 
-#include <array>
 #include <cmath>
 #include <utility>
-
-namespace {
-static_assert(std::to_underlying(NoiseType::kWhite) == 0);
-static_assert(std::to_underlying(NoiseType::kPink) == 1);
-static_assert(std::to_underlying(NoiseType::kBrown) == 2);
-static_assert(std::to_underlying(NoiseType::kGrey) == 3);
-}  // namespace
 
 void NoiseAudioSource::SetCutoff(float normalised_0_to_100) noexcept {
   cutoff_.store(juce::jlimit(0.0f, 100.0f, normalised_0_to_100),
