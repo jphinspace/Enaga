@@ -8,26 +8,6 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
-#include <utility>
-
-namespace {
-template <std::size_t kCount>
-consteval bool HasZeroBasedContiguousOrdinals(
-    const std::array<NoiseType, kCount>& values) {
-  if (std::to_underlying(values.front()) != 0) {
-    return false;
-  }
-
-  for (std::size_t i = 1; i < values.size(); ++i) {
-    if (std::to_underlying(values[i]) !=
-        std::to_underlying(values[i - 1]) + 1) {
-      return false;
-    }
-  }
-
-  return true;
-}
-}  // namespace
 
 void EnagaEditorActions::HandlePlayToggle(bool should_play) noexcept {
   if (should_play) {
@@ -54,7 +34,6 @@ void EnagaEditorActions::HandleNoiseTypeSelection(
       NoiseType::kBrown,
       NoiseType::kGrey,
   };
-  static_assert(HasZeroBasedContiguousOrdinals(kNoiseTypes));
 
   // Slider positions are 1..N in the UI.
   constexpr int kUiSelectionBase = 1;

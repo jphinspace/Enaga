@@ -5,37 +5,35 @@
 
 #include "ui/lfo_component.h"
 
-#include <array>
-#include <utility>
-
 namespace {
-constexpr std::array<LfoMode, 4> kLfoModeCycle = {
-    LfoMode::kDisabled,
-    LfoMode::kVolume,
-    LfoMode::kFilter,
-    LfoMode::kBoth,
-};
-
-static_assert(std::to_underlying(LfoMode::kDisabled) == 0);
-static_assert(std::to_underlying(LfoMode::kVolume) == 1);
-static_assert(std::to_underlying(LfoMode::kFilter) == 2);
-static_assert(std::to_underlying(LfoMode::kBoth) == 3);
-
-constexpr std::array<const char*, kLfoModeCycle.size()> kLfoModeLabels = {
-    "LFO: Disabled",
-    "LFO: Volume",
-    "LFO: Filter",
-    "LFO: Both",
-};
-
-[[nodiscard]] std::size_t ToModeIndex(LfoMode mode) {
-  const auto mode_index = static_cast<std::size_t>(std::to_underlying(mode));
-  if (mode_index < kLfoModeCycle.size()) {
-    jassert(kLfoModeCycle[mode_index] == mode);
-    return mode_index;
+[[nodiscard]] LfoMode NextMode(LfoMode mode) noexcept {
+  switch (mode) {
+    case LfoMode::kDisabled:
+      return LfoMode::kVolume;
+    case LfoMode::kVolume:
+      return LfoMode::kFilter;
+    case LfoMode::kFilter:
+      return LfoMode::kBoth;
+    case LfoMode::kBoth:
+      return LfoMode::kDisabled;
   }
   jassertfalse;
-  return 0;
+  return LfoMode::kDisabled;
+}
+
+[[nodiscard]] const char* LabelForMode(LfoMode mode) noexcept {
+  switch (mode) {
+    case LfoMode::kDisabled:
+      return "LFO: Disabled";
+    case LfoMode::kVolume:
+      return "LFO: Volume";
+    case LfoMode::kFilter:
+      return "LFO: Filter";
+    case LfoMode::kBoth:
+      return "LFO: Both";
+  }
+  jassertfalse;
+  return "LFO: Disabled";
 }
 }  // namespace
 
@@ -81,10 +79,9 @@ void LfoComponent::resized() {
 }
 
 void LfoComponent::SetupModeButton() {
-  mode_button_.setButtonText(kLfoModeLabels[0]);
+  mode_button_.setButtonText(LabelForMode(LfoMode::kDisabled));
   mode_button_.onClick = [this] {
-    const std::size_t mode_index = ToModeIndex(current_mode_);
-    current_mode_ = kLfoModeCycle[(mode_index + 1) % kLfoModeCycle.size()];
+    current_mode_ = NextMode(current_mode_);
     UpdateModeButtonText();
     if (on_mode_) on_mode_(current_mode_);
   };
@@ -149,7 +146,7 @@ void LfoComponent::SetupLabels() {
 }
 
 void LfoComponent::UpdateModeButtonText() {
-  mode_button_.setButtonText(kLfoModeLabels[ToModeIndex(current_mode_)]);
+  mode_button_.setButtonText(LabelForMode(current_mode_));
 }
 
 void LfoComponent::SyncRateValueBox() {

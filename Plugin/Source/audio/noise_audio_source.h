@@ -12,7 +12,6 @@
 
 #include <array>
 #include <atomic>
-#include <utility>
 
 #include "audio/generators/brown_noise_generator.h"
 #include "audio/generators/grey_noise_generator.h"
@@ -103,13 +102,6 @@ class NoiseAudioSource final : public juce::AudioSource {
   void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override;
 
  private:
-  static_assert(std::to_underlying(NoiseType::kWhite) == 0);
-  static_assert(std::to_underlying(NoiseType::kPink) == 1);
-  static_assert(std::to_underlying(NoiseType::kBrown) == 2);
-  static_assert(std::to_underlying(NoiseType::kGrey) == 3);
-  static constexpr std::size_t kNoiseTypeCount =
-      static_cast<std::size_t>(std::to_underlying(NoiseType::kGrey)) + 1;
-
   /** Recompute LP IIR coefficients from last_cutoff_ (audio thread). */
   void UpdateLpFilters();
 
@@ -122,12 +114,6 @@ class NoiseAudioSource final : public juce::AudioSource {
   PinkNoiseGenerator pink_gen_;
   BrownNoiseGenerator brown_gen_;
   GreyNoiseGenerator grey_gen_;
-  std::array<NoiseGenerator*, kNoiseTypeCount> generators_ = {
-      &white_gen_,
-      &pink_gen_,
-      &brown_gen_,
-      &grey_gen_,
-  };
 
   std::atomic<NoiseType> noise_type_{NoiseType::kWhite};
   std::atomic<float> cutoff_{100.0f};     // normalised 0-100

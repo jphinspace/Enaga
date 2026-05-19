@@ -6,7 +6,6 @@
 #include "audio/noise_audio_source.h"
 
 #include <cmath>
-#include <utility>
 
 void NoiseAudioSource::SetCutoff(float normalised_0_to_100) noexcept {
   cutoff_.store(juce::jlimit(0.0f, 100.0f, normalised_0_to_100),
@@ -70,13 +69,18 @@ void NoiseAudioSource::releaseResources() {
 }
 
 NoiseGenerator* NoiseAudioSource::ActiveGenerator() noexcept {
-  const auto index = static_cast<std::size_t>(
-      std::to_underlying(noise_type_.load(std::memory_order_relaxed)));
-  jassert(index < generators_.size());
-  if (index < generators_.size()) {
-    return generators_[index];
+  switch (noise_type_.load(std::memory_order_relaxed)) {
+    case NoiseType::kWhite:
+      return &white_gen_;
+    case NoiseType::kPink:
+      return &pink_gen_;
+    case NoiseType::kBrown:
+      return &brown_gen_;
+    case NoiseType::kGrey:
+      return &grey_gen_;
   }
-  return generators_[0];
+  jassertfalse;
+  return &white_gen_;
 }
 
 void NoiseAudioSource::getNextAudioBlock(
