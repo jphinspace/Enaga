@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <array>
+#include <utility>
 
 void EnagaEditorActions::HandlePlayToggle(bool should_play) noexcept {
   if (should_play) {
@@ -33,9 +34,14 @@ void EnagaEditorActions::HandleNoiseTypeSelection(
       NoiseType::kBrown,
       NoiseType::kGrey,
   };
-  const int clamped_index = std::clamp(static_cast<int>(selected_index), 1, 4);
+  constexpr int kMinSelection = std::to_underlying(NoiseType::kWhite) + 1;
+  constexpr int kMaxSelection = static_cast<int>(kNoiseTypes.size());
+  static_assert(kMaxSelection == std::to_underlying(NoiseType::kGrey) + 1);
+
+  const int clamped_index = std::clamp(static_cast<int>(selected_index),
+                                       kMinSelection, kMaxSelection);
   controls_.SetNoiseType(
-      kNoiseTypes[static_cast<std::size_t>(clamped_index - 1)]);
+      kNoiseTypes[static_cast<std::size_t>(clamped_index - kMinSelection)]);
 }
 
 void EnagaEditorActions::HandleLfoRate(float rate_hz) noexcept {
