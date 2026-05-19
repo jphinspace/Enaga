@@ -197,25 +197,19 @@ void MainComponent::SetupDiscreteSlider() {
 
   // Show the noise-type name instead of a raw number.
   discrete_slider_.textFromValueFunction = [](double v) -> juce::String {
-    switch (static_cast<int>(std::round(v))) {
-      case 1:
-        return "White";
-      case 2:
-        return "Pink";
-      case 3:
-        return "Brown";
-      case 4:
-        return "Grey";
-      default:
-        return {};
-    }
+    static const juce::StringArray kNoiseTypeLabels = {"White", "Pink", "Brown",
+                                                       "Grey"};
+    const int index = juce::roundToInt(v) - 1;
+    if (index < 0 || index >= kNoiseTypeLabels.size()) return {};
+    return kNoiseTypeLabels[index];
   };
   discrete_slider_.valueFromTextFunction =
       [](const juce::String& text) -> double {
+    static const juce::StringArray kNoiseTypeLabels = {"white", "pink", "brown",
+                                                       "grey"};
     const auto lower = text.toLowerCase();
-    if (lower == "pink") return 2.0;
-    if (lower == "brown") return 3.0;
-    if (lower == "grey") return 4.0;
+    const int index = kNoiseTypeLabels.indexOf(lower);
+    if (index >= 0) return static_cast<double>(index + 1);
     return 1.0;  // default to White
   };
 
