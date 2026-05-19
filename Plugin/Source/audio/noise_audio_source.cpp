@@ -5,7 +5,16 @@
 
 #include "audio/noise_audio_source.h"
 
+#include <array>
 #include <cmath>
+#include <utility>
+
+namespace {
+static_assert(std::to_underlying(NoiseType::kWhite) == 0);
+static_assert(std::to_underlying(NoiseType::kPink) == 1);
+static_assert(std::to_underlying(NoiseType::kBrown) == 2);
+static_assert(std::to_underlying(NoiseType::kGrey) == 3);
+}  // namespace
 
 void NoiseAudioSource::SetCutoff(float normalised_0_to_100) noexcept {
   cutoff_.store(juce::jlimit(0.0f, 100.0f, normalised_0_to_100),
@@ -69,16 +78,19 @@ void NoiseAudioSource::releaseResources() {
 }
 
 NoiseGenerator* NoiseAudioSource::ActiveGenerator() noexcept {
-  switch (noise_type_.load(std::memory_order_relaxed)) {
-    case NoiseType::kPink:
-      return &pink_gen_;
-    case NoiseType::kBrown:
-      return &brown_gen_;
-    case NoiseType::kGrey:
-      return &grey_gen_;
-    default:
-      return &white_gen_;
+  const std::array<NoiseGenerator*, 4> generators = {
+      &white_gen_,
+      &pink_gen_,
+      &brown_gen_,
+      &grey_gen_,
+  };
+  const auto index = static_cast<std::size_t>(
+      std::to_underlying(noise_type_.load(std::memory_order_relaxed)));
+  if (index < generators.size()) {
+    return generators[index];
   }
+  jassertfalse;
+  return generators[0];
 }
 
 void NoiseAudioSource::getNextAudioBlock(
