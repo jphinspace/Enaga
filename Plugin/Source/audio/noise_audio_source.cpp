@@ -78,19 +78,13 @@ void NoiseAudioSource::releaseResources() {
 }
 
 NoiseGenerator* NoiseAudioSource::ActiveGenerator() noexcept {
-  const std::array<NoiseGenerator*, 4> generators = {
-      &white_gen_,
-      &pink_gen_,
-      &brown_gen_,
-      &grey_gen_,
-  };
   const auto index = static_cast<std::size_t>(
       std::to_underlying(noise_type_.load(std::memory_order_relaxed)));
-  if (index < generators.size()) {
-    return generators[index];
+  if (index < generators_.size()) {
+    return generators_[index];
   }
-  jassertfalse;
-  return generators[0];
+  jassert(index < generators_.size());
+  return generators_[0];
 }
 
 void NoiseAudioSource::getNextAudioBlock(

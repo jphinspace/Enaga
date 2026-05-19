@@ -114,6 +114,12 @@ class NoiseAudioSource final : public juce::AudioSource {
   PinkNoiseGenerator pink_gen_;
   BrownNoiseGenerator brown_gen_;
   GreyNoiseGenerator grey_gen_;
+  std::array<NoiseGenerator*, 4> generators_ = {
+      &white_gen_,
+      &pink_gen_,
+      &brown_gen_,
+      &grey_gen_,
+  };
 
   std::atomic<NoiseType> noise_type_{NoiseType::kWhite};
   std::atomic<float> cutoff_{100.0f};     // normalised 0-100
