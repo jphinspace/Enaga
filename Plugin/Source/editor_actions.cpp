@@ -34,13 +34,17 @@ void EnagaEditorActions::HandleNoiseTypeSelection(
       NoiseType::kBrown,
       NoiseType::kGrey,
   };
+  static_assert(std::to_underlying(kNoiseTypes[0]) + 1 ==
+                std::to_underlying(kNoiseTypes[1]));
+  static_assert(std::to_underlying(kNoiseTypes[1]) + 1 ==
+                std::to_underlying(kNoiseTypes[2]));
+  static_assert(std::to_underlying(kNoiseTypes[2]) + 1 ==
+                std::to_underlying(kNoiseTypes[3]));
+
   constexpr int kUiSelectionBase = 1;
-  constexpr int kMinSelection =
-      std::to_underlying(kNoiseTypes.front()) + kUiSelectionBase;
+  constexpr int kMinSelection = kUiSelectionBase;
   constexpr int kMaxSelection =
-      std::to_underlying(kNoiseTypes.back()) + kUiSelectionBase;
-  static_assert(kMaxSelection - kMinSelection + 1 ==
-                static_cast<int>(kNoiseTypes.size()));
+      kUiSelectionBase + static_cast<int>(kNoiseTypes.size()) - 1;
 
   const int clamped_index = std::clamp(static_cast<int>(selected_index),
                                        kMinSelection, kMaxSelection);
