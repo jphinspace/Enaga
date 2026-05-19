@@ -5,6 +5,34 @@
 
 #include "ui/lfo_component.h"
 
+#include <array>
+#include <utility>
+
+namespace {
+constexpr std::array kLfoModeCycle = {
+    LfoMode::kDisabled,
+    LfoMode::kVolume,
+    LfoMode::kFilter,
+    LfoMode::kBoth,
+};
+
+constexpr std::array<const char*, kLfoModeCycle.size()> kLfoModeLabels = {
+    "LFO: Disabled",
+    "LFO: Volume",
+    "LFO: Filter",
+    "LFO: Both",
+};
+
+[[nodiscard]] std::size_t ToModeIndex(LfoMode mode) {
+  const auto raw_mode = std::to_underlying(mode);
+  if (raw_mode < 0 ||
+      raw_mode >= static_cast<decltype(raw_mode)>(kLfoModeCycle.size())) {
+    return 0;
+  }
+  return static_cast<std::size_t>(raw_mode);
+}
+}  // namespace
+
 LfoComponent::LfoComponent(RateCallback on_rate, IntensityCallback on_intensity,
                            ModeCallback on_mode)
     : on_rate_(std::move(on_rate)),
@@ -47,23 +75,10 @@ void LfoComponent::resized() {
 }
 
 void LfoComponent::SetupModeButton() {
-  mode_button_.setButtonText("LFO: Disabled");
+  mode_button_.setButtonText(kLfoModeLabels[0]);
   mode_button_.onClick = [this] {
-    // Cycle: kDisabled → kVolume → kFilter → kBoth → kDisabled
-    switch (current_mode_) {
-      case LfoMode::kDisabled:
-        current_mode_ = LfoMode::kVolume;
-        break;
-      case LfoMode::kVolume:
-        current_mode_ = LfoMode::kFilter;
-        break;
-      case LfoMode::kFilter:
-        current_mode_ = LfoMode::kBoth;
-        break;
-      case LfoMode::kBoth:
-        current_mode_ = LfoMode::kDisabled;
-        break;
-    }
+    const std::size_t mode_index = ToModeIndex(current_mode_);
+    current_mode_ = kLfoModeCycle[(mode_index + 1) % kLfoModeCycle.size()];
     UpdateModeButtonText();
     if (on_mode_) on_mode_(current_mode_);
   };
@@ -128,21 +143,7 @@ void LfoComponent::SetupLabels() {
 }
 
 void LfoComponent::UpdateModeButtonText() {
-  const char* text = "LFO: Disabled";
-  switch (current_mode_) {
-    case LfoMode::kVolume:
-      text = "LFO: Volume";
-      break;
-    case LfoMode::kFilter:
-      text = "LFO: Filter";
-      break;
-    case LfoMode::kBoth:
-      text = "LFO: Both";
-      break;
-    default:
-      break;
-  }
-  mode_button_.setButtonText(text);
+  mode_button_.setButtonText(kLfoModeLabels[ToModeIndex(current_mode_)]);
 }
 
 void LfoComponent::SyncRateValueBox() {
