@@ -92,7 +92,7 @@ noiseSource (WhiteNoiseAudioSource)
   JUCE modules only when strictly necessary and update `CMakeLists.txt` accordingly.
 - Compile-time flags: `JUCE_WEB_BROWSER=0`, `JUCE_USE_CURL=0` — do not enable
   these unless a specific feature requires them.
-- JUCE version is pinned to **8.0.4** in `CMakeLists.txt`. Bump deliberately
+- JUCE version is pinned to **8.0.13** in `CMakeLists.txt`. Bump deliberately
   and update the comment when changing it.
 - Prefer `juce::Logger::writeToLog(...)` over `std::cout` for diagnostic output.
 
