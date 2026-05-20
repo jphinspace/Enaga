@@ -24,11 +24,11 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 # --- JUCE -----------------------------------------------------------------
 # JUCE handles the platform lifecycle for iOS, Android, macOS, Windows, Linux.
 # NOTE: Update to a JUCE release with first-class C++26 support when available;
-#       currently pinned to 8.0.4 (targets C++17 internally).
+#       currently pinned to 8.0.13 (targets C++17 internally).
 FetchContent_Declare(
     JUCE
     GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-    GIT_TAG        8.0.4          # keep pinned; bump deliberately
+    GIT_TAG        8.0.13         # keep pinned; bump deliberately
     GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(JUCE)
