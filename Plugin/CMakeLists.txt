@@ -75,6 +75,10 @@ target_compile_definitions(EnagaPlugin
     PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
+        # No VST2 version of this plugin has ever been released; disabling
+        # VST3_CAN_REPLACE_VST2 avoids a JUCE 8.0.13+ compile-time error about
+        # potential parameter-automation conflicts between VST2 and VST3.
+        JUCE_VST3_CAN_REPLACE_VST2=0
 )
 
 target_link_libraries(EnagaPlugin
