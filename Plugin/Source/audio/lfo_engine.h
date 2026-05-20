@@ -79,8 +79,8 @@ class LfoEngine final {
  private:
   std::atomic<float> rate_{0.1f};       // Hz; clamped to [0.01, 2.0]
   std::atomic<float> intensity_{0.0f};  // 0–100
-  std::atomic<int> mode_{0};            // cast to LfoMode; UI thread writes
-  double phase_{0.0};                   // radians; audio thread only
+  std::atomic<LfoMode> mode_{LfoMode::kDisabled};
+  double phase_{0.0};  // radians; audio thread only
 };
 
 #endif  // ENAGA_AUDIO_LFO_ENGINE_H_

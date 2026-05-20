@@ -13,10 +13,10 @@
 
 // NOTE(juce)  Replace #include with module imports once JUCE ships modules.
 
-#include <cassert>
+#include <array>
 #include <cmath>
-#include <cstdio>
-#include <vector>
+#include <print>
+#include <utility>
 
 #include "audio/noise_audio_source.h"
 
@@ -37,8 +37,8 @@ bool RunSmokeTest() {
   source.prepareToPlay(kSamplesPerBlock, kSampleRate);
 
   // Exercise all four noise types.
-  constexpr NoiseType kNoiseTypes[] = {NoiseType::kWhite, NoiseType::kPink,
-                                       NoiseType::kBrown, NoiseType::kGrey};
+  constexpr std::array kNoiseTypes = {NoiseType::kWhite, NoiseType::kPink,
+                                      NoiseType::kBrown, NoiseType::kGrey};
 
   juce::AudioBuffer<float> buffer(kNumChannels, kSamplesPerBlock);
 
@@ -56,11 +56,10 @@ bool RunSmokeTest() {
         const float* data = buffer.getReadPointer(ch);
         for (int i = 0; i < kSamplesPerBlock; ++i) {
           if (!std::isfinite(data[i])) {
-            std::fprintf(stderr,
-                         "FAIL: non-finite sample at NoiseType=%d "
-                         "ch=%d i=%d value=%f\n",
-                         static_cast<int>(type), ch, i,
-                         static_cast<double>(data[i]));
+            std::println(stderr,
+                         "FAIL: non-finite sample at NoiseType={} "
+                         "ch={} i={} value={}",
+                         std::to_underlying(type), ch, i, data[i]);
             return false;
           }
         }
@@ -71,7 +70,7 @@ bool RunSmokeTest() {
   }
 
   source.releaseResources();
-  std::puts("PASS: NoiseAudioSource smoke test");
+  std::println("PASS: NoiseAudioSource smoke test");
   return true;
 }
 

@@ -14,7 +14,7 @@ lifecycle, audio, and UI.
 |------|-----------------|-------|
 | [CMake](https://cmake.org/download/) | 3.22 | Provides `cmake --preset` |
 | [Git](https://git-scm.com/) | 2.x | Required by CMake's `FetchContent` |
-| C++23-capable compiler | see below | |
+| C++26-capable compiler | see below | |
 
 ### macOS / iOS
 | Tool | Notes |
@@ -31,9 +31,12 @@ lifecycle, audio, and UI.
 ### Linux
 | Tool | Install |
 |------|---------|
-| GCC 13+ or Clang 17+ | `sudo apt install gcc g++` / `sudo apt install clang` |
+| GCC 14+ or Clang 18+ | `sudo apt install gcc g++` / `sudo apt install clang` |
 | Ninja | `sudo apt install ninja-build` |
 | JUCE system dependencies | `sudo apt install libasound2-dev libx11-dev libxext-dev libxinerama-dev libxrandr-dev libxcursor-dev libfreetype6-dev libcurl4-openssl-dev` |
+
+If default distro packages are older, use toolchain repositories/packages that
+provide GCC 14+ or Clang 18+.
 
 ### Android
 | Tool | Notes |
@@ -125,12 +128,12 @@ open build/macos/Enaga.xcodeproj
 Use *File → Open → CMake…* and select the repository root. Visual Studio reads
 `CMakePresets.json` directly.
 
-### Bumping the C++ standard to C++26
+### C++ standard
 
-When compiler support is ready, change one line in `CMakeLists.txt`:
+This repository is standardized on C++26:
 
 ```cmake
-set(CMAKE_CXX_STANDARD 26)   # was 23
+set(CMAKE_CXX_STANDARD 26)
 ```
 
 ---

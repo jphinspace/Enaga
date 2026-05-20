@@ -6,7 +6,7 @@ constants) and include organisation.  This round applies the
 project issue.
 
 > **Exception:** Google mandates C++20 conformance; this project targets
-> C++23/26 and that requirement is unchanged.
+> C++26 and that requirement is unchanged.
 
 ---
 
@@ -18,7 +18,7 @@ The previous configuration was based on LLVM with Allman braces, 4-space
 indentation, and a 100-column limit.  All of these diverge from Google style.
 
 **Applied fix:** Replaced the full custom config with `BasedOnStyle: Google`
-plus `Standard: Latest` (clang-format 18 does not yet recognise `c++23` as a
+plus `Standard: Latest` (clang-format 18 does not yet recognise `c++26` as a
 literal; `Latest` selects the highest standard the tool understands).
 
 Google formatting gives:

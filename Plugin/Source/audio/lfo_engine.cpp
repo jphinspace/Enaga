@@ -20,8 +20,10 @@ float LfoEngine::Tick(int num_samples, double sample_rate) noexcept {
             static_cast<double>(num_samples) / sample_rate;
 
   // Keep phase in [0, 2π) to avoid precision loss.
-  while (phase_ >= juce::MathConstants<double>::twoPi)
-    phase_ -= juce::MathConstants<double>::twoPi;
+  // phase_ is always non-negative: Reset() sets it to 0.0 and Tick() only
+  // ever adds a positive step (rate_ > 0, num_samples > 0, sample_rate > 0),
+  // so std::fmod is guaranteed to return a value in [0, 2π).
+  phase_ = std::fmod(phase_, juce::MathConstants<double>::twoPi);
 
   return result;
 }
@@ -41,11 +43,11 @@ void LfoEngine::SetIntensity(float intensity) noexcept {
 }
 
 void LfoEngine::SetMode(LfoMode mode) noexcept {
-  mode_.store(static_cast<int>(mode), std::memory_order_relaxed);
+  mode_.store(mode, std::memory_order_relaxed);
 }
 
 LfoMode LfoEngine::GetMode() const noexcept {
-  return static_cast<LfoMode>(mode_.load(std::memory_order_relaxed));
+  return mode_.load(std::memory_order_relaxed);
 }
 
 float LfoEngine::GetIntensity() const noexcept {

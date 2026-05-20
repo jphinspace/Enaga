@@ -6,6 +6,8 @@
 #include "editor_actions.h"
 
 #include <algorithm>
+#include <array>
+#include <cstddef>
 
 void EnagaEditorActions::HandlePlayToggle(bool should_play) noexcept {
   if (should_play) {
@@ -26,8 +28,23 @@ void EnagaEditorActions::HandleGain(float gain) noexcept {
 
 void EnagaEditorActions::HandleNoiseTypeSelection(
     float selected_index) noexcept {
-  const int clamped_index = std::clamp(static_cast<int>(selected_index), 1, 4);
-  controls_.SetNoiseType(static_cast<NoiseType>(clamped_index - 1));
+  constexpr std::array kNoiseTypes = {
+      NoiseType::kWhite,
+      NoiseType::kPink,
+      NoiseType::kBrown,
+      NoiseType::kGrey,
+  };
+
+  // Slider positions are 1..N in the UI.
+  constexpr int kUiSelectionBase = 1;
+  constexpr int kMaxSelection =
+      kUiSelectionBase + static_cast<int>(kNoiseTypes.size()) - 1;
+
+  const int clamped_index = std::clamp(static_cast<int>(selected_index),
+                                       kUiSelectionBase, kMaxSelection);
+  const auto noise_type_index =
+      static_cast<std::size_t>(clamped_index - kUiSelectionBase);
+  controls_.SetNoiseType(kNoiseTypes[noise_type_index]);
 }
 
 void EnagaEditorActions::HandleLfoRate(float rate_hz) noexcept {

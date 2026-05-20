@@ -3,22 +3,22 @@
  * @brief  Entry point for processor/editor unit tests.
  */
 
-#include <cstdio>
+#include <print>
 
 bool RunProcessorCoreTests();
 bool RunEditorActionsTests();
 
 int main() {
   if (!RunProcessorCoreTests()) {
-    std::fprintf(stderr, "FAIL: processor core tests\n");
+    std::println(stderr, "FAIL: processor core tests");
     return 1;
   }
 
   if (!RunEditorActionsTests()) {
-    std::fprintf(stderr, "FAIL: editor actions tests\n");
+    std::println(stderr, "FAIL: editor actions tests");
     return 1;
   }
 
-  std::puts("PASS: processor/editor unit tests");
+  std::println("PASS: processor/editor unit tests");
   return 0;
 }
