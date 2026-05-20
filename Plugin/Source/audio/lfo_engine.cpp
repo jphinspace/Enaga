@@ -20,8 +20,7 @@ float LfoEngine::Tick(int num_samples, double sample_rate) noexcept {
             static_cast<double>(num_samples) / sample_rate;
 
   // Keep phase in [0, 2π) to avoid precision loss.
-  while (phase_ >= juce::MathConstants<double>::twoPi)
-    phase_ -= juce::MathConstants<double>::twoPi;
+  phase_ = std::fmod(phase_, juce::MathConstants<double>::twoPi);
 
   return result;
 }

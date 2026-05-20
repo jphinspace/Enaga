@@ -5,6 +5,8 @@
 
 #include "ui/enaga_look_and_feel.h"
 
+#include <ranges>
+
 EnagaLookAndFeel::EnagaLookAndFeel() {
   const auto bg = juce::Colour(kBackground);
   const auto panel = juce::Colour(kPanel);
@@ -58,8 +60,12 @@ void EnagaLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y,
   // Position ticks just below the slider track centre.
   const int tick_y = y + height / 2 + 5;
 
-  for (double v = lo; v <= hi + interval * 0.01; v += interval) {
-    const float proportion = static_cast<float>((v - lo) / span);
+  const int num_ticks = juce::roundToInt(span / interval) + 1;
+  for (const int i : std::views::iota(0, num_ticks)) {
+    const float proportion =
+        (num_ticks > 1)
+            ? static_cast<float>(i) / static_cast<float>(num_ticks - 1)
+            : 0.0f;
     const int tick_x =
         x + juce::roundToInt(proportion * static_cast<float>(width)) -
         tick_w / 2;
