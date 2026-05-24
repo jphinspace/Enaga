@@ -1,12 +1,21 @@
 # ---------------------------------------------------------------------------
-# EnagaPlugin — JUCE plugin target (VST3 / AU)
+# EnagaPlugin — JUCE plugin target (VST3 / AU / AUv3)
 #
 # Builds the Enaga noise generator as a standard audio plugin that can be
-# loaded in any VST3- or AU-compatible DAW on macOS, Windows, and Linux.
+# loaded in compatible DAWs/hosts on desktop and iOS.
 #
 # Standalone format is intentionally omitted; this repository builds plugin
 # formats only.
 # ---------------------------------------------------------------------------
+
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(ENAGA_PLUGIN_FORMATS AUv3)
+    set(ENAGA_IOS_ASSET_ARGS
+        CUSTOM_XCASSETS_FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/Resources/iOS/Assets.xcassets")
+else()
+    set(ENAGA_PLUGIN_FORMATS VST3 AU)
+    set(ENAGA_IOS_ASSET_ARGS)
+endif()
 
 juce_add_plugin(EnagaPlugin
     PRODUCT_NAME              "Enaga"
@@ -16,6 +25,7 @@ juce_add_plugin(EnagaPlugin
     COMPANY_EMAIL             ""
     VERSION                   "${PROJECT_VERSION}"
     DESCRIPTION               "Relaxing noise generator"
+    ${ENAGA_IOS_ASSET_ARGS}
 
     # Plugin type flags
     IS_SYNTH                  FALSE
@@ -27,8 +37,8 @@ juce_add_plugin(EnagaPlugin
     PLUGIN_MANUFACTURER_CODE  Jphs
     PLUGIN_CODE               Enag
 
-    # Build VST3 and AU plugin binaries.
-    FORMATS                   VST3 AU
+    # iOS hosts use AUv3; desktop builds keep the regular VST3/AU outputs.
+    FORMATS                   ${ENAGA_PLUGIN_FORMATS}
 
     # Category metadata
     VST3_CATEGORIES           "Fx"
@@ -96,6 +106,7 @@ target_link_libraries(EnagaPlugin
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     target_link_libraries(EnagaPlugin PRIVATE
         juce::juce_gui_extra
+        "-framework CoreAudioKit"
         "-framework MediaPlayer"
     )
 endif()

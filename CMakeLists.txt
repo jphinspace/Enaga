@@ -6,6 +6,10 @@ project(Enaga
     LANGUAGES    C CXX
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    enable_language(OBJCXX)
+endif()
+
 # ---------------------------------------------------------------------------
 # Dependencies via FetchContent
 # ---------------------------------------------------------------------------
@@ -33,8 +37,7 @@ include(CTest)
 add_subdirectory(tests)
 
 # ---------------------------------------------------------------------------
-# Component 1: Enaga VST/AU plugin
+# Component 1: Enaga plugin
 # ---------------------------------------------------------------------------
-# Source lives in Plugin/; builds VST3 and AU formats that can be loaded
-# in any compatible DAW.
-add_subdirectory(Plugin)
+# Source lives in Enaga/; builds VST3/AU on desktop and AUv3 on iOS.
+add_subdirectory(Enaga)

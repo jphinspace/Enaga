@@ -49,6 +49,26 @@
         },
 
         {
+            "name":        "macos-llvm",
+            "displayName": "macOS – Homebrew LLVM – Debug",
+            "description": "Desktop macOS build using Homebrew LLVM and Unix Makefiles.",
+            "inherits":    "base",
+            "generator":   "Unix Makefiles",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER":      "/opt/homebrew/opt/llvm/bin/clang",
+                "CMAKE_CXX_COMPILER":    "/opt/homebrew/opt/llvm/bin/clang++",
+                "CMAKE_OBJCXX_COMPILER": "/opt/homebrew/opt/llvm/bin/clang++",
+                "CMAKE_CXX_FLAGS":       "-Wno-enum-enum-conversion",
+                "CMAKE_OBJCXX_FLAGS":    "-Wno-enum-enum-conversion"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs":  "${hostSystemName}",
+                "rhs":  "Darwin"
+            }
+        },
+
+        {
             "name":        "windows",
             "displayName": "Windows – Visual Studio 2022 – Debug",
             "description": "Desktop Windows build using Visual Studio 2022.",
@@ -63,12 +83,13 @@
 
         {
             "name":        "ios",
-            "displayName": "iOS – Xcode – Debug",
-            "description": "iOS device / simulator build.  Must be configured on macOS.",
+            "displayName": "iOS AUv3 – Xcode – Debug",
+            "description": "iOS AUv3 device / simulator build.  Must be configured on macOS.",
             "inherits":    "base",
             "generator":   "Xcode",
             "cacheVariables": {
-                "CMAKE_SYSTEM_NAME": "iOS"
+                "CMAKE_SYSTEM_NAME": "iOS",
+                "CMAKE_OSX_DEPLOYMENT_TARGET": "15.0"
             },
             "condition": {
                 "type": "equals",
@@ -118,6 +139,26 @@
         },
 
         {
+            "name":        "macos-llvm-release",
+            "displayName": "macOS – Homebrew LLVM – Release",
+            "description": "Desktop macOS release build using Homebrew LLVM and Unix Makefiles.",
+            "inherits":    "base-release",
+            "generator":   "Unix Makefiles",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER":      "/opt/homebrew/opt/llvm/bin/clang",
+                "CMAKE_CXX_COMPILER":    "/opt/homebrew/opt/llvm/bin/clang++",
+                "CMAKE_OBJCXX_COMPILER": "/opt/homebrew/opt/llvm/bin/clang++",
+                "CMAKE_CXX_FLAGS":       "-Wno-enum-enum-conversion",
+                "CMAKE_OBJCXX_FLAGS":    "-Wno-enum-enum-conversion"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs":  "${hostSystemName}",
+                "rhs":  "Darwin"
+            }
+        },
+
+        {
             "name":        "windows-release",
             "displayName": "Windows – Visual Studio 2022 – Release",
             "description": "Desktop Windows release build using Visual Studio 2022.",
@@ -132,12 +173,13 @@
 
         {
             "name":        "ios-release",
-            "displayName": "iOS – Xcode – Release",
-            "description": "iOS device / simulator release build.  Must be configured on macOS.",
+            "displayName": "iOS AUv3 – Xcode – Release",
+            "description": "iOS AUv3 device / simulator release build.  Must be configured on macOS.",
             "inherits":    "base-release",
             "generator":   "Xcode",
             "cacheVariables": {
-                "CMAKE_SYSTEM_NAME": "iOS"
+                "CMAKE_SYSTEM_NAME": "iOS",
+                "CMAKE_OSX_DEPLOYMENT_TARGET": "15.0"
             },
             "condition": {
                 "type": "equals",
@@ -164,11 +206,13 @@
     "buildPresets": [
         { "name": "linux",            "configurePreset": "linux"            },
         { "name": "macos",            "configurePreset": "macos"            },
+        { "name": "macos-llvm",       "configurePreset": "macos-llvm"       },
         { "name": "windows",          "configurePreset": "windows"          },
         { "name": "ios",              "configurePreset": "ios"              },
         { "name": "android",          "configurePreset": "android"          },
         { "name": "linux-release",    "configurePreset": "linux-release"    },
         { "name": "macos-release",    "configurePreset": "macos-release"    },
+        { "name": "macos-llvm-release","configurePreset": "macos-llvm-release" },
         { "name": "windows-release",  "configurePreset": "windows-release"  },
         { "name": "ios-release",      "configurePreset": "ios-release"      },
         { "name": "android-release",  "configurePreset": "android-release"  }
