@@ -6,6 +6,8 @@
 #ifndef ENAGA_PLATFORM_IOS_VOLUME_VIEW_H_
 #define ENAGA_PLATFORM_IOS_VOLUME_VIEW_H_
 
+#include <juce_core/system/juce_TargetPlatform.h>
+
 #if JUCE_IOS
 
 #include <juce_gui_extra/juce_gui_extra.h>

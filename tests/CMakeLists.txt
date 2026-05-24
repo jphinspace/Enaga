@@ -15,17 +15,17 @@ enable_testing()
 
 add_executable(EnagaSmokeTest smoke_test.cpp
 
-    # Audio sources under test (now in Plugin/Source/ after refactoring)
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/noise_audio_source.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/lfo_engine.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/white_noise_generator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/pink_noise_generator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/brown_noise_generator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/grey_noise_generator.cpp
+    # Audio sources under test
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/noise_audio_source.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/lfo_engine.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/white_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/pink_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/brown_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/grey_noise_generator.cpp
 )
 
 target_include_directories(EnagaSmokeTest PRIVATE
-    ${CMAKE_SOURCE_DIR}/Plugin/Source
+    ${CMAKE_SOURCE_DIR}/Enaga/Source
 )
 
 target_compile_features(EnagaSmokeTest PRIVATE cxx_std_26)
@@ -52,18 +52,18 @@ add_executable(EnagaProcessorEditorUnitTest
     processor_editor_test_main.cpp
     processor_core_test.cpp
     editor_actions_test.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/processor_core.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/editor_actions.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/noise_audio_source.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/lfo_engine.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/white_noise_generator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/pink_noise_generator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/brown_noise_generator.cpp
-    ${CMAKE_SOURCE_DIR}/Plugin/Source/audio/generators/grey_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/processor_core.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/editor_actions.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/noise_audio_source.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/lfo_engine.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/white_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/pink_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/brown_noise_generator.cpp
+    ${CMAKE_SOURCE_DIR}/Enaga/Source/audio/generators/grey_noise_generator.cpp
 )
 
 target_include_directories(EnagaProcessorEditorUnitTest PRIVATE
-    ${CMAKE_SOURCE_DIR}/Plugin/Source
+    ${CMAKE_SOURCE_DIR}/Enaga/Source
 )
 
 target_compile_features(EnagaProcessorEditorUnitTest PRIVATE cxx_std_26)
