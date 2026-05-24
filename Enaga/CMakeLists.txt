@@ -9,7 +9,7 @@
 # ---------------------------------------------------------------------------
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    set(ENAGA_PLUGIN_FORMATS AUv3)
+    set(ENAGA_PLUGIN_FORMATS AUv3 Standalone)
     set(ENAGA_IOS_ASSET_ARGS
         CUSTOM_XCASSETS_FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/Resources/iOS/Assets.xcassets")
 else()
@@ -37,7 +37,8 @@ juce_add_plugin(EnagaPlugin
     PLUGIN_MANUFACTURER_CODE  Jphs
     PLUGIN_CODE               Enag
 
-    # iOS hosts use AUv3; desktop builds keep the regular VST3/AU outputs.
+    # iOS builds include a small standalone container app so the AUv3 can be
+    # installed on a device; desktop builds keep the regular VST3/AU outputs.
     FORMATS                   ${ENAGA_PLUGIN_FORMATS}
 
     # Category metadata
@@ -99,6 +100,7 @@ target_link_libraries(EnagaPlugin
         juce::juce_events            # MessageManager, Timer, …
         juce::juce_audio_basics      # AudioSource, AudioBuffer, …
         juce::juce_audio_devices     # AudioDeviceManager, AudioSourcePlayer, …
+        juce::juce_audio_utils       # Standalone plugin wrapper on iOS
 )
 
 # iOS-specific: UIViewComponent (hosts MPVolumeView) lives in juce_gui_extra;
