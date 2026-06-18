@@ -1,0 +1,9 @@
+<!-- Logo 09: White rounded square, very small dot eyes, tiny beak – ultra-minimal -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Small dot eyes -->
+  <circle cx="76" cy="98" r="6" fill="#1A1A1A"/>
+  <circle cx="124" cy="98" r="6" fill="#1A1A1A"/>
+  <!-- Tiny beak -->
+  <path d="M95 114 L100 122 L105 114Z" fill="#1A1A1A"/>
+</svg>

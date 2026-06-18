@@ -1,0 +1,11 @@
+<!-- Logo 21: White rounded square, eyes angled slightly (happy expression), beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Eyes slightly angled (happy) -->
+  <circle cx="74" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="77" cy="93" r="3" fill="#FFFFFF"/>
+  <circle cx="126" cy="96" r="10" fill="#1A1A1A"/>
+  <circle cx="123" cy="93" r="3" fill="#FFFFFF"/>
+  <!-- Beak -->
+  <path d="M93 116 L100 126 L107 116Z" fill="#1A1A1A"/>
+</svg>

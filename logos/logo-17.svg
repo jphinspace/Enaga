@@ -1,0 +1,9 @@
+<!-- Logo 17: White rounded square, closed crescent eyes (sleeping), small beak -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="48" fill="#FFFFFF"/>
+  <!-- Closed eyes (arc crescents) -->
+  <path d="M64 100 Q74 90 84 100" fill="none" stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M116 100 Q126 90 136 100" fill="none" stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Beak -->
+  <path d="M93 116 L100 128 L107 116Z" fill="#1A1A1A"/>
+</svg>
